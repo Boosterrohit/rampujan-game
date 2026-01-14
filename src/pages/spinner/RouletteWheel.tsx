@@ -23,7 +23,7 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ data, mustSpin, prizeNumb
       innerBorderColor="#f2f2f2"
       radiusLineColor="#dedede"
       radiusLineWidth={1}
-      fontSize={15}
+      fontSize={25}
       textColors={["#ffffff"]}
       backgroundColors={[
         "#F22B35",

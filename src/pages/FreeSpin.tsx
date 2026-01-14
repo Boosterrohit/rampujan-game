@@ -37,7 +37,7 @@ export default function FreeSpin() {
   const rewards = selectedCampaign?.rewards || []
 
   const wheelData = rewards.map(reward => ({
-    option: `${reward.reward}\n${reward.amount}`
+    option: reward.reward
   }))
 
   const rarityColors = {
@@ -57,14 +57,15 @@ export default function FreeSpin() {
       difficulty: "Easy",
       spinsRequired: 1,
       rewards: [
-        { reward: "Coins", amount: 100, rarity: "common", icon: Coins },
-        { reward: "Bonus", amount: 250, rarity: "rare", icon: Gift },
-        { reward: "Jackpot", amount: 500, rarity: "epic", icon: Trophy },
-        { reward: "Mega Win", amount: 1000, rarity: "legendary", icon: Crown },
-        { reward: "Coins", amount: 150, rarity: "common", icon: Coins },
-        { reward: "Lucky Draw", amount: 300, rarity: "rare", icon: Sparkles },
-        { reward: "Prize", amount: 200, rarity: "common", icon: Award },
-        { reward: "Treasure", amount: 750, rarity: "epic", icon: Target },
+        { reward: "5%", amount: 100, rarity: "common", icon: Coins },
+        { reward: "50%", amount: 250, rarity: "rare", icon: Gift },
+        { reward: "25%", amount: 500, rarity: "epic", icon: Trophy },
+        { reward: "70%", amount: 1000, rarity: "legendary", icon: Crown },
+        { reward: "60%", amount: 150, rarity: "common", icon: Coins },
+        { reward: "30%", amount: 300, rarity: "rare", icon: Sparkles },
+        { reward: "40%", amount: 200, rarity: "common", icon: Award },
+        { reward: "10%", amount: 750, rarity: "epic", icon: Target },
+        // { reward: "200%", amount: 750, rarity: "epic", icon: Target },
       ]
     },
     {
@@ -76,14 +77,14 @@ export default function FreeSpin() {
       difficulty: "Medium",
       spinsRequired: 3,
       rewards: [
-        { reward: "Diamond", amount: 50, rarity: "common", icon: Diamond },
-        { reward: "Gold Bar", amount: 200, rarity: "rare", icon: Trophy },
-        { reward: "VIP Pass", amount: 1, rarity: "epic", icon: Crown },
-        { reward: "Legendary Chest", amount: 1, rarity: "legendary", icon: Target },
-        { reward: "Diamond", amount: 75, rarity: "common", icon: Diamond },
-        { reward: "Mystery Box", amount: 150, rarity: "rare", icon: Sparkles },
-        { reward: "Bonus Spin", amount: 5, rarity: "common", icon: RotateCw },
-        { reward: "Epic Mount", amount: 1, rarity: "epic", icon: Award },
+        { reward: "80%", amount: 50, rarity: "common", icon: Diamond },
+        { reward: "20%", amount: 200, rarity: "rare", icon: Trophy },
+        { reward: "120%", amount: 1, rarity: "epic", icon: Crown },
+        { reward: "100%", amount: 1, rarity: "legendary", icon: Target },
+        { reward: "150%", amount: 75, rarity: "common", icon: Diamond },
+        { reward: "5%", amount: 150, rarity: "rare", icon: Sparkles },
+        { reward: "50%", amount: 5, rarity: "common", icon: RotateCw },
+        { reward: "25%", amount: 1, rarity: "epic", icon: Award },
       ]
     },
     {
@@ -95,14 +96,14 @@ export default function FreeSpin() {
       difficulty: "Hard",
       spinsRequired: 5,
       rewards: [
-        { reward: "Fire Crystal", amount: 25, rarity: "common", icon: Flame },
-        { reward: "Phoenix Feather", amount: 100, rarity: "rare", icon: Sparkles },
-        { reward: "Dragon Egg", amount: 1, rarity: "epic", icon: Target },
-        { reward: "Inferno Sword", amount: 1, rarity: "legendary", icon: Sword },
-        { reward: "Fire Crystal", amount: 50, rarity: "common", icon: Flame },
-        { reward: "Blaze Potion", amount: 75, rarity: "rare", icon: Trophy },
-        { reward: "Ember Shard", amount: 30, rarity: "common", icon: Award },
-        { reward: "Volcano Key", amount: 1, rarity: "epic", icon: Crown },
+        { reward: "70%", amount: 25, rarity: "common", icon: Flame },
+        { reward: "60%", amount: 100, rarity: "rare", icon: Sparkles },
+        { reward: "30%", amount: 1, rarity: "epic", icon: Target },
+        { reward: "40%", amount: 1, rarity: "legendary", icon: Sword },
+        { reward: "10%", amount: 50, rarity: "common", icon: Flame },
+        { reward: "80%", amount: 75, rarity: "rare", icon: Trophy },
+        { reward: "20%", amount: 30, rarity: "common", icon: Award },
+        { reward: "120%", amount: 1, rarity: "epic", icon: Crown },
       ]
     }
   ]
@@ -298,9 +299,9 @@ export default function FreeSpin() {
               onClick={handleSpin}
               disabled={isSpinning || !selectedCampaign}
               size="lg"
-              className="gap-3 px-10 py-6 text-xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl hover:shadow-primary/25 transition-all duration-300 transform hover:scale-105 border-2 border-primary"
+              className="gap-3 px-10 py-2 text-xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl hover:shadow-primary/25 transition-all duration-300 transform hover:scale-105 border-2 border-primary"
             >
-              <RotateCw className={`w-7 h-7 ${isSpinning ? "animate-spin" : ""}`} />
+              <RotateCw className={`w-7 h-7 ${isSpinning ? "animate-spin" : "hidden"}`} />
               {isSpinning ? "Spinning..." : selectedCampaign ? `SPIN` : "SELECT CAMPAIGN"}
               {!isSpinning && selectedCampaign && <Sparkles className="w-6 h-6" />}
             </Button>
@@ -324,8 +325,8 @@ export default function FreeSpin() {
                     <p className="text-primary text-sm uppercase tracking-widest font-bold drop-shadow-md">{lastReward.rarity}</p>
                     <Star className="w-5 h-5 text-primary fill-primary drop-shadow-lg" />
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground drop-shadow-lg">{lastReward.reward}</h3>
-                  <p className="text-4xl gradient-text font-bold drop-shadow-lg">+{lastReward.amount} Coins</p>
+                  <h3 className="text-4xl gradient-text font-bold drop-shadow-lg">{lastReward.reward}</h3>
+                  {/* <p className="text-4xl gradient-text font-bold drop-shadow-lg">+{lastReward.amount} Coins</p> */}
                   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Gift className="w-4 h-4" />
                     <span className="font-medium">🎰 Reward claimed successfully!</span>
