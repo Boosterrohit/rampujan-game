@@ -1,6 +1,7 @@
 "use client"
 
-import { Heart, Github, Twitter, Mail, Gamepad2 } from "lucide-react"
+import { Heart, Github, Twitter, Mail, Gamepad2, Facebook, Instagram, Send } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -51,19 +52,19 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/help-center" className="text-muted-foreground hover:text-primary transition-colors">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -77,21 +78,21 @@ export default function Footer() {
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                 aria-label="Twitter"
               >
-                <Twitter className="w-4 h-4" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a
                 href="#"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                 aria-label="GitHub"
               >
-                <Github className="w-4 h-4" />
+                <Instagram className="w-4 h-4" />
               </a>
               <a
                 href="#"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                 aria-label="Email"
               >
-                <Mail className="w-4 h-4" />
+                <Send className="w-4 h-4" />
               </a>
             </div>
           </div>

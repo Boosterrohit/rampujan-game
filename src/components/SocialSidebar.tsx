@@ -76,7 +76,7 @@ export default function SocialSidebar() {
     },
     {
       name: "Telegram",
-      icon: MessageSquare,
+      icon: Send,
       url: "https://telegram.org",
       color: "bg-blue-500 hover:bg-blue-600",
       hoverColor: "group-hover:bg-blue-500"

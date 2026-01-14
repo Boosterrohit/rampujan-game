@@ -7,6 +7,9 @@ import Home from "@/pages/Home"
 import Milestone from "@/pages/Milestone"
 import FreeSpin from "@/pages/FreeSpin"
 import PrizeChat from "@/pages/PrizeChat"
+import HelpCenter from "@/pages/HelpCenter"
+import TermsOfService from "@/pages/TermsOfService"
+import PrivacyPolicy from "@/pages/PrivacyPolicy"
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
             <Route path="/milestone" element={<Milestone />} />
             <Route path="/free-spin" element={<FreeSpin />} />
             <Route path="/prize-chat" element={<PrizeChat />} />
+            <Route path="/help-center" element={<HelpCenter />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
         </main>
         <SocialSidebar />
