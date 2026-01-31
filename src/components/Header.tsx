@@ -4,17 +4,12 @@ import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Menu, X, Moon, Sun, Gamepad2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import LoginForm from "@/components/LoginForm"
-import SignupForm from "@/components/SignupForm"
 import video1 from '../asset/video1.mp4'
 
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [signupOpen, setSignupOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("darkMode")
@@ -94,10 +89,10 @@ export default function Header() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden sm:flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
               Login
             </Button>
-            <Button variant="default" size="sm" onClick={() => setSignupOpen(true)}>
+            <Button variant="default" size="sm" onClick={() => navigate("/signup")}>
               Sign Up
             </Button>
           </div>
@@ -134,7 +129,7 @@ export default function Header() {
               size="sm"
               className="flex-1 bg-transparent"
               onClick={() => {
-                setLoginOpen(true)
+                navigate("/login")
                 setMobileOpen(false)
               }}
             >
@@ -145,7 +140,7 @@ export default function Header() {
               size="sm"
               className="flex-1"
               onClick={() => {
-                setSignupOpen(true)
+                navigate("/signup")
                 setMobileOpen(false)
               }}
             >
@@ -155,25 +150,6 @@ export default function Header() {
         </div>
       )}
 
-      {/* Login Dialog */}
-      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
-        <DialogContent className="w-full max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Welcome Back</DialogTitle>
-          </DialogHeader>
-          <LoginForm onSuccess={() => setLoginOpen(false)} />
-        </DialogContent>
-      </Dialog>
-
-      {/* Signup Dialog */}
-      <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
-        <DialogContent className="w-full max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Create Account</DialogTitle>
-          </DialogHeader>
-          <SignupForm onSuccess={() => setSignupOpen(false)} />
-        </DialogContent>
-      </Dialog>
     </header>
 
     {/* Video Banner for Home Page */}
