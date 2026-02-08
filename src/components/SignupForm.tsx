@@ -5,9 +5,10 @@ import type React from "react"
 import { useState } from "react"
 import { Mail, Lock, User, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { authService } from "@/services/authService"
 
 interface SignupFormProps {
-  onSuccess: () => void
+  onSuccess: (email: string) => void
 }
 
 export default function SignupForm({ onSuccess }: SignupFormProps) {
@@ -18,22 +19,57 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
+    // Validation
+    if (!username.trim()) {
+      setError("Username is required")
+      return
+    }
+
+    if (!email.trim()) {
+      setError("Email is required")
+      return
+    }
+
+    if (!password) {
+      setError("Password is required")
+      return
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
       return
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return
+    }
+
     setLoading(true)
 
-    setTimeout(() => {
+    try {
+      const response = await authService.register({
+        username,
+        email,
+        password,
+        confirmPassword,
+      })
+
+      // Set OTP session for 1 minute
+      authService.setOTPSession(email)
+
+      // Pass email to parent to show OTP verification
+      onSuccess(email)
+    } catch (err) {
+      const error = err as any
+      setError(error.message || "Registration failed. Please try again.")
+    } finally {
       setLoading(false)
-      alert(`Account created for ${username}`)
-      onSuccess()
-    }, 1500)
+    }
   }
 
   return (
@@ -51,6 +87,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             placeholder="your_username"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>
@@ -66,6 +103,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             placeholder="your@email.com"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>
@@ -81,6 +119,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             placeholder="••••••••"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>
@@ -96,6 +135,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             placeholder="••••••••"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>

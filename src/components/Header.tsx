@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Menu, X, Moon, Sun, Gamepad2 } from "lucide-react"
+import { Menu, X, Moon, Sun, Gamepad2, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/AuthContext"
+import { authService } from "@/services/authService"
 import video1 from '../asset/video1.mp4'
 
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, isLoggedIn, logout } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("darkMode")
@@ -50,6 +54,17 @@ export default function Header() {
     { label: "Prize Chat", path: "/prize-chat" },
   ]
 
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+    } catch (error) {
+      console.error("Logout failed:", error)
+    } finally {
+      logout()
+      navigate("/")
+    }
+  }
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -65,17 +80,19 @@ export default function Header() {
         </div>
 
         {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center gap-1">
-          {menuItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors duration-200"
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
+        {isLoggedIn && (
+          <nav className="hidden md:flex items-center gap-1">
+            {menuItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className="px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors duration-200"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        )}
 
         {/* Right Section */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -87,14 +104,49 @@ export default function Header() {
             {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth Section */}
           <div className="hidden sm:flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-            <Button variant="default" size="sm" onClick={() => navigate("/signup")}>
-              Sign Up
-            </Button>
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">{user?.username}</span>
+                </button>
+                
+                {/* User Dropdown Menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-card shadow-lg">
+                    <div className="px-4 py-3 border-b border-border">
+                      <p className="text-sm font-medium">{user?.username}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Wallet: ${user?.walletBalance || 0}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setUserMenuOpen(false)
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
+                  Login
+                </Button>
+                <Button variant="default" size="sm" onClick={() => navigate("/signup")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Trigger */}
@@ -111,42 +163,63 @@ export default function Header() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card p-4 space-y-2">
-          {menuItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => {
-                navigate(item.path)
-                setMobileOpen(false)
-              }}
-              className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
-            >
-              {item.label}
-            </button>
-          ))}
-          <div className="border-t border-border pt-2 mt-2 flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 bg-transparent"
-              onClick={() => {
-                navigate("/login")
-                setMobileOpen(false)
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="flex-1"
-              onClick={() => {
-                navigate("/signup")
-                setMobileOpen(false)
-              }}
-            >
-              Sign Up
-            </Button>
-          </div>
+          {isLoggedIn && (
+            <>
+              <div className="px-4 py-3 rounded-lg bg-muted mb-3">
+                <p className="text-sm font-medium">{user?.username}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
+                <p className="text-xs text-muted-foreground mt-1">Wallet: ${user?.walletBalance || 0}</p>
+              </div>
+              {menuItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    navigate(item.path)
+                    setMobileOpen(false)
+                  }}
+                  className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  handleLogout()
+                  setMobileOpen(false)
+                }}
+                className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200 flex items-center gap-2 text-accent"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </>
+          )}
+          {!isLoggedIn && (
+            <div className="border-t border-border pt-2 mt-2 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 bg-transparent"
+                onClick={() => {
+                  navigate("/login")
+                  setMobileOpen(false)
+                }}
+              >
+                Login
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  navigate("/signup")
+                  setMobileOpen(false)
+                }}
+              >
+                Sign Up
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -154,7 +227,7 @@ export default function Header() {
 
     {/* Video Banner for Home Page */}
     {isHomePage && (
-      <div className="relative w-full h-64 md:h-[68vh] overflow-hidden">
+      <div className="relative w-full h-64 md:h-[72vh] overflow-hidden">
         <video
           autoPlay
           muted
@@ -174,6 +247,25 @@ export default function Header() {
             <p className="text-xl md:text-2xl lg:text-3xl font-semibold opacity-95 video-text-shadow">
               Join thousands of players in our exciting gaming community
             </p>
+            {/* {!isLoggedIn && (
+              <div className="flex gap-3 justify-center">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate("/login")}
+                  className="bg-transparent border-white text-white hover:bg-white hover:text-black"
+                >
+                  Login
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/signup")}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )} */}
           </div>
         </div>
       </div>

@@ -5,6 +5,8 @@ import type React from "react"
 import { useState } from "react"
 import { Mail, Lock, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { authService } from "@/services/authService"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface LoginFormProps {
   onSuccess: () => void
@@ -14,20 +16,49 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const { login } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
+
+    if (!email.trim()) {
+      setError("Email is required")
+      return
+    }
+
+    if (!password) {
+      setError("Password is required")
+      return
+    }
+
     setLoading(true)
 
-    setTimeout(() => {
+    try {
+      const response = await authService.login({
+        email,
+        password,
+      })
+
+      if (response.success && response.data) {
+        login(response.data)
+        onSuccess()
+      } else {
+        setError(response.message || "Login failed")
+      }
+    } catch (err) {
+      const error = err as any
+      setError(error.message || "Login failed. Please try again.")
+    } finally {
       setLoading(false)
-      alert(`Logged in as ${email}`)
-      onSuccess()
-    }, 1500)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <div className="p-3 rounded-lg bg-accent/10 border border-accent text-accent text-sm">{error}</div>}
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Email</label>
         <div className="relative">
@@ -39,6 +70,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             placeholder="your@email.com"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>
@@ -54,6 +86,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             placeholder="••••••••"
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             required
+            disabled={loading}
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useNavigate } from "react-router-dom"
-import { Zap, Gift, TrendingUp, ShipWheel, Trophy, Star, Crown } from "lucide-react"
+import { Zap, Gift, TrendingUp, ShipWheel, Trophy, Star, Crown, User, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import panda from '../asset/panda.jpg';
@@ -225,7 +225,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       {/* Features Section */}
-      <section className="px-4 py-16 md:py-16">
+      <section className="px-4 py-16 md:py-14">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8">
             <h2 className="text-3xl md:text-4xl font-bold">Game Features</h2>
@@ -240,53 +240,15 @@ export default function Home() {
               Spin Now
             </Button>
             <Button variant="outline" size="lg" onClick={() => navigate("/milestone")} className="flex justify-center items-center h-10">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              View Progress
+              <Users className="w-5 h-5 mr-2" />
+              About Us
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="px-4 py-20 md:py-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold">Featured Sections</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Explore everything GamePro has to offer</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {features.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <Card
-                  key={feature.path}
-                  className="group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
-                        <Icon className="w-6 h-6 text-primary" />
-                      </div>
-                    </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-muted-foreground">{feature.description}</p>
-                    <Button variant="outline" className="w-full bg-transparent" onClick={() => navigate(feature.path)}>
-                      Explore
-                    </Button>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      
-       {/* MEGA WINNERS */}
-      <section className="px-4 py-20 md:py-32">
+         {/* MEGA WINNERS */}
+      <section className="px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl md:text-4xl font-bold">🏆 MEGA WINNERS</h2>
@@ -392,27 +354,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="px-4 py-20 md:py-32 bg-card/50 border-t border-b border-border">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { number: "1K+", label: "Active Players" },
-              { number: "$2M+", label: "Prizes Awarded" },
-              { number: "99.9%", label: "Uptime" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center space-y-2">
-                <p className="text-4xl md:text-5xl font-bold gradient-text">{stat.number}</p>
-                <p className="text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-     
 
-{/* Games Available Section */}
-      <section className="px-4 py-20 md:py-32 bg-gradient-to-br from-card/30 via-background to-card/20">
+
+      {/* Games Available Section */}
+      <section className="px-4 pb-20 pt-12 bg-gradient-to-br from-card/30 via-background to-card/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl md:text-5xl font-bold">🎮 Games Available</h2>
@@ -486,6 +431,71 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+     
+
+      
+    
+
+      {/* Stats Section */}
+      <section className="px-4 py-20 md:py-32 bg-card/50 border-t border-b border-border">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { number: "1K+", label: "Active Players" },
+              { number: "$2M+", label: "Prizes Awarded" },
+              { number: "99.9%", label: "Uptime" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center space-y-2">
+                <p className="text-4xl md:text-5xl font-bold gradient-text">{stat.number}</p>
+                <p className="text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+
+       {/* Features Section */}
+      <section className="px-4 py-20 md:pt-16 md:pb-32">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold">Featured Sections</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Explore everything GamePro has to offer</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {features.map((feature) => {
+              const Icon = feature.icon
+              return (
+                <Card
+                  key={feature.path}
+                  className="group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+                >
+                  <CardHeader>
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                    </div>
+                    <CardTitle>{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground">{feature.description}</p>
+                    <Button variant="outline" className="w-full bg-transparent" onClick={() => navigate(feature.path)}>
+                      Explore
+                    </Button>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+     
+
+
 
     </main>
   )

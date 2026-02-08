@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom"
+import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ScrollToTop from "@/components/ScrollToTop"
@@ -13,8 +14,20 @@ import HelpCenter from "@/pages/HelpCenter"
 import TermsOfService from "@/pages/TermsOfService"
 import PrivacyPolicy from "@/pages/PrivacyPolicy"
 
+// Protected route component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn } = useAuth()
+  
+  if (!isLoggedIn) {
+    return <Navigate to="/" replace />
+  }
+  
+  return <>{children}</>
+}
+
 function AppContent() {
   const location = useLocation()
+  const { isLoggedIn } = useAuth()
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup"
 
   return (
@@ -27,9 +40,34 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/milestone" element={<Milestone />} />
-            <Route path="/free-spin" element={<FreeSpin />} />
-            <Route path="/prize-chat" element={<PrizeChat />} />
+            
+            {/* Protected Routes - Only accessible if logged in */}
+            <Route
+              path="/milestone"
+              element={
+                <ProtectedRoute>
+                  <Milestone />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/free-spin"
+              element={
+                <ProtectedRoute>
+                  <FreeSpin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/prize-chat"
+              element={
+                <ProtectedRoute>
+                  <PrizeChat />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Public Routes */}
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -45,7 +83,9 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   )
 }
