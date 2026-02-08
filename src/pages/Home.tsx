@@ -200,7 +200,9 @@ export default function Home() {
           </div>
 
           {/* Mobile: 2 column grid, Desktop: 3 column grid */}
-         <MegaWinners/>
+         <div>
+          <MegaWinners/>
+         </div>
 
           {/* Call to Action */}
           <div className="text-center mt-4 md:mt-6">
