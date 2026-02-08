@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              This Privacy Policy explains how GamePro collects, uses, and protects your personal information.
+              This Privacy Policy explains how RowGaming collects, uses, and protects your personal information.
             </p>
           </CardContent>
         </Card>

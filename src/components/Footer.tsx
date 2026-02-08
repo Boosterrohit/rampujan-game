@@ -18,7 +18,7 @@ export default function Footer() {
                     <Gamepad2 className="w-5 h-5 text-white" />
                 </span>
               </div>
-              <span className="text-lg font-bold gradient-text">GamePro</span>
+              <span className="text-lg font-bold gradient-text">RowGaming</span>
             </div>
             <p className="text-muted-foreground text-sm">
               Experience the thrill of gaming with our exciting rewards and challenges.
@@ -101,7 +101,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} GamePro. All rights reserved.
+            © {currentYear} RowGaming. All rights reserved.
           </p>
           <p className="text-muted-foreground text-sm flex items-center gap-1">
             Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> for gamers

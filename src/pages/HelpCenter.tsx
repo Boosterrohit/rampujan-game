@@ -13,7 +13,7 @@ export default function HelpCenter() {
       icon: MessageCircle,
       title: "Getting Started",
       description: "Learn how to create your account and start playing",
-      content: "Welcome to GamePro! To get started, simply sign up for a free account and explore our exciting games. You can earn points, unlock milestones, and claim rewards through our various gaming challenges."
+      content: "Welcome to RowGaming! To get started, simply sign up for a free account and explore our exciting games. You can earn points, unlock milestones, and claim rewards through our various gaming challenges."
     },
     {
       icon: FileText,

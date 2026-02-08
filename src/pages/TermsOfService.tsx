@@ -12,7 +12,7 @@ export default function TermsOfService() {
     {
       icon: Users,
       title: "User Agreement",
-      content: "By accessing and using GamePro, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service."
+      content: "By accessing and using RowGaming, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service."
     },
     {
       icon: Shield,
@@ -27,7 +27,7 @@ export default function TermsOfService() {
     {
       icon: FileText,
       title: "Content and Intellectual Property",
-      content: "All content on GamePro, including games, graphics, and text, is owned by us or our licensors. You may not reproduce, distribute, or create derivative works without permission."
+      content: "All content on RowGaming, including games, graphics, and text, is owned by us or our licensors. You may not reproduce, distribute, or create derivative works without permission."
     }
   ]
 
@@ -53,7 +53,7 @@ export default function TermsOfService() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              These Terms of Service govern your use of GamePro and its services. Please read them carefully.
+              These Terms of Service govern your use of RowGaming and its services. Please read them carefully.
             </p>
           </CardContent>
         </Card>

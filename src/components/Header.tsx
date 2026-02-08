@@ -76,7 +76,7 @@ export default function Header() {
               <Gamepad2 className="w-7 h-7 text-white" />
             </span>
           </div>
-          <span className="hidden sm:inline text-lg font-bold gradient-text">GamePro</span>
+          <span className="hidden sm:inline text-lg font-bold gradient-text">RowGaming</span>
         </div>
 
         {/* Desktop Menu */}
