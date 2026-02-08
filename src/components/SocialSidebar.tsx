@@ -119,7 +119,7 @@ export default function SocialSidebar() {
             className="w-10 h-10 md:w-12 md:h-12 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-125 hover:shadow-xl border-l-4 border-white/20"
             title="Chat with Agent"
           >
-            <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
+            <MessageSquare className="w-4 h-4 md:w-6 md:h-6" />
           </button>
           {/* Tooltip */}
           <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">

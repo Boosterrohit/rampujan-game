@@ -49,7 +49,8 @@ export default function Header() {
 
   const allMenuItems = [
     { label: "Home", path: "/" },
-    { label: "Milestone", path: "/milestone" },
+    // { label: "Milestone", path: "/milestone" },
+    { label: "About Us", path: "/about-us" },
     { label: "Free Spin", path: "/free-spin" },
     { label: "Prize Chat", path: "/prize-chat" },
   ]
@@ -92,7 +93,11 @@ export default function Header() {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors duration-200"
+              className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
+                location.pathname === item.path
+                  ? "text-primary font-semibold"
+                  : "text-foreground hover:bg-muted"
+              }`}
             >
               {item.label}
             </button>
@@ -182,7 +187,11 @@ export default function Header() {
                     navigate(item.path)
                     setMobileOpen(false)
                   }}
-                  className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
+                  className={`block w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
+                    location.pathname === item.path
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "text-foreground hover:bg-muted"
+                  }`}
                 >
                   {item.label}
                 </button>
@@ -207,7 +216,11 @@ export default function Header() {
                     navigate(item.path)
                     setMobileOpen(false)
                   }}
-                  className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
+                  className={`block w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
+                    location.pathname === item.path
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "text-foreground hover:bg-muted"
+                  }`}
                 >
                   {item.label}
                 </button>

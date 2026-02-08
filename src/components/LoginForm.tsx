@@ -56,7 +56,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
       {error && <div className="p-3 rounded-lg bg-accent/10 border border-accent text-accent text-sm">{error}</div>}
 
       <div className="space-y-2">

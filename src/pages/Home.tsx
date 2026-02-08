@@ -184,7 +184,7 @@ export default function Home() {
     },
     {
       id: 9,
-      name: "777 River Sweeps Online Casino",
+      name: "777 River Sweeps",
       category: "Slots",
       icon: a777,
       players: "3.1K",
@@ -212,6 +212,7 @@ export default function Home() {
       players: "2.2K",
       prize: "$14K",
       color: "from-blue-600 to-indigo-600",
+      hot: true,
       bgImage: milky,
       slug: "https://milkywayapp.xyz/",
     },
@@ -232,7 +233,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
  {/* MEGA WINNERS */}
-      <section className="px-4 py-16">
+      <section className="px-4 py-16 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold">🏆 MEGA WINNERS</h2>
@@ -247,7 +248,7 @@ export default function Home() {
          </div>
 
           {/* Call to Action */}
-          <div className="text-center mt-4 md:mt-6">
+          <div className="text-center mt-8 md:mt-10">
             <p className="text-muted-foreground mb-2 md:mb-6 text-sm md:text-lg">
               Join thousands of winners and start your journey to victory!
             </p>
@@ -314,66 +315,44 @@ export default function Home() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {availableGames.slice(0, 14).map((game) => (
-              <Card
-                key={game.id}
-                className={`group relative overflow-hidden cursor-pointer transition-all duration-500 hover:scale-105 hover:shadow-2xl bg-gradient-to-br dark:from-black/20 dark:to-gray-900/20 from-white/30 to-gray-100/30 border-2 hover:border-${game.color.split("-")[1]}/50 backdrop-blur-sm`}
-                // onClick={() => navigate({ pathname: game.slug }, { target: "_blank" })}
-                // onClick={() => navigate(`/game/${game.slug}`)}
-              >
-                {/* Background Image */}
-                <div className="absolute inset-0">
-                  <div
-                    className="w-full h-full bg-cover bg-center dark:opacity-20 dark:group-hover:opacity-30 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
-                    style={{
-                      backgroundImage: `url('${game.bgImage}')`,
-                    }}
-                  ></div>
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br dark:from-black/30 dark:to-gray-900/30 from-white/40 to-gray-200/40`}
-                  ></div>
+              <Card key={game.id} className="group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col">
+                {/* Image / cover */}
+                <div className="relative w-full h-36 md:h-48">
+                  <img src={game.bgImage} alt={game.name} className="w-full h-full object-cover block" />
+                  <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:bg-black/40" />
+                  {game.hot && (
+                    <div className="absolute top-3 right-3 bg-green-400 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                      ⚡ HOT
+                    </div>
+                  )}
                 </div>
 
-                <CardContent className="relative p-3 md:p-6 text-center space-y-2 md:space-y-4">
-                  {/* Game Icon */}
-                  <div
-                    className={`w-12 h-12 md:w-20 md:h-20 overflow-hidden mx-auto rounded-full bg-gradient-to-br ${game.color} flex items-center justify-center text-2xl md:text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300 ring-2 md:ring-4 dark:ring-white/20 ring-black/20`}
-                  >
-                    {/* {game.icon} */}
-                    <img src={game.icon} alt="games" />
+                {/* Info bar */}
+                <div className="bg-black px-4 md:px-6 py-2 flex flex-col items-center gap-3">
+                  <h3 className="text-white text-center text-xs md:text-xl font-bold w-full">
+                    {game.name}
+                  </h3>
+
+                  <div className="w-full md:w-3/4">
+                    <div className="p-[2px] rounded-xl bg-gradient-to-r from-cyan-500 to-pink-500">
+                      <button
+                        onClick={() => {
+                          // if (isLoggedIn) {
+                          //   window.open(game.slug, "_blank");
+                          // } else {
+                          //   setDialogFeatureName(`play ${game.name}`);
+                          //   setShowLoginDialog(true);
+                          // }
+                          window.open(game.slug, "_blank");
+                        }}
+                        className="w-full rounded-lg py-2 text-xs md:text-sm bg-[#0b0b0b] text-white font-semibold flex items-center justify-center gap-2"
+                      >
+                        <Zap className="w-4 h-4" />
+                        PLAY NOW
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Game Name */}
-                  <div className="space-y-1 md:space-y-2">
-                    <h3 className="font-bold text-sm md:text-lg text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
-                      {game.name}
-                    </h3>
-                    {/* <p className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                      {game.category}
-                    </p> */}
-                  </div>
-
-                  {/* Play Button */}
-                  <Button
-                    size="sm"
-                    className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white font-semibold py-2 md:py-3 shadow-lg hover:shadow-xl transition-all duration-300 border-0 group-hover:scale-105 text-xs md:text-sm`}
-                    onClick={() => {
-                      if (isLoggedIn) {
-                        window.open(game.slug, "_blank");
-                      } else {
-                        setDialogFeatureName(`play ${game.name}`);
-                        setShowLoginDialog(true);
-                      }
-                    }}
-                  >
-                    <Zap className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Play Now
-                  </Button>
-                </CardContent>
-
-                {/* Decorative Corner */}
-                <div
-                  className={`absolute top-0 right-0 w-0 h-0 border-l-[15px] md:border-l-[20px] border-l-transparent border-t-[15px] md:border-t-[20px] border-t-${game.color.split("-")[1]}/30`}
-                ></div>
+                </div>
               </Card>
             ))}
           </div>

@@ -11,10 +11,11 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="imglogin min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="space-y-6">
           <div className="text-center space-y-2">
+             
             <h1 className="text-3xl font-bold">Welcome Back</h1>
             <p className="text-muted-foreground">
               Sign in to your account to continue
@@ -25,12 +26,12 @@ export default function Login() {
             <LoginForm onSuccess={handleSuccess} />
           </div>
 
-          <div className="text-center">
+          <div className="text-center bg-card py-2 rounded-md">
             <p className="text-muted-foreground">
               Don't have an account?{" "}
               <button
                 onClick={() => navigate("/signup")}
-                className="text-primary hover:underline font-medium"
+                className="text-primary underline font-medium"
               >
                 Sign up here
               </button>

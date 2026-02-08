@@ -129,3 +129,54 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
+ .slick-next:before,
+  .slick-prev:before {
+    font-size: 24px;
+    text-shadow:
+      0 0 6px #ff9800,
+      0 0 12px #ff9800,
+      0 0 20px #ff9800;
+  }
+
+@media (max-width: 640px) {
+  .slick-next:before,
+  .slick-prev:before {
+    text-shadow:
+      0 0 6px #ff9800,
+      0 0 12px #ff9800,
+      0 0 20px #ff9800;
+  }
+}
+.slick-dots li button:before, .slick-dots li.slick-active button:before, .slick-dots li.slick-active button:before{
+    text-shadow:
+      0 0 6px #ff9800,
+      0 0 12px #ff9800,
+      0 0 20px #ff9800;
+      color: orange !important;
+  
+}
+.imglogin{
+  background-image: url('/src/asset/whiteLogin.png') !important;
+  background-size: cover;
+  background-position: center 100%;
+  background-repeat: no-repeat;
+}
+
+.dark .imglogin{
+  background-image: url('/src/asset/login-bg.png') !important;
+  background-size: cover;
+  background-position: center 100%;
+  background-repeat: no-repeat;
+}
+
+/* Mobile backgrounds - Login & Register */
+@media (max-width: 768px) {
+  .imglogin{
+    background-image: url('/src/asset/mobileWhite.png') !important;
+  }
+
+  .dark .imglogin{
+    background-image: url('/src/asset/mobileBlack.png') !important;
+  }
+}

@@ -29,7 +29,7 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="imglogin min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="space-y-6">
           <div className="text-center space-y-2">
@@ -52,12 +52,12 @@ export default function Signup() {
           </div>
 
           {!showOTP && (
-            <div className="text-center">
+            <div className="text-center bg-card py-2 rounded-md">
               <p className="text-muted-foreground">
                 Already have an account?{" "}
                 <button
                   onClick={() => navigate("/login")}
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary underline font-bold"
                 >
                   Login here
                 </button>
