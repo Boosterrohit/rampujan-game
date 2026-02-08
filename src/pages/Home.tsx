@@ -250,38 +250,39 @@ export default function Home() {
          {/* MEGA WINNERS */}
       <section className="px-4 py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
+          <div className="text-center space-y-4 mb-8 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold">🏆 MEGA WINNERS</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto hidden md:block">
               Celebrating our biggest winners - Could you be next?
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* Mobile: Horizontal scroll, Desktop: 3 column grid */}
+          <div className="flex md:grid overflow-x-auto md:overflow-x-visible gap-4 pb-4 md:gap-8 md:pb-8 md:grid-cols-3 scrollbar-hide">
             {megaWinners.map((winner) => {
               const BadgeIcon = winner.badge
               return (
                 <Card
                   key={winner.id}
-                  className={`relative overflow-hidden border-2 bg-gradient-to-br ${winner.gradient}/10 hover:shadow-2xl hover:shadow-${winner.gradient.split('-')[1]}/20 transition-all duration-500 group cursor-pointer`}
+                  className={`relative overflow-hidden border-2 bg-gradient-to-br ${winner.gradient}/10 hover:shadow-2xl transition-all duration-500 group cursor-pointer flex-shrink-0 w-40 md:w-auto md:flex-shrink`}
                 >
                   {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-5">
+                  <div className="absolute inset-0 opacity-5 hidden md:block">
                     <div className="absolute top-4 right-4">
                       <BadgeIcon className="w-16 h-16 text-current" />
                     </div>
                   </div>
 
                   {/* Winner Badge */}
-                  <div className="absolute top-4 right-4 z-10">
+                  <div className="absolute top-4 right-4 z-10 hidden md:block">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${winner.gradient} flex items-center justify-center shadow-lg`}>
                       <BadgeIcon className="w-6 h-6 text-white" />
                     </div>
                   </div>
 
-                  <CardHeader className="text-center pb-4">
+                  <CardHeader className="text-center pb-2 p-3 md:p-4 md:pb-4">
                     {/* Avatar */}
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${winner.gradient} mx-auto mb-4 flex items-center justify-center shadow-lg ring-4 ring-white/20 overflow-hidden`}>
+                    <div className={`w-7 h-7 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${winner.gradient} mx-auto mb-2 md:mb-4 flex items-center justify-center shadow-lg ring-4 ring-white/20 overflow-hidden`}>
                       {winner.avatar.includes('.jpg') || winner.avatar.includes('.png') || winner.avatar.includes('.jpeg') ? (
                         <img 
                           src={winner.avatar} 
@@ -289,49 +290,51 @@ export default function Home() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-2xl font-bold text-white">{winner.avatar}</span>
+                        <span className="text-xs md:text-2xl font-bold text-white">{winner.avatar}</span>
                       )}
                     </div>
 
                     {/* Winner Name */}
-                    <CardTitle className="text-xl font-bold text-center">
+                    <CardTitle className="text-xs md:text-xl font-bold text-center line-clamp-2">
                       {winner.name}
                     </CardTitle>
 
-                    {/* Prize Title */}
-                    <p className={`text-sm font-semibold bg-gradient-to-r ${winner.gradient} bg-clip-text text-transparent uppercase tracking-wider`}>
+                    {/* Prize Title - Desktop Only */}
+                    <p className={`text-xs md:text-sm md:font-semibold bg-gradient-to-r ${winner.gradient} bg-clip-text text-transparent uppercase tracking-wider`}>
                       {winner.prize}
                     </p>
                   </CardHeader>
 
-                  <CardContent className="text-center space-y-4">
+                  <CardContent className="text-center space-y-1 md:space-y-4 p-3 md:p-4 pt-0">
                     {/* Prize Amount */}
-                    <div className="space-y-2">
-                      <p className="text-3xl md:text-4xl font-black gradient-text">
-                        {winner.amount}
-                      </p>
+                    <p className="text-sm md:text-4xl font-black gradient-text -mt-3">
+                      {winner.amount}
+                    </p>
+
+                    {/* Extra content - Desktop only */}
+                    <div className="hidden md:block space-y-4">
                       <p className="text-sm text-muted-foreground uppercase tracking-wide">
                         Won in {winner.game}
                       </p>
-                    </div>
 
-                    {/* Game Badge */}
-                    <div className="flex justify-center">
-                      <div className="px-4 pb-2 bg-card/80 rounded-full border border-border/50">
-                        <span className="text-xs font-medium text-muted-foreground">
-                          🎮 {winner.game}
-                        </span>
+                      {/* Game Badge */}
+                      <div className="flex justify-center">
+                        <div className="px-4 pb-2 bg-card/80 rounded-full border border-border/50">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            🎮 {winner.game}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* CTA Button */}
-                    <Button
-                      className={`w-full bg-gradient-to-r ${winner.gradient} hover:opacity-90 text-white border-0 shadow-lg group-hover:shadow-xl transition-all duration-300`}
-                      onClick={() => navigate("/free-spin")}
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      Try Your Luck
-                    </Button>
+                      {/* CTA Button */}
+                      <Button
+                        className={`w-full bg-gradient-to-r ${winner.gradient} hover:opacity-90 text-white border-0 shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                        onClick={() => navigate("/free-spin")}
+                      >
+                        <Zap className="w-4 h-4 mr-2" />
+                        Try Your Luck
+                      </Button>
+                    </div>
                   </CardContent>
 
                   {/* Decorative Elements */}
