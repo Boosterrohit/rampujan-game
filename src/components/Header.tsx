@@ -47,12 +47,19 @@ export default function Header() {
 
   const isHomePage = location.pathname === "/"
 
-  const menuItems = [
+  const allMenuItems = [
     { label: "Home", path: "/" },
     { label: "Milestone", path: "/milestone" },
     { label: "Free Spin", path: "/free-spin" },
     { label: "Prize Chat", path: "/prize-chat" },
   ]
+
+  const publicMenuItems = [
+    { label: "Home", path: "/" },
+    { label: "About Us", path: "/about-us" },
+  ]
+
+  const menuItems = isLoggedIn ? allMenuItems : publicMenuItems
 
   const handleLogout = async () => {
     try {
@@ -80,19 +87,17 @@ export default function Header() {
         </div>
 
         {/* Desktop Menu */}
-        {isLoggedIn && (
-          <nav className="hidden md:flex items-center gap-1">
-            {menuItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors duration-200"
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        )}
+        <nav className="hidden md:flex items-center gap-1">
+          {menuItems.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors duration-200"
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
 
         {/* Right Section */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -163,7 +168,7 @@ export default function Header() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card p-4 space-y-2">
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <>
               <div className="px-4 py-3 rounded-lg bg-muted mb-3">
                 <p className="text-sm font-medium">{user?.username}</p>
@@ -193,32 +198,45 @@ export default function Header() {
                 Logout
               </button>
             </>
-          )}
-          {!isLoggedIn && (
-            <div className="border-t border-border pt-2 mt-2 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 bg-transparent"
-                onClick={() => {
-                  navigate("/login")
-                  setMobileOpen(false)
-                }}
-              >
-                Login
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                className="flex-1"
-                onClick={() => {
-                  navigate("/signup")
-                  setMobileOpen(false)
-                }}
-              >
-                Sign Up
-              </Button>
-            </div>
+          ) : (
+            <>
+              {menuItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    navigate(item.path)
+                    setMobileOpen(false)
+                  }}
+                  className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors duration-200"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <div className="border-t border-border pt-2 mt-2 flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 bg-transparent"
+                  onClick={() => {
+                    navigate("/login")
+                    setMobileOpen(false)
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    navigate("/signup")
+                    setMobileOpen(false)
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </div>
+            </>
           )}
         </div>
       )}

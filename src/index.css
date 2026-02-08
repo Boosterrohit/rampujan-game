@@ -88,3 +88,44 @@
     );
   }
 }
+
+.bgimg{
+  background-image: url('/src/asset/aboutus.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.bgimage{
+  background-image: url('/src/asset/sss.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  }
+  .bgimge{
+  background-image: url('/src/asset/rr.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scaleX(-1);
+  }
+  50% {
+    transform: translateY(-20px) scaleX(-1);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.backimg{
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.386), rgba(0, 0, 0, 0.5)), /* black overlay with 50% opacity */
+    url('/src/asset/coin.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

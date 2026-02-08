@@ -10,6 +10,7 @@ import Signup from "@/pages/Signup"
 import Milestone from "@/pages/Milestone"
 import FreeSpin from "@/pages/FreeSpin"
 import PrizeChat from "@/pages/PrizeChat"
+import AboutUs from "@/pages/AboutUs"
 import HelpCenter from "@/pages/HelpCenter"
 import TermsOfService from "@/pages/TermsOfService"
 import PrivacyPolicy from "@/pages/PrivacyPolicy"
@@ -68,6 +69,7 @@ function AppContent() {
             />
             
             {/* Public Routes */}
+            <Route path="/about-us" element={<AboutUs />} />
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
