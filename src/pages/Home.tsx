@@ -29,6 +29,21 @@ import vegas from "../asset/vegas.jpg";
 import milky from "../asset/milkyway.jpg";
 import orion from "../asset/orion.jpg";
 import juwa2 from "../asset/juwa2.jpg";
+import vegasSweeps from "../asset/vegassweeps.jpg";
+import fb1 from "../asset/fb1.jpg";
+import fb2 from "../asset/fb2.png";
+import cashFrenzy from "../asset/CashFrenzy.png";
+import fortuneNexus from "../asset/FortuneNexus.png";
+import funStation from "../asset/FunStation1.png";
+import goldenTreasure from "../asset/GoldenTreasure.png";
+import hofoo from "../asset/Hofoo.png";
+import kingOfPop from "../asset/KingOfPop.png";
+import luckyStars from "../asset/LuckyStars.png";
+import mafia from "../asset/Mafia.png";
+import maio from "../asset/MAIO.png";
+import pandaMaster from "../asset/PandaMaster.png";
+import winnerClub from "../asset/WinnerClub.png";
+import winstar from "../asset/winstar.png";
 import MegaWinners from "@/components/MegaWinner";
 import SliderBanner from "@/components/SliderBanner";
 export default function Home() {
@@ -36,6 +51,7 @@ export default function Home() {
   const { isLoggedIn } = useAuth();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [dialogFeatureName, setDialogFeatureName] = useState("this feature");
+  const [activeTab, setActiveTab] = useState("all");
 
   const handleFreeSpin = () => {
     if (!isLoggedIn) {
@@ -105,7 +121,8 @@ export default function Home() {
       color: "from-red-500 to-pink-500",
       bgImage: panda,
       slug: "https://www.ultrapanda.mobi/",
-        borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 2,
@@ -118,6 +135,7 @@ export default function Home() {
       bgImage: fire,
       slug: "https://www.firekirin.mobi/",
       borderColor: "border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 3,
@@ -129,7 +147,8 @@ export default function Home() {
       color: "from-yellow-500 to-orange-500",
       bgImage: gameroom,
       slug: "https://www.gameroom777.com/",
-       borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 4,
@@ -142,6 +161,7 @@ export default function Home() {
       bgImage: vblink,
       slug: "https://www.vblink777.club/",
       borderColor: "border-blue-400 shadow-[0_0_15px_rgba(52,152,219,0.5)]",
+      type: ["all","new"],
     },
     {
       id: 5,
@@ -154,6 +174,7 @@ export default function Home() {
       bgImage: yolo,
       slug: "https://h5.yolo777.top/YOLO/",
       borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]",
+      type: ["all","hot"],
     },
     {
       id: 6,
@@ -165,7 +186,8 @@ export default function Home() {
       color: "from-red-600 to-red-800",
       bgImage: valut,
       slug: "https://gamevault.download/",
-      borderColor: "border-red-600 shadow-[0_0_15px_rgba(185,28,28,0.5)]"
+      borderColor: "border-red-600 shadow-[0_0_15px_rgba(185,28,28,0.5)]",
+      type: ["all", "hot"],
     },
     {
       id: 7,
@@ -177,7 +199,8 @@ export default function Home() {
       color: "from-gray-700 to-gray-900",
       bgImage: juwa,
       slug: "https://dl.juwa777.com/?fbclid=IwY2xjawFtFvZleHRuA2FlbQIxMAABHWaygnEZ03842WW0UPnpbLBvrrDeM0VGWCXmkQMvpm6jioyCs1jJB70ZqA_aem_2jIRv6mHNu0HMx5wefr0Kw",
-    borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]"
+      borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 8,
@@ -189,7 +212,8 @@ export default function Home() {
       color: "from-pink-500 to-rose-500",
       bgImage: juwa2,
       slug: "https://m.juwa2.com/",
-      borderColor: "border-blue-800 shadow-[0_0_15px_rgba(52,152,219,0.5)]"
+      borderColor: "border-blue-800 shadow-[0_0_15px_rgba(52,152,219,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 9,
@@ -201,7 +225,8 @@ export default function Home() {
       color: "from-yellow-400 to-orange-500",
       bgImage: a777,
       slug: "https://river777.net/",
-      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]"
+      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 10,
@@ -213,7 +238,8 @@ export default function Home() {
       color: "from-purple-600 to-pink-600",
       bgImage: vegas,
       slug: "https://www.vegas-x.org/",
-      borderColor: "border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+      borderColor: "border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]",
+      type: ["all", "popular"],
     },
     {
       id: 11,
@@ -226,7 +252,8 @@ export default function Home() {
       hot: true,
       bgImage: milky,
       slug: "https://milkywayapp.xyz/",
-       borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "hot"],
     },
     {
       id: 12,
@@ -238,7 +265,192 @@ export default function Home() {
       color: "from-cyan-500 to-blue-500",
       bgImage: orion,
       slug: "https://start.orionstars.vip:8888/index.html",
-      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]"
+      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]",
+      type: ["all", "popular"],
+    },
+    // New Games
+    {
+      id: 13,
+      name: "Cash Frenzy",
+      category: "Slots",
+      icon: cashFrenzy,
+      players: "2.8K",
+      prize: "$22K",
+      color: "from-emerald-500 to-teal-500",
+      bgImage: cashFrenzy,
+      slug: "https://www.cashfrenzy777.com/",
+      borderColor: "border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 14,
+      name: "Fortune Nexus",
+      category: "Casino",
+      icon: fortuneNexus,
+      players: "1.5K",
+      prize: "$16K",
+      color: "from-indigo-500 to-purple-500",
+      bgImage: fortuneNexus,
+      slug: "https://www.fortunenexus.vip/",
+      borderColor: "border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 15,
+      name: "Fun Station",
+      category: "Arcade",
+      icon: funStation,
+      players: "3.2K",
+      prize: "$28K",
+      color: "from-rose-500 to-red-500",
+      bgImage: funStation,
+      slug: "https://www.funstation.site/",
+      borderColor: "border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 16,
+      name: "Golden Treasure",
+      category: "Slots",
+      icon: goldenTreasure,
+      players: "2.0K",
+      prize: "$20K",
+      color: "from-yellow-500 to-amber-500",
+      bgImage: goldenTreasure,
+      slug: "https://www.goldentreasure.mobi/",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 17,
+      name: "Hofoo",
+      category: "Cards",
+      icon: hofoo,
+      players: "1.1K",
+      prize: "$7K",
+      color: "from-blue-500 to-purple-500",
+      bgImage: hofoo,
+      slug: "https://game.hofoo.top/web-mobile/",
+      borderColor: "border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 18,
+      name: "King Of Pop",
+      category: "Slots",
+      icon: kingOfPop,
+      players: "2.7K",
+      prize: "$19K",
+      color: "from-pink-500 to-purple-500",
+      bgImage: kingOfPop,
+      slug: "https://www.slots88888.com/",
+      borderColor: "border-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 19,
+      name: "Lucky Stars",
+      category: "Casino",
+      icon: luckyStars,
+      players: "2.4K",
+      prize: "$17K",
+      color: "from-violet-500 to-purple-500",
+      bgImage: luckyStars,
+      slug: "https://luckystars.mobi/",
+      borderColor: "border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 20,
+      name: "Mafia",
+      category: "Adventure",
+      icon: mafia,
+      players: "1.6K",
+      prize: "$11K",
+      color: "from-gray-600 to-black",
+      bgImage: mafia,
+      slug: "https://www.mafia77777.com/",
+      borderColor: "border-gray-600 shadow-[0_0_15px_rgba(75,85,99,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 21,
+      name: "MAIO",
+      category: "Dice",
+      icon: maio,
+      players: "1.9K",
+      prize: "$13K",
+      color: "from-orange-500 to-red-500",
+      bgImage: maio,
+      slug: "https://www.mrallinone777.com/",
+      borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 22,
+      name: "Panda Master",
+      category: "Slots",
+      icon: pandaMaster,
+      players: "3.0K",
+      prize: "$26K",
+      color: "from-black to-gray-700",
+      bgImage: pandaMaster,
+      slug: "https://pandamaster.vip:8888/index.html",
+      borderColor: "border-black shadow-[0_0_15px_rgba(31,41,55,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 23,
+      name: "Winner Club",
+      category: "Casino",
+      icon: winnerClub,
+      players: "2.6K",
+      prize: "$21K",
+      color: "from-amber-500 to-yellow-500",
+      bgImage: winnerClub,
+      slug: "https://www.winnersclub777.com/",
+      borderColor: "border-amber-400 shadow-[0_0_15px_rgba(217,119,6,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 24,
+      name: "Winstar",
+      category: "Slots",
+      icon: winstar,
+      players: "2.9K",
+      prize: "$24K",
+      color: "from-cyan-500 to-blue-500",
+      bgImage: winstar,
+      slug: "http://server.winstar99999.com:8009/",
+      borderColor: "border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]",
+      type: ["all", "hot"],
+    },
+    // Facebook Tab Games
+    {
+      id: 25,
+      name: "Sophie Cliffton",
+      category: "Facebook",
+      icon: fb1,
+      players: "5.2K",
+      prize: "$35K",
+      color: "from-blue-600 to-blue-800",
+      bgImage: fb1,
+      slug: "https://www.facebook.com/sophie.cliffton?rdid=bQPsNmXcPPpEV35z&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DDrATbLTx%2F#",
+      borderColor: "border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.5)]",
+      type: ["facebook"],
+    },
+    {
+      id: 26,
+      name: "Jackpot Zone",
+      category: "Facebook",
+      icon: fb2,
+      players: "4.8K",
+      prize: "$32K",
+      color: "from-blue-700 to-indigo-600",
+      bgImage: fb2,
+      slug: "https://www.facebook.com/people/Jackpot-Zone/61581237008726/?rdid=YFSQXc0UL3ChZuoM&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CAsMQKRys%2F",
+      borderColor: "border-green-700 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["facebook"],
     },
   ];
 
@@ -417,56 +629,78 @@ drop-shadow-[0_0_4px_#b593ff]
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {availableGames.slice(0, 14).map((game) => (
-              <Card
-                key={game.id}
-                // className="group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col"
-              className={`group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col transition-all duration-300 hover:scale-105 ${game.borderColor}`}
+          {/* Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {["all", "new", "hot", "popular", "facebook"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base ${
+                  activeTab === tab
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                    : "bg-card/50 text-foreground hover:bg-card border border-border"
+                }`}
               >
-                {/* Image / cover */}
-                <div className="relative w-full h-36 md:h-48">
-                  <img
-                    src={game.bgImage}
-                    alt={game.name}
-                    className="w-full h-full object-cover block"
-                  />
-                  <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:bg-black/40" />
-                  {/* {game.hot && (
-                    <div className="absolute top-3 right-3 bg-green-400 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                      ⚡ HOT
-                    </div>
-                  )} */}
-                </div>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
 
-                {/* Info bar */}
-                <div className="bg-black px-4 md:px-6 py-2 flex flex-col items-center gap-3">
-                  <h3 className="text-white text-center text-xs md:text-xl font-bold w-full">
-                    {game.name}
-                  </h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {availableGames
+              .filter((game) => game.type.includes(activeTab))
+              .map((game) => (
+                <Card
+                  key={game.id}
+                  className={`group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col transition-all duration-300 hover:scale-105 ${game.borderColor}`}
+                >
+                  {/* Image / cover */}
+                  <div className="relative w-full h-36 md:h-48">
+                    <img
+                      src={game.bgImage}
+                      alt={game.name}
+                      className="w-full h-full object-cover block"
+                    />
+                    <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:bg-black/40" />
+                    {game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        🔥 HOT
+                      </div>
+                    )}
+                    {game.type.includes("new") && !game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        ⭐ NEW
+                      </div>
+                    )}
+                    {game.type.includes("popular") && !game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        🌟 POPULAR
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="w-full md:w-3/4">
-                    <div className="p-[2px] rounded-xl bg-gradient-to-r from-cyan-500 to-pink-500">
-                      <button
-                        onClick={() => {
-                          // if (isLoggedIn) {
-                          //   window.open(game.slug, "_blank");
-                          // } else {
-                          //   setDialogFeatureName(`play ${game.name}`);
-                          //   setShowLoginDialog(true);
-                          // }
-                          window.open(game.slug, "_blank");
-                        }}
-                        className="w-full rounded-lg py-2 text-xs md:text-sm bg-[#0b0b0b] text-white font-semibold flex items-center justify-center gap-2"
-                      >
-                        <Zap className="w-4 h-4" />
-                        PLAY NOW
-                      </button>
+                  {/* Info bar */}
+                  <div className="bg-black px-4 md:px-6 py-2 flex flex-col items-center gap-3">
+                    <h3 className="text-white text-center text-xs md:text-xl font-bold w-full">
+                      {game.name}
+                    </h3>
+
+                    <div className="w-full md:w-3/4">
+                      <div className="p-[2px] rounded-xl bg-gradient-to-r from-cyan-500 to-pink-500">
+                        <button
+                          onClick={() => {
+                            window.open(game.slug, "_blank");
+                          }}
+                          className="w-full rounded-lg py-2 text-xs md:text-sm bg-[#0b0b0b] text-white font-semibold flex items-center justify-center gap-2"
+                        >
+                          <Zap className="w-4 h-4" />
+                          PLAY NOW
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
           </div>
 
           {/* Load More / View All */}
@@ -474,22 +708,18 @@ drop-shadow-[0_0_4px_#b593ff]
             <p className="text-muted-foreground mb-6">
               And many more games waiting for you!
             </p>
-            {/* <Button size="lg" variant="outline" onClick={handleFreeSpin}>
-              <Zap className="w-5 h-5 mr-2" />
-              Start Playing Now
-            </Button> */}
             <div className="flex justify-center">
               <div className=" rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
-              <Button
-                variant="default"
-                size="sm"
-                className="w-full md:w-44 rounded-lg bg-background text-foreground shadow-none border-none flex justify-center items-center h-9"
-                onClick={handleFreeSpin}
-              >
-                <Zap className="w-5 h-5 mr-2" />
-                Start Playing Now
-              </Button>
-            </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="w-full md:w-44 rounded-lg bg-background text-foreground shadow-none border-none flex justify-center items-center h-9"
+                  onClick={handleFreeSpin}
+                >
+                  <Zap className="w-5 h-5 mr-2" />
+                  Start Playing Now
+                </Button>
+              </div>
             </div>
           </div>
         </div>

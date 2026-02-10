@@ -115,9 +115,10 @@ export default function Footer() {
             <div className="flex gap-4">
               {/* Facebook Button */}
               <a
-                href="#"
+                href="https://www.facebook.com/share/1DDrATbLTx/"
                 className="p-2 rounded-lg bg-[#1877f2] hover:bg-[#1877f2]/80 transition-colors"
                 aria-label="Facebook"
+                target="_blank"
               >
                 <Facebook className="w-4 h-4 text-white" />
               </a>

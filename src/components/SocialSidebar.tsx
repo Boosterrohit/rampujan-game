@@ -63,7 +63,7 @@ export default function SocialSidebar() {
     {
       name: "Facebook",
       icon: Facebook,
-      url: "https://facebook.com",
+      url: "https://www.facebook.com/share/1DDrATbLTx/",
       color: "bg-blue-600 hover:bg-blue-700",
       hoverColor: "group-hover:bg-blue-600"
     },
