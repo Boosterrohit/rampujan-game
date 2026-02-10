@@ -30,6 +30,7 @@ import milky from "../asset/milkyway.jpg";
 import orion from "../asset/orion.jpg";
 import juwa2 from "../asset/juwa2.jpg";
 import MegaWinners from "@/components/MegaWinner";
+import SliderBanner from "@/components/SliderBanner";
 export default function Home() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
@@ -73,25 +74,25 @@ export default function Home() {
   };
 
   const features = [
-  {
-    icon: Zap,
-    title: "Free Spin Every 24 Hours",
-    description: "Spin the wheel once every 24 hours and win exciting prizes",
-    path: "/free-spin",
-  },
-  {
-    icon: Gift,
-    title: "Chat with Agent",
-    description: "Connect with our support agents anytime for assistance",
-    path: "/prize-chat",
-  },
-  {
-    icon: TrendingUp,
-    title: "Win Real Money",
-    description: "Play games and win real cash prizes instantly",
-    path: "/games",
-  },
-]
+    {
+      icon: Zap,
+      title: "Free Spin Every 24 Hours",
+      description: "Spin the wheel once every 24 hours and win exciting prizes",
+      path: "/free-spin",
+    },
+    {
+      icon: Gift,
+      title: "Chat with Agent",
+      description: "Connect with our support agents anytime for assistance",
+      path: "/prize-chat",
+    },
+    {
+      icon: TrendingUp,
+      title: "Win Real Money",
+      description: "Play games and win real cash prizes instantly",
+      path: "/games",
+    },
+  ];
 
   const availableGames = [
     {
@@ -104,6 +105,7 @@ export default function Home() {
       color: "from-red-500 to-pink-500",
       bgImage: panda,
       slug: "https://www.ultrapanda.mobi/",
+        borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
     },
     {
       id: 2,
@@ -115,6 +117,7 @@ export default function Home() {
       color: "from-blue-500 to-cyan-500",
       bgImage: fire,
       slug: "https://www.firekirin.mobi/",
+      borderColor: "border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.5)]",
     },
     {
       id: 3,
@@ -126,6 +129,7 @@ export default function Home() {
       color: "from-yellow-500 to-orange-500",
       bgImage: gameroom,
       slug: "https://www.gameroom777.com/",
+       borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
     },
     {
       id: 4,
@@ -137,6 +141,7 @@ export default function Home() {
       color: "from-purple-500 to-indigo-500",
       bgImage: vblink,
       slug: "https://www.vblink777.club/",
+      borderColor: "border-blue-400 shadow-[0_0_15px_rgba(52,152,219,0.5)]",
     },
     {
       id: 5,
@@ -148,6 +153,7 @@ export default function Home() {
       color: "from-green-500 to-teal-500",
       bgImage: yolo,
       slug: "https://h5.yolo777.top/YOLO/",
+      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]",
     },
     {
       id: 6,
@@ -159,6 +165,7 @@ export default function Home() {
       color: "from-red-600 to-red-800",
       bgImage: valut,
       slug: "https://gamevault.download/",
+      borderColor: "border-red-600 shadow-[0_0_15px_rgba(185,28,28,0.5)]"
     },
     {
       id: 7,
@@ -170,6 +177,7 @@ export default function Home() {
       color: "from-gray-700 to-gray-900",
       bgImage: juwa,
       slug: "https://dl.juwa777.com/?fbclid=IwY2xjawFtFvZleHRuA2FlbQIxMAABHWaygnEZ03842WW0UPnpbLBvrrDeM0VGWCXmkQMvpm6jioyCs1jJB70ZqA_aem_2jIRv6mHNu0HMx5wefr0Kw",
+    borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]"
     },
     {
       id: 8,
@@ -181,6 +189,7 @@ export default function Home() {
       color: "from-pink-500 to-rose-500",
       bgImage: juwa2,
       slug: "https://m.juwa2.com/",
+      borderColor: "border-blue-800 shadow-[0_0_15px_rgba(52,152,219,0.5)]"
     },
     {
       id: 9,
@@ -192,6 +201,7 @@ export default function Home() {
       color: "from-yellow-400 to-orange-500",
       bgImage: a777,
       slug: "https://river777.net/",
+      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]"
     },
     {
       id: 10,
@@ -203,6 +213,7 @@ export default function Home() {
       color: "from-purple-600 to-pink-600",
       bgImage: vegas,
       slug: "https://www.vegas-x.org/",
+      borderColor: "border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]"
     },
     {
       id: 11,
@@ -215,6 +226,7 @@ export default function Home() {
       hot: true,
       bgImage: milky,
       slug: "https://milkywayapp.xyz/",
+       borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
     },
     {
       id: 12,
@@ -226,26 +238,51 @@ export default function Home() {
       color: "from-cyan-500 to-blue-500",
       bgImage: orion,
       slug: "https://start.orionstars.vip:8888/index.html",
+      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]"
     },
-   
   ];
 
   return (
     <main className="min-h-screen bg-background">
- {/* MEGA WINNERS */}
+      {/* MEGA WINNERS */}
       <section className="px-4 py-16 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold">🏆 MEGA WINNERS</h2>
+            <h2 className="text-3xl md:text-4xl font-bold ">
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+                🏆
+              </span>{" "}
+              <span
+                className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500
+  "
+              >
+                MEGA WINNERS
+              </span>
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+                🏆
+              </span>
+            </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto hidden md:block">
               Celebrating our biggest winners - Could you be next?
             </p>
           </div>
 
           {/* Mobile: 2 column grid, Desktop: 3 column grid */}
-         <div>
-          <MegaWinners/>
-         </div>
+          <div>
+            <MegaWinners />
+          </div>
 
           {/* Call to Action */}
           <div className="text-center mt-8 md:mt-10">
@@ -255,7 +292,10 @@ export default function Home() {
             <Button
               size="lg"
               onClick={handleFreeSpin}
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 h-12"
+              className=" hover:opacity-90 h-12 mt-2  bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white"
             >
               <ShipWheel className="w-5 h-5 mr-2" />
               Start Playing Now
@@ -264,12 +304,36 @@ export default function Home() {
         </div>
       </section>
 
-
       {/* Features Section */}
       <section className="px-4 py-14 my-5 border-t border-border border-b bg-card/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold">Game Features</h2>
+            <h2 className="text-3xl md:text-4xl font-bold ">
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+                🔥
+              </span>
+              <span
+                className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500
+  "
+              >
+                Game Features
+              </span>
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+                🔥
+              </span>
+            </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Discover all the exciting features we offer to enhance your gaming
               experience
@@ -280,12 +344,15 @@ export default function Home() {
             <Button
               size="lg"
               onClick={handleFreeSpin}
-              className="flex justify-center items-center h-10"
+              className="flex justify-center items-center h-10 hover:opacity-90 bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white"
             >
               <ShipWheel className="w-5 h-5 mr-2" />
               Spin Now
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               size="lg"
               onClick={() => navigate("/about-us")}
@@ -293,19 +360,56 @@ export default function Home() {
             >
               <Users className="w-5 h-5 mr-2" />
               About Us
-            </Button>
+            </Button> */}
+            <div className=" rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full md:w-40 rounded-lg bg-background text-foreground shadow-none border-none flex justify-center items-center h-9"
+                onClick={() => navigate("/about-us")}
+              >
+                <Users className="w-5 h-5 mr-2" />
+                About Us
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
-     
+
+{/* banner */}
+
 
       {/* Games Available Section */}
       <section className="px-4 pb-20 pt-12 bg-gradient-to-br from-card/30 via-background to-card/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-10">
-            <h2 className="text-3xl md:text-5xl font-bold">
-              🎮 Games Available
+            <h2 className="text-3xl md:text-4xl font-bold ">
+              <span
+                className="
+    text-[#583888]
+  drop-shadow-[0_0_3px_#9c78e0]  
+drop-shadow-[0_0_4px_#b593ff] 
+"
+              >
+                🎮
+              </span>
+              <span
+                className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500
+  "
+              >
+                Game Avaliable
+              </span>
+
+              <span
+                className="
+    text-[#583888]
+  drop-shadow-[0_0_3px_#9c78e0]  
+drop-shadow-[0_0_4px_#b593ff] 
+"
+              >
+                🎮
+              </span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Discover our collection of exciting games. Each game offers unique
@@ -315,16 +419,24 @@ export default function Home() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {availableGames.slice(0, 14).map((game) => (
-              <Card key={game.id} className="group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col">
+              <Card
+                key={game.id}
+                // className="group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col"
+              className={`group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col transition-all duration-300 hover:scale-105 ${game.borderColor}`}
+              >
                 {/* Image / cover */}
                 <div className="relative w-full h-36 md:h-48">
-                  <img src={game.bgImage} alt={game.name} className="w-full h-full object-cover block" />
+                  <img
+                    src={game.bgImage}
+                    alt={game.name}
+                    className="w-full h-full object-cover block"
+                  />
                   <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:bg-black/40" />
-                  {game.hot && (
+                  {/* {game.hot && (
                     <div className="absolute top-3 right-3 bg-green-400 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                       ⚡ HOT
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 {/* Info bar */}
@@ -362,18 +474,29 @@ export default function Home() {
             <p className="text-muted-foreground mb-6">
               And many more games waiting for you!
             </p>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleFreeSpin}
-            >
+            {/* <Button size="lg" variant="outline" onClick={handleFreeSpin}>
               <Zap className="w-5 h-5 mr-2" />
               Start Playing Now
-            </Button>
+            </Button> */}
+            <div className="flex justify-center">
+              <div className=" rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full md:w-44 rounded-lg bg-background text-foreground shadow-none border-none flex justify-center items-center h-9"
+                onClick={handleFreeSpin}
+              >
+                <Zap className="w-5 h-5 mr-2" />
+                Start Playing Now
+              </Button>
+            </div>
+            </div>
           </div>
         </div>
       </section>
-
+{/* <section className="px-4 pb-20 md:pb-32 md:pt-5">
+  <SliderBanner/>
+</section> */}
       {/* Stats Section */}
       <section className="px-4 py-20 md:py-32 bg-card/50 border-t border-b border-border">
         <div className="max-w-6xl mx-auto">
@@ -384,7 +507,7 @@ export default function Home() {
               { number: "99.9%", label: "Uptime" },
             ].map((stat) => (
               <div key={stat.label} className="text-center space-y-2">
-                <p className="text-4xl md:text-5xl font-bold gradient-text">
+                <p className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
                   {stat.number}
                 </p>
                 <p className="text-muted-foreground">{stat.label}</p>
@@ -395,7 +518,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="px-4 py-20 md:pt-16 md:pb-32">
+      {/* <section className="px-4 py-20 md:pt-16 md:pb-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl md:text-4xl font-bold">
@@ -432,7 +555,114 @@ export default function Home() {
             })}
           </div>
         </div>
-      </section>
+      </section> */}
+
+
+      {/* Features Section */}
+<section className="px-4 py-20 md:pt-16 md:pb-32">
+  <div className="max-w-6xl mx-auto">
+    <div className="text-center space-y-4 mb-16">
+       <h2 className="text-3xl md:text-4xl font-bold ">
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+               ⭐
+              </span>
+              <span
+                className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500
+  "
+              >
+                Featured
+              </span>
+              <span
+                className="
+    text-yellow-400
+  drop-shadow-[0px_0_2px_#facc15]
+  drop-shadow-[0px_0_3px_#fde047]
+"
+              >
+               ⭐
+              </span>
+            </h2>
+      <p className="text-muted-foreground max-w-2xl mx-auto">
+        Explore everything RowGaming has to offer
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-6">
+      {/* Card 1 - Welcome Bonus */}
+      <div className="relative group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-orange-500/20 via-pink-500/20 to-purple-900/40 backdrop-blur-sm border border-orange-500/30 hover:border-orange-500/60 transition-all duration-300 p-6 md:p-8">
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/50">
+          <Gift className="w-8 h-8 text-white" />
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+          Chat with Agent
+        </h3>
+
+        {/* Description */}
+        <p className="text-gray-300 text-sm md:text-base ">
+          Connect with our support agents anytime for assistance
+        </p>
+
+      </div>
+
+      {/* Card 2 - Free Spins */}
+      <div className="relative group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-900/40 backdrop-blur-sm border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 p-6 md:p-8">
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/50">
+          <Zap className="w-8 h-8 text-white" />
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+          Free Spin Every 24 Hours
+        </h3>
+
+        {/* Description */}
+        <p className="text-gray-300 text-sm md:text-base ">
+          Spin the wheel once every 24 hours and win exciting prizes
+        </p>
+
+       
+      </div>
+
+      {/* Card 3 - Cashback */}
+      <div className="relative group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-purple-900/40 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-500/60 transition-all duration-300 p-6 md:p-8">
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/50">
+          <TrendingUp className="w-8 h-8 text-white" />
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+          Win Real Money
+        </h3>
+
+        {/* Description */}
+        <p className="text-gray-300 text-sm md:text-base">
+          Play games and win real cash prizes instantly
+        </p>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Login Required Dialog */}
       <LoginRequiredDialog

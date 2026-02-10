@@ -26,7 +26,7 @@ export default function MegaWinners() {
   const megaWinners = [
     {
       id: 1,
-      name: "Rampujan Bhadwa",
+      name: "Rampujan",
       prize: "Jackpot Winner",
       amount: "$50,000",
       game: "Mega Spin",
@@ -152,7 +152,7 @@ export default function MegaWinners() {
 
             <CardContent className="text-center space-y-1 md:space-y-4 p-3 md:p-4 pt-0">
               {/* Prize Amount */}
-              <p className="text-sm md:text-4xl font-black gradient-text -mt-3">
+              <p className="text-sm md:text-4xl font-black gradient-text -mt-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
                 {winner.amount}
               </p>
 

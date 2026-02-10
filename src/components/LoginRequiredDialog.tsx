@@ -33,13 +33,15 @@ export default function LoginRequiredDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Login Required</DialogTitle>
-          <p className="text-sm text-muted-foreground">To access {featureName}, you need to be logged in</p>
+          <p className="text-sm text-muted-foreground">
+            To access {featureName}, you need to be logged in
+          </p>
         </DialogHeader>
 
         <div className="flex flex-col gap-6 py-4">
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <LogIn className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center mx-auto">
+              <LogIn className="w-8 h-8 text-white" />
             </div>
             <p className="text-foreground font-medium">
               You're almost there! Please log in to continue.
@@ -50,16 +52,28 @@ export default function LoginRequiredDialog({
           </div>
 
           <div className="flex gap-3">
-            <Button
+            {/* <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 "
             >
               Close
-            </Button>
+            </Button> */}
+            <div className="flex-1 w-full rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500 hover:bg-transparent">
+              <Button
+                // variant="outline"
+                onClick={onClose}
+                className="w-full rounded-lg bg-background text-foreground shadow-none border-none hover:border-none"
+              >
+                Cancel
+              </Button>
+            </div>
             <Button
               onClick={handleLogin}
-              className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+              className="flex-1  hover:opacity-90  bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white"
             >
               <LogIn className="w-4 h-4 mr-2" />
               Go to Login

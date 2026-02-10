@@ -54,17 +54,17 @@ function AppContent() {
             <Route
               path="/free-spin"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <FreeSpin />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             <Route
               path="/prize-chat"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <PrizeChat />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             

@@ -1,7 +1,8 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Gift, MessageCircle, Clock } from "lucide-react"
+import { Gift, MessageCircle, Clock, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -75,6 +76,51 @@ export default function PrizeChat() {
     { id: 6, name: "Legendary Badge", coins: 3000, points: "3000 pts", time: "3 days" },
   ]
 
+  const prizeColorSchemes = [
+    {
+      bg: "bg-gradient-to-br from-orange-500/20 via-pink-500/20 to-purple-900/40",
+      border: "border-orange-500/30 hover:border-orange-500/60",
+      iconBg: "bg-gradient-to-br from-yellow-400 to-orange-500",
+      iconShadow: "shadow-orange-500/50",
+      glow: "from-orange-500/10"
+    },
+    {
+      bg: "bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-900/40",
+      border: "border-purple-500/30 hover:border-purple-500/60",
+      iconBg: "bg-gradient-to-br from-pink-400 to-purple-500",
+      iconShadow: "shadow-purple-500/50",
+      glow: "from-purple-500/10"
+    },
+    {
+      bg: "bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-purple-900/40",
+      border: "border-cyan-500/30 hover:border-cyan-500/60",
+      iconBg: "bg-gradient-to-br from-cyan-400 to-blue-500",
+      iconShadow: "shadow-cyan-500/50",
+      glow: "from-cyan-500/10"
+    },
+    {
+      bg: "bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-purple-900/40",
+      border: "border-green-500/30 hover:border-green-500/60",
+      iconBg: "bg-gradient-to-br from-green-400 to-emerald-500",
+      iconShadow: "shadow-green-500/50",
+      glow: "from-green-500/10"
+    },
+    {
+      bg: "bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-purple-900/40",
+      border: "border-pink-500/30 hover:border-pink-500/60",
+      iconBg: "bg-gradient-to-br from-pink-400 to-rose-500",
+      iconShadow: "shadow-pink-500/50",
+      glow: "from-pink-500/10"
+    },
+    {
+      bg: "bg-gradient-to-br from-yellow-500/20 via-orange-500/20 to-purple-900/40",
+      border: "border-yellow-500/30 hover:border-yellow-500/60",
+      iconBg: "bg-gradient-to-br from-yellow-400 to-orange-500",
+      iconShadow: "shadow-yellow-500/50",
+      glow: "from-yellow-500/10"
+    }
+  ]
+
   const handleOptionClick = (option: MessageOption) => {
     const time = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
 
@@ -119,99 +165,175 @@ export default function PrizeChat() {
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-8 h-full flex flex-col">
+    <main className=" overflow-hidden bg-background">
+      <div className="max-w-7xl mx-auto px-4 py-8 h-full flex flex-col">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-4xl font-bold flex items-center gap-3">
             <MessageCircle className="w-10 h-10 text-primary" />
-            Prize Chat
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+              Prize Chat
+            </span>
           </h1>
           <p className="text-muted-foreground">Chat, claim, and track your prizes</p>
         </div>
 
         {/* Points */}
-        <Card className="mb-6">
-          <CardContent className="p-4 flex justify-between items-center">
+        <div className="relative group rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-900/40 backdrop-blur-sm border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 p-6 mb-6">
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <div className="flex justify-between items-center relative z-10">
             <div>
-              <p className="text-sm text-muted-foreground">Available Coins</p>
-              <p className="text-2xl font-bold">{userPoints.toLocaleString()}</p>
+              <p className="text-sm text-gray-300 mb-1">Available Coins</p>
+              <p className="text-3xl font-bold text-white">{userPoints.toLocaleString()}</p>
             </div>
-            <Gift className="w-8 h-8 text-primary opacity-50" />
-          </CardContent>
-        </Card>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+              <Gift className="w-7 h-7 text-white" />
+            </div>
+          </div>
+        </div>
 
         {/* Main */}
-        <div className="flex-1 grid lg:grid-cols-3 gap-6 overflow-hidden">
+        <div className="flex-1 h-screen grid lg:grid-cols-3 gap-6 overflow-hidden">
           {/* Chat */}
-          <div className="lg:col-span-2 flex flex-col border rounded-lg overflow-hidden">
+          <div className="h-[100vh] lg:col-span-2 flex flex-col border-2 border-primary/20 rounded-2xl overflow-hidden bg-card/50">
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-6 space-y-4"
+              className="flex-1 overflow-y-auto p-6 space-y-6"
             >
               {messages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-xs px-4 py-3 rounded-lg ${
-                      msg.sender === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-none"
-                        : "bg-muted rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm">{msg.message}</p>
-                    {msg.prize && (
-                      <div className="mt-2 pt-2 border-t flex items-center gap-1 text-xs">
-                        <Gift className="w-4 h-4" />
-                        {msg.prize}
+                <div key={msg.id} className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                  {/* Agent Avatar */}
+                  {msg.sender === "system" && (
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+                      <Bot className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+
+                  {/* Message Bubble */}
+                  <div className="max-w-[70%]">
+                    {msg.sender === "system" ? (
+                      // Agent Message - Dark style
+                      <div className="relative group rounded-2xl overflow-hidden bg-gradient-to-br from-gray-700/90 via-gray-800/90 to-gray-900/90 backdrop-blur-sm border border-gray-600/30 p-4">
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <div className="relative z-10">
+                          <p className="text-sm text-white leading-relaxed">{msg.message}</p>
+                          {msg.prize && (
+                            <div className="mt-3 pt-3 border-t border-gray-600/50 flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                                <Gift className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="text-xs font-semibold text-yellow-400">{msg.prize}</span>
+                            </div>
+                          )}
+                          <p className="text-xs text-gray-400 mt-2">{msg.timestamp}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      // User Message - Gradient style
+                      <div className="relative group rounded-2xl overflow-hidden bg-gradient-to-br from-orange-500/80 via-yellow-500/80 to-orange-600/80 backdrop-blur-sm p-4 shadow-lg">
+                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <div className="relative z-10">
+                          <p className="text-sm text-white font-medium leading-relaxed">{msg.message}</p>
+                          <p className="text-xs text-white/80 mt-2 text-right">{msg.timestamp}</p>
+                        </div>
                       </div>
                     )}
-                    <p className="text-xs opacity-60 mt-1">{msg.timestamp}</p>
                   </div>
+
+                  {/* User Avatar */}
+                  {msg.sender === "user" && (
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/50">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
             {/* Quick Actions */}
-            <div className="border-t p-4 grid grid-cols-2 gap-2">
-              {messageOptions.map((option) => (
-                <Button
-                  key={option.id}
-                  onClick={() => handleOptionClick(option)}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                >
-                  {option.text}
-                </Button>
-              ))}
+            <div className="border-t border-primary/20 p-4 bg-card/30">
+              <p className="text-xs text-muted-foreground mb-3 font-semibold">Quick Actions</p>
+              <div className="grid grid-cols-2 gap-2">
+                {messageOptions.map((option) => (
+                  <Button
+                    key={option.id}
+                    onClick={() => handleOptionClick(option)}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs hover:bg-primary/10 hover:border-primary/50 transition-all"
+                  >
+                    {option.text}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Prizes */}
-          <div className="overflow-y-auto">
-            <h3 className="font-bold mb-4">Available Prizes</h3>
-            <div className="space-y-3">
-              {availablePrizes.map((prize) => (
-                <Card key={prize.id} className={userPoints < prize.coins ? "opacity-50" : ""}>
-                  <CardContent className="p-4">
-                    <p className="font-semibold text-sm">{prize.name}</p>
-                    <p className="text-xs text-muted-foreground">{prize.points}</p>
-                    <div className="flex items-center gap-1 text-xs mt-1">
-                      <Clock className="w-3 h-3" />
-                      {prize.time}
+          <div className="overflow-y-auto pr-2 h-[100vh]">
+            <h3 className="font-bold text-xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+              Available Prizes
+            </h3>
+            <div className="space-y-4">
+              {availablePrizes.map((prize, index) => {
+                const scheme = prizeColorSchemes[index % prizeColorSchemes.length]
+                const canAfford = userPoints >= prize.coins
+                
+                return (
+                  <div 
+                    key={prize.id} 
+                    className={`relative group rounded-2xl overflow-hidden ${scheme.bg} backdrop-blur-sm border ${scheme.border} transition-all duration-300 p-4 ${!canAfford ? 'opacity-50' : ''}`}
+                  >
+                    {/* Glow effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${scheme.glow} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${scheme.iconBg} flex items-center justify-center shadow-lg ${scheme.iconShadow}`}>
+                          <Gift className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-white text-sm mb-1">{prize.name}</p>
+                          <p className="text-xs text-gray-300">{prize.points}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
+                        <Clock className="w-3 h-3" />
+                        <span>{prize.time}</span>
+                      </div>
+                      
+                      {/* <Button
+                        size="sm"
+                        className="w-full text-xs font-semibold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
+                        disabled={!canAfford}
+                        onClick={() => handleClaimPrize(prize)}
+                      >
+                        {canAfford ? "Claim Prize" : `Need ${prize.coins - userPoints} more`}
+                      </Button> */}
+                       <Button
+                    variant="default"
+                    size="sm"
+                    disabled={!canAfford}
+                    onClick={() => handleClaimPrize(prize)}
+                    className=" w-full text-xs font-semibold
+              bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white
+                "
+                  >
+                    {canAfford ? "Claim Prize" : `Need ${prize.coins - userPoints} more`}
+                  </Button>
                     </div>
-                    <Button
-                      size="sm"
-                      className="w-full mt-3 text-xs"
-                      disabled={userPoints < prize.coins}
-                      onClick={() => handleClaimPrize(prize)}
-                    >
-                      {userPoints < prize.coins ? "Not Enough" : "Claim"}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
