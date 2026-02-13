@@ -14,6 +14,7 @@ import AboutUs from "@/pages/AboutUs"
 import HelpCenter from "@/pages/HelpCenter"
 import TermsOfService from "@/pages/TermsOfService"
 import PrivacyPolicy from "@/pages/PrivacyPolicy"
+import ForgotPassword from "@/pages/ForgotPassword"
 
 // Protected route component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -29,7 +30,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppContent() {
   const location = useLocation()
   const { isLoggedIn } = useAuth()
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup"
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password"
 
   return (
     <>
@@ -41,6 +42,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Protected Routes - Only accessible if logged in */}
             <Route

@@ -17,6 +17,7 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [timeRemaining, setTimeRemaining] = useState(60)
+  const [resendLoading, setResendLoading] = useState(false)
 
   // Countdown timer
   useEffect(() => {
@@ -31,6 +32,26 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
 
     return () => clearInterval(timer)
   }, [email])
+
+  const handleResendOtp = async () => {
+    if (!email) return
+
+    setError("")
+    setResendLoading(true)
+
+    try {
+      // reset OTP session timer to 60s
+      authService.setOTPSession(email)
+      setTimeRemaining(60)
+
+      await authService.resendOtp({ email })
+    } catch (err) {
+      const error = err as any
+      setError(error.message || "Failed to resend OTP. Please try again.")
+    } finally {
+      setResendLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,12 +113,6 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
           </div>
         )}
 
-        {isSessionExpired && (
-          <div className="p-3 rounded-lg bg-warning/10 border border-warning text-warning text-sm">
-            OTP session expired. Please sign up again.
-          </div>
-        )}
-
         <div className="space-y-2">
           <label className="text-sm font-medium">Enter OTP</label>
           <div className="relative">
@@ -113,15 +128,33 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
               disabled={isSessionExpired}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            {timeRemaining > 0 ? (
-              <>
-                OTP expires in <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">{timeRemaining}s</span>
-              </>
-            ) : (
-              <span className="text-accent">OTP session expired</span>
-            )}
-          </p>
+          <div className="flex items-center justify-between text-xs">
+            <p className="text-muted-foreground">
+              {timeRemaining > 0 ? (
+                <>
+                  OTP expires in{" "}
+                  <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+                    {timeRemaining}s
+                  </span>
+                </>
+              ) : (
+                <span className="text-accent">OTP session expired</span>
+              )}
+            </p>
+
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              disabled={timeRemaining > 0 || resendLoading}
+              className={`font-medium underline-offset-4 ${
+                timeRemaining > 0 || resendLoading
+                  ? "text-muted-foreground cursor-not-allowed"
+                  : "text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500 hover:underline"
+              }`}
+            >
+              {resendLoading ? "Resending..." : "Resend OTP"}
+            </button>
+          </div>
         </div>
 
         <Button

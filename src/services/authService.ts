@@ -12,6 +12,22 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface ResetPasswordEmailPayload {
+  email: string;
+}
+
+export interface ResetPasswordOtpPayload {
+  otp: string;
+}
+
+export interface ResetPasswordNewPasswordPayload {
+  newPassword: string;
+}
+
+export interface ResendOtpParams {
+  email: string;
+}
+
 export interface OTPVerifyPayload {
   email: string;
   otp: string;
@@ -70,6 +86,98 @@ export const authService = {
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async resetPasswordWithEmail(payload: ResetPasswordEmailPayload) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send reset password email');
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async resetPasswordWithOtp(payload: ResetPasswordOtpPayload) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to verify OTP');
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async resetPasswordWithNewPassword(payload: ResetPasswordNewPasswordPayload) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password');
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async resendOtp(params: ResendOtpParams) {
+    try {
+      // Build URL exactly as backend expects, without encoding '@'
+      const response = await fetch(`${API_BASE_URL}/resend-otp?email=${params.email}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to resend OTP');
       }
 
       return data;
