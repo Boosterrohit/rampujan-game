@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://two4th-backend.onrender.com/api/auth';
+const API_BASE_URL = 'http://192.168.1.99:5000/api/v1/auth';
 
 export interface RegisterPayload {
   username: string;

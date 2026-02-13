@@ -31,7 +31,7 @@ export default function Login() {
               Don't have an account?{" "}
               <button
                 onClick={() => navigate("/signup")}
-                className="text-primary underline font-medium"
+                className="underline font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500"
               >
                 Sign up here
               </button>

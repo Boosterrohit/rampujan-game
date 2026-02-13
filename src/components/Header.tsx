@@ -28,8 +28,6 @@ export default function Header() {
   const publicMenuItems = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about-us" },
-    { label: "Free Spin", path: "/free-spin" },
-     { label: "Prize Chat", path: "/prize-chat" },
   ];
 
   const menuItems = isLoggedIn ? allMenuItems : publicMenuItems;
@@ -296,6 +294,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
           </video>
           <div className="absolute inset-0 video-overlay flex items-center justify-center">
             <div className="text-center text-white space-y-6 px-4 max-w-4xl">
+              <p><Gamepad2/> </p>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight video-text-shadow">
                 Experience Gaming Like Never Before
               </h2>

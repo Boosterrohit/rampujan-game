@@ -140,7 +140,10 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full gap-2">
+      <Button type="submit" disabled={loading} className="w-full gap-2 hover:opacity-90 h-12 mt-2  bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white">
         {loading && <Loader className="w-4 h-4 animate-spin" />}
         {loading ? "Creating account..." : "Sign Up"}
       </Button>

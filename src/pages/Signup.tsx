@@ -57,7 +57,7 @@ export default function Signup() {
                 Already have an account?{" "}
                 <button
                   onClick={() => navigate("/login")}
-                  className="text-primary underline font-bold"
+                  className="underline font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500"
                 >
                   Login here
                 </button>
