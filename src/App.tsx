@@ -18,7 +18,13 @@ import ForgotPassword from "@/pages/ForgotPassword"
 
 // Protected route component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, logout, isTokenValid } = useAuth()
+  
+  // If user is logged in but token is expired, logout automatically
+  if (isLoggedIn && !isTokenValid()) {
+    logout()
+    return <Navigate to="/" replace />
+  }
   
   if (!isLoggedIn) {
     return <Navigate to="/" replace />

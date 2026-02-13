@@ -40,7 +40,8 @@ export default function Header() {
     try {
       await authService.logout();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout API failed (expected if token expired):", error);
+      // Continue with logout even if API fails (token might be expired)
     } finally {
       logout();
       navigate("/");
