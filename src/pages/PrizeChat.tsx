@@ -29,6 +29,17 @@ interface MessageOption {
 }
 
 export default function PrizeChat() {
+  interface Agent {
+    _id: string
+    username: string
+    email?: string
+    phone?: string
+    activeChatCount?: number
+  }
+
+  const [availableAgents, setAvailableAgents] = useState<Agent[]>([])
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
+  const [assigning, setAssigning] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
@@ -58,14 +69,31 @@ export default function PrizeChat() {
     container.scrollTop = container.scrollHeight
   }, [messages])
 
-  const messageOptions: MessageOption[] = [
-    { id: 1, text: "How do I earn more coins?", response: "You can earn coins by completing daily tasks, spinning the wheel, and reaching milestones!" },
-    { id: 2, text: "What prizes are available?", response: "Check the Available Prizes section on the right to see all prizes you can claim with your coins." },
-    { id: 3, text: "How do I claim a prize?", response: "Simply click the 'Claim' button on any prize you have enough coins for. The prize will be added to your account!" },
-    { id: 4, text: "Check my balance", response: `You currently have ${userPoints} coins available to spend on amazing prizes!` },
-    { id: 5, text: "Tell me about VIP Membership", response: "VIP Membership gives you exclusive benefits, bonus spins, and priority support. It costs 2,000 coins and activates within 1 day!" },
-    { id: 6, text: "Help & Support", response: "Need help? Contact our support team at support@prizechat.com or check our FAQ section for common questions." },
-  ]
+  // Fetch available agents for dropdown (include Authorization header if available)
+  useEffect(() => {
+    const loadAgents = async () => {
+      try {
+        const backend = 'http://192.168.1.99:5000'
+        const token = localStorage.getItem('accessToken')
+        const headers: any = {}
+        if (token) headers['Authorization'] = `Bearer ${token}`
+
+        const res = await fetch(`${backend}/api/v1/agents/available`, {
+          method: 'GET',
+          credentials: 'include',
+          headers,
+        })
+        const data = await res.json()
+        if (res.ok && data?.data?.agents) {
+          setAvailableAgents(data.data.agents)
+        }
+      } catch (err) {
+        // ignore silently for now
+      }
+    }
+
+    loadAgents()
+  }, [])
 
   const availablePrizes: AvailablePrize[] = [
     { id: 1, name: "Premium Badge", coins: 500, points: "500 pts", time: "Instant" },
@@ -121,7 +149,14 @@ export default function PrizeChat() {
     }
   ]
 
-  const handleOptionClick = (option: MessageOption) => {
+  // No quick message options — users must select an agent and type messages
+
+  const [newMessage, setNewMessage] = useState("")
+
+  const handleSendMessage = () => {
+    if (!selectedAgentId) return
+    if (!newMessage.trim()) return
+
     const time = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
 
     setMessages((prev) => [
@@ -129,22 +164,12 @@ export default function PrizeChat() {
       {
         id: prev.length + 1,
         sender: "user",
-        message: option.text,
+        message: newMessage.trim(),
         timestamp: time,
       },
     ])
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          sender: "system",
-          message: option.response,
-          timestamp: time,
-        },
-      ])
-    }, 800)
+    setNewMessage("")
   }
 
   const handleClaimPrize = (prize: AvailablePrize) => {
@@ -162,6 +187,59 @@ export default function PrizeChat() {
         timestamp: time,
       },
     ])
+  }
+
+  const handleAssignAgent = async () => {
+    if (!selectedAgentId) return
+    setAssigning(true)
+    try {
+      const backend = 'http://192.168.1.99:5000'
+      const token = localStorage.getItem('accessToken')
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      const res = await fetch(`${backend}/api/v1/chat/assign-agent`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({ agentId: selectedAgentId }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            sender: 'system',
+            message: `Agent assigned successfully. You can now chat with the agent.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ])
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            sender: 'system',
+            message: data?.message || 'Failed to assign agent',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ])
+      }
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: 'system',
+          message: 'Network error while assigning agent',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ])
+    } finally {
+      setAssigning(false)
+    }
   }
 
   return (
@@ -198,6 +276,27 @@ export default function PrizeChat() {
         <div className="flex-1 h-screen grid lg:grid-cols-3 gap-6 overflow-hidden">
           {/* Chat */}
           <div className="h-[100vh] lg:col-span-2 flex flex-col border-2 border-primary/20 rounded-2xl overflow-hidden bg-card/50">
+            {/* Agent selector */}
+            <div className="flex items-center justify-between gap-3 p-4 border-b border-primary/10">
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-gray-300">Select Agent</label>
+                <select
+                  className="bg-card/40 text-sm text-white px-3 py-1 rounded-md"
+                  value={selectedAgentId ?? ''}
+                  onChange={(e) => setSelectedAgentId(e.target.value || null)}
+                >
+                  <option value="">-- Choose an agent --</option>
+                  {availableAgents.map((a) => (
+                    <option key={a._id} value={a._id}>{a.username} {a.activeChatCount ? `(${a.activeChatCount})` : ''}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Button size="sm" onClick={handleAssignAgent} disabled={!selectedAgentId || assigning}>
+                  {assigning ? 'Assigning...' : 'Assign Agent'}
+                </Button>
+              </div>
+            </div>
             {/* Messages */}
             <div
               ref={messagesContainerRef}
@@ -255,21 +354,21 @@ export default function PrizeChat() {
               ))}
             </div>
 
-            {/* Quick Actions */}
+            {/* Message input - disabled until an agent is selected */}
             <div className="border-t border-primary/20 p-4 bg-card/30">
-              <p className="text-xs text-muted-foreground mb-3 font-semibold">Quick Actions</p>
-              <div className="grid grid-cols-2 gap-2">
-                {messageOptions.map((option) => (
-                  <Button
-                    key={option.id}
-                    onClick={() => handleOptionClick(option)}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs hover:bg-primary/10 hover:border-primary/50 transition-all"
-                  >
-                    {option.text}
-                  </Button>
-                ))}
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={selectedAgentId ? "Type your message..." : "Select an agent to start chat"}
+                  disabled={!selectedAgentId}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <Button onClick={handleSendMessage} disabled={!selectedAgentId || !newMessage.trim()}>
+                  Send
+                </Button>
               </div>
             </div>
           </div>

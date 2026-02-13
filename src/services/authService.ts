@@ -62,6 +62,7 @@ export interface LoginResponse {
     email: string;
     role: string;
     walletBalance: number;
+    accessToken?: string;
   };
   message: string;
   success: boolean;
@@ -97,8 +98,18 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await handleResponse(response, 'Login failed');
-      return data as LoginResponse;
+      const data: LoginResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store access token in localStorage if backend returned it
+      if (data?.data?.accessToken) {
+        localStorage.setItem('accessToken', data.data.accessToken);
+      }
+
+      return data;
     } catch (error) {
       throw error;
     }
