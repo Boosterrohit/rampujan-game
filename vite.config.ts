@@ -9,4 +9,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      // Proxy API requests to backend to avoid cross-origin cookie issues in dev
+      '/api': {
+        target: 'http://192.168.1.99:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

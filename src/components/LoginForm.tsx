@@ -43,7 +43,19 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       })
 
       if (response.success && response.data) {
-        login(response.data)
+        // If backend returned an accessToken, extract its expiry and pass it to context
+        const token = (response as any).data?.accessToken
+        let expiry: number | undefined = undefined
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            if (payload && payload.exp) expiry = payload.exp * 1000
+          } catch (e) {
+            // ignore parse errors and fall back to default expiry
+          }
+        }
+
+        login(response.data, expiry)
         onSuccess()
       } else {
         setError(response.message || "Login failed")

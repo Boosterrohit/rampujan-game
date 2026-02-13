@@ -45,6 +45,7 @@ export interface LoginResponse {
     email: string;
     role: string;
     walletBalance: number;
+    accessToken?: string;
   };
   message: string;
   success: boolean;
@@ -89,6 +90,11 @@ export const authService = {
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
+      }
+
+      // Store access token in localStorage if backend returned it
+      if (data?.data?.accessToken) {
+        localStorage.setItem('accessToken', data.data.accessToken);
       }
 
       return data;

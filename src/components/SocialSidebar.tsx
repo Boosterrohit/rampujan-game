@@ -6,6 +6,11 @@ import { useLocation } from "react-router-dom"
 
 export default function SocialSidebar() {
   const [isChatOpen, setIsChatOpen] = useState(false)
+  interface Agent { _id: string; username: string; activeChatCount?: number }
+  const [availableAgents, setAvailableAgents] = useState<Agent[]>([])
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
+  const [agentsLoading, setAgentsLoading] = useState(false)
+  const [assigning, setAssigning] = useState(false)
   const [messages, setMessages] = useState([
     { id: 1, text: "Hello! How can I help you today?", sender: "agent", time: "10:30 AM" }
   ])
@@ -35,7 +40,30 @@ export default function SocialSidebar() {
     setIsChatOpen(false)
   }, [location.pathname])
 
+  // Load available agents when chat opens
+  useEffect(() => {
+    if (!isChatOpen) return
+    const load = async () => {
+      setAgentsLoading(true)
+      try {
+        const backend = 'http://192.168.1.99:5000'
+        const token = localStorage.getItem('accessToken')
+        const headers: any = {}
+        if (token) headers['Authorization'] = `Bearer ${token}`
+        const res = await fetch(`${backend}/api/v1/agents/available`, { credentials: 'include', headers })
+        const data = await res.json()
+        if (res.ok && data?.data?.agents) setAvailableAgents(data.data.agents)
+      } catch (err) {
+        // ignore for now
+      } finally {
+        setAgentsLoading(false)
+      }
+    }
+    load()
+  }, [isChatOpen])
+
   const handleSendMessage = () => {
+    if (!selectedAgentId) return
     if (newMessage.trim()) {
       const message = {
         id: messages.length + 1,
@@ -56,6 +84,44 @@ export default function SocialSidebar() {
         }
         setMessages(prev => [...prev, agentResponse])
       }, 1000)
+    }
+  }
+
+  const handleAssignAgent = async () => {
+    if (!selectedAgentId) return
+    setAssigning(true)
+    try {
+      const backend = 'http://192.168.1.99:5000'
+      const token = localStorage.getItem('accessToken')
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      const res = await fetch(`${backend}/api/v1/chat/assign-agent`, {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify({ agentId: selectedAgentId }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setMessages(prev => [
+          ...prev,
+          { id: prev.length + 1, text: 'Agent assigned. You can now chat with the agent.', sender: 'agent', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+        ])
+        setIsChatOpen(true)
+      } else {
+        setMessages(prev => [
+          ...prev,
+          { id: prev.length + 1, text: data?.message || 'Failed to assign agent', sender: 'agent', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+        ])
+      }
+    } catch (err) {
+      setMessages(prev => [
+        ...prev,
+        { id: prev.length + 1, text: 'Network error while assigning agent', sender: 'agent', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+      ])
+    } finally {
+      setAssigning(false)
     }
   }
 
@@ -172,6 +238,37 @@ export default function SocialSidebar() {
                 ))}
               </div>
 
+                  {/* Agent selector */}
+                  <div className="p-3 border-t bg-white dark:bg-gray-800">
+                    <div className="flex items-center space-x-2">
+                      {agentsLoading ? (
+                        <div className="text-sm text-gray-500">Loading agents...</div>
+                      ) : availableAgents.length > 0 ? (
+                        <select
+                          value={selectedAgentId ?? ''}
+                          onChange={(e) => setSelectedAgentId(e.target.value || null)}
+                          className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                        >
+                          <option value="">Select agent</option>
+                          {availableAgents.map((a) => (
+                            <option key={a._id} value={a._id}>{a.username}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="text-sm text-gray-500">Agent not found</div>
+                      )}
+
+                      <Button
+                        onClick={handleAssignAgent}
+                        size="sm"
+                        className="bg-green-500 hover:bg-green-600"
+                        disabled={assigning || !selectedAgentId}
+                      >
+                        {assigning ? 'Assigning...' : 'Assign'}
+                      </Button>
+                    </div>
+                  </div>
+
               {/* Input */}
               <div className="p-3 mb-14 border-t bg-white dark:bg-gray-800">
                 <div className="flex space-x-2">
@@ -179,7 +276,8 @@ export default function SocialSidebar() {
                     type="text"
                     value={newMessage}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewMessage(e.target.value)}
-                    placeholder="Type your message..."
+                    placeholder={selectedAgentId ? "Type your message..." : "Select an agent to start chat"}
+                    disabled={!selectedAgentId}
                     onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSendMessage()}
                     className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                   />
@@ -187,6 +285,7 @@ export default function SocialSidebar() {
                     onClick={handleSendMessage}
                     size="sm"
                     className="bg-green-500 hover:bg-green-600"
+                    disabled={!selectedAgentId || !newMessage.trim()}
                   >
                     <Send className="w-4 h-4" />
                   </Button>
