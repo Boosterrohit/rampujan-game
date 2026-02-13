@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import Header from "@/components/Header"
@@ -16,11 +17,22 @@ import TermsOfService from "@/pages/TermsOfService"
 import PrivacyPolicy from "@/pages/PrivacyPolicy"
 import ForgotPassword from "@/pages/ForgotPassword"
 
+// Listen for 401 session-expired from backend and logout
+function SessionExpiryListener() {
+  const { logout } = useAuth()
+  useEffect(() => {
+    const handleSessionExpired = () => logout()
+    window.addEventListener("session-expired", handleSessionExpired)
+    return () => window.removeEventListener("session-expired", handleSessionExpired)
+  }, [logout])
+  return null
+}
+
 // Protected route component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, logout, isTokenValid } = useAuth()
   
-  // If user is logged in but token is expired, logout automatically
+  // Session expired: logout and redirect to home
   if (isLoggedIn && !isTokenValid()) {
     logout()
     return <Navigate to="/" replace />
@@ -75,12 +87,24 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            {/* Alias: free-chat redirects to prize-chat */}
+            <Route
+              path="/free-chat"
+              element={
+                <ProtectedRoute>
+                  <PrizeChat />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Public Routes */}
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            
+            {/* Catch-all route: redirect unknown routes to home if not logged in */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
         {!isAuthPage && <SocialSidebar />}
@@ -94,6 +118,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SessionExpiryListener />
         <AppContent />
       </AuthProvider>
     </BrowserRouter>

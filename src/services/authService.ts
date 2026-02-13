@@ -1,5 +1,22 @@
 const API_BASE_URL = 'http://192.168.1.99:5000/api/v1/auth';
 
+const SESSION_EXPIRED_EVENT = 'session-expired';
+
+export const dispatchSessionExpired = () => {
+  window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+};
+
+const handleResponse = async (response: Response, errorMessage: string) => {
+  const data = await response.json();
+  if (response.status === 401) {
+    dispatchSessionExpired();
+  }
+  if (!response.ok) {
+    throw new Error(data.message || errorMessage);
+  }
+  return data;
+};
+
 export interface RegisterPayload {
   username: string;
   email: string;
@@ -49,6 +66,7 @@ export interface LoginResponse {
   };
   message: string;
   success: boolean;
+  expiresIn?: number; // Token expiry in seconds (optional, from backend)
 }
 
 export const authService = {
@@ -63,13 +81,7 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      return data;
+      return handleResponse(response, 'Registration failed');
     } catch (error) {
       throw error;
     }
@@ -114,13 +126,7 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to send reset password email');
-      }
-
-      return data;
+      return handleResponse(response, 'Failed to send reset password email');
     } catch (error) {
       throw error;
     }
@@ -137,13 +143,7 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to verify OTP');
-      }
-
-      return data;
+      return handleResponse(response, 'Failed to verify OTP');
     } catch (error) {
       throw error;
     }
@@ -160,13 +160,7 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to reset password');
-      }
-
-      return data;
+      return handleResponse(response, 'Failed to reset password');
     } catch (error) {
       throw error;
     }
@@ -184,13 +178,7 @@ export const authService = {
          body: JSON.stringify(params),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to resend OTP');
-      }
-
-      return data;
+      return handleResponse(response, 'Failed to resend OTP');
     } catch (error) {
       throw error;
     }
@@ -207,13 +195,7 @@ export const authService = {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'OTP verification failed');
-      }
-
-      return data;
+      return handleResponse(response, 'OTP verification failed');
     } catch (error) {
       throw error;
     }
@@ -229,13 +211,7 @@ export const authService = {
         credentials: 'include',
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Logout failed');
-      }
-
-      return data;
+      return handleResponse(response, 'Logout failed');
     } catch (error) {
       throw error;
     }

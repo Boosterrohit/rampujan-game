@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
   userId: string;
@@ -20,49 +20,40 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getInitialAuth = (): { user: User | null; tokenExpiry: number | null } => {
+  if (typeof window === 'undefined') return { user: null, tokenExpiry: null };
+  const storedUser = localStorage.getItem('user');
+  const storedExpiry = localStorage.getItem('tokenExpiry');
+  if (!storedUser || !storedExpiry) return { user: null, tokenExpiry: null };
+  try {
+    const parsedUser = JSON.parse(storedUser) as User;
+    const expiry = parseInt(storedExpiry);
+    if (Date.now() > expiry) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('tokenExpiry');
+      return { user: null, tokenExpiry: null };
+    }
+    return { user: parsedUser, tokenExpiry: expiry };
+  } catch {
+    localStorage.removeItem('user');
+    localStorage.removeItem('tokenExpiry');
+    return { user: null, tokenExpiry: null };
+  }
+};
+
+const initialAuth = getInitialAuth();
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(initialAuth.user);
   const [loading, setLoading] = useState(false);
-  const [tokenExpiry, setTokenExpiry] = useState<number | null>(null);
-
-  // Check if user is logged in on mount
-  useEffect(() => {
-    const checkAuth = () => {
-      const storedUser = localStorage.getItem('user');
-      const storedExpiry = localStorage.getItem('tokenExpiry');
-      if (storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          const expiry = storedExpiry ? parseInt(storedExpiry) : null;
-          
-          // Check if token is still valid
-          if (expiry && Date.now() > expiry) {
-            // Token has expired
-            localStorage.removeItem('user');
-            localStorage.removeItem('tokenExpiry');
-            setUser(null);
-            setTokenExpiry(null);
-          } else {
-            setUser(parsedUser);
-            setTokenExpiry(expiry);
-          }
-        } catch (error) {
-          console.error('Failed to parse stored user:', error);
-          localStorage.removeItem('user');
-          localStorage.removeItem('tokenExpiry');
-        }
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const [tokenExpiry, setTokenExpiry] = useState<number | null>(initialAuth.tokenExpiry);
 
   const login = (userData: User, tokenExpiryTime?: number) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     
-    // Store token expiry time (10 seconds from now as per your backend)
-    const expiryTime = tokenExpiryTime || (Date.now() + 10 * 1000);
+    // Store token expiry time (15 minutes default to match backend; use backend's expiresIn if provided)
+    const expiryTime = tokenExpiryTime || (Date.now() + 15 * 60 * 1000);
     setTokenExpiry(expiryTime);
     localStorage.setItem('tokenExpiry', expiryTime.toString());
   };
