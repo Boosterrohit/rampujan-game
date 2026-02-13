@@ -457,7 +457,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       {/* MEGA WINNERS */}
-      <section className="px-4 py-16 overflow-hidden">
+      <section className="px-4 py-16 overflow-hidden winner_bg">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold ">
@@ -492,7 +492,7 @@ export default function Home() {
           </div>
 
           {/* Mobile: 2 column grid, Desktop: 3 column grid */}
-          <div>
+          <div className="">
             <MegaWinners />
           </div>
 
@@ -517,7 +517,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
       </section>
 
       {/* Features Section */}
-      <section className="px-4 py-14 my-5 border-t border-border border-b bg-card/50">
+      <section className="px-4 py-14  border-t border-border border-b bg-card/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-8">
             <h2 className="text-3xl md:text-4xl font-bold ">

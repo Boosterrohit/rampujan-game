@@ -116,7 +116,7 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
           <p className="text-xs text-muted-foreground">
             {timeRemaining > 0 ? (
               <>
-                OTP expires in <span className="font-semibold text-primary">{timeRemaining}s</span>
+                OTP expires in <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">{timeRemaining}s</span>
               </>
             ) : (
               <span className="text-accent">OTP session expired</span>
@@ -126,7 +126,10 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white"
           disabled={loading || isSessionExpired}
         >
           {loading ? (

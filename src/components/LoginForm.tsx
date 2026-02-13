@@ -7,6 +7,7 @@ import { Mail, Lock, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/services/authService"
 import { useAuth } from "@/contexts/AuthContext"
+import { Link } from "react-router-dom"
 
 interface LoginFormProps {
   onSuccess: () => void
@@ -89,6 +90,11 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             disabled={loading}
           />
         </div>
+        <div>
+          <Link to="/forgot-password" className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+            Forgot password?
+          </Link>
+         </div>
       </div>
 
       <Button type="submit" disabled={loading} className="w-full gap-2 hover:opacity-90 h-12 mt-2  bg-gradient-to-r from-purple-600 to-pink-600
