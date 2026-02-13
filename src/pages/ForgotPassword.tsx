@@ -101,7 +101,7 @@ export default function ForgotPassword() {
 
     setLoading(true)
     try {
-      const response = await authService.resetPasswordWithNewPassword({ email, otp, newPassword })
+      const response = await authService.resetPasswordWithNewPassword({ email, newPassword, confirmPassword })
       setMessage(response.message || "Password reset successfully")
       setStep("done")
       setTimeout(() => navigate("/login"), 1500)

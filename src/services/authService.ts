@@ -23,8 +23,8 @@ export interface ResetPasswordOtpPayload {
 
 export interface ResetPasswordNewPasswordPayload {
   email: string;
-  otp: string;
   newPassword: string;
+  confirmPassword: string;
 }
 
 export interface ResendOtpParams {
@@ -122,7 +122,7 @@ export const authService = {
 
   async resetPasswordWithOtp(payload: ResetPasswordOtpPayload) {
     try {
-      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+      const response = await fetch(`${API_BASE_URL}/verify-reset-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ export const authService = {
 
   async resetPasswordWithNewPassword(payload: ResetPasswordNewPasswordPayload) {
     try {
-      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+      const response = await fetch(`${API_BASE_URL}/update-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
