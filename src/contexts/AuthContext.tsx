@@ -61,8 +61,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     
-    // Store token expiry time (10 seconds from now as per your backend)
-    const expiryTime = tokenExpiryTime || (Date.now() + 10 * 1000);
+    // Store token expiry time (24 hours default; use backend's expiresIn if provided)
+    const expiryTime = tokenExpiryTime || (Date.now() + 24 * 60 * 60 * 1000);
     setTokenExpiry(expiryTime);
     localStorage.setItem('tokenExpiry', expiryTime.toString());
   };

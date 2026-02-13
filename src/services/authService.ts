@@ -48,6 +48,7 @@ export interface LoginResponse {
   };
   message: string;
   success: boolean;
+  expiresIn?: number; // Token expiry in seconds (optional, from backend)
 }
 
 export const authService = {

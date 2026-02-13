@@ -43,7 +43,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       })
 
       if (response.success && response.data) {
-        login(response.data)
+        const tokenExpiryTime = response.expiresIn
+          ? Date.now() + response.expiresIn * 1000
+          : undefined
+        login(response.data, tokenExpiryTime)
         onSuccess()
       } else {
         setError(response.message || "Login failed")
