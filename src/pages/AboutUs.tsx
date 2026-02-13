@@ -312,7 +312,7 @@ drop-shadow-[0_0_4px_#b593ff]
      
 
       {/* Contact Section */}
-      <section className="px-4 py-16 md:py-24">
+      <section className="px-4 py-16 md:py-24 winner_bg">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold"><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">Get In Touch </span></h2>
           <p className="text-lg text-muted-foreground">

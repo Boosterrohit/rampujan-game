@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Gamepad2, LogOut, User } from "lucide-react";
+import { Menu, X, Gamepad2, LogOut, User, Play, ShipWheel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
 import video1 from "../asset/video1.mp4";
+import LoginRequiredDialog from "./LoginRequiredDialog";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -14,6 +15,9 @@ export default function Header() {
   const { user, isLoggedIn, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [dialogFeatureName, setDialogFeatureName] = useState("this feature");
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  
 
   const isHomePage = location.pathname === "/";
 
@@ -42,7 +46,14 @@ export default function Header() {
       navigate("/");
     }
   };
-
+  const handleFreeSpin = () => {
+    if (!isLoggedIn) {
+      setDialogFeatureName("free spin");
+      setShowLoginDialog(true);
+    } else {
+      navigate("/free-spin");
+    }
+  };
   return (
     <>
       <header className="sticky  top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -91,8 +102,6 @@ export default function Header() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2 sm:gap-3">
-
-
             {/* Desktop Auth Section */}
             <div className="hidden sm:flex gap-2">
               {isLoggedIn ? (
@@ -247,7 +256,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white
                   >
                     Login
                   </Button> */}
-                    <div className="flex-1 rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
+                  <div className="flex-1 rounded-lg p-[2px] bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
                     <Button
                       variant="default"
                       size="sm"
@@ -280,7 +289,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
 
       {/* Video Banner for Home Page */}
       {isHomePage && (
-        <div className="relative w-full h-96 md:h-[72vh] overflow-hidden">
+        <div className="relative w-full h-[90vh] md:h-[90vh] overflow-hidden">
           <video
             autoPlay
             muted
@@ -294,13 +303,50 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
           </video>
           <div className="absolute inset-0 video-overlay flex items-center justify-center">
             <div className="text-center text-white space-y-6 px-4 max-w-4xl">
-              <p><Gamepad2/> </p>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight video-text-shadow">
-                Experience Gaming Like Never Before
+              <div className="w-fit flex justify-center mx-auto">
+                <p
+                  className="flex text-xs md:text-xl justify-center items-center gap-1 p-3 rounded-full bg-gradient-to-r from-purple-600/20 to-pink-600/20
+backdrop-blur-lg
+bg-white/10
+border border-white/20
+px-6 py-3
+text-white
+drop-shadow-[0_0_6px_#a855f7]
+drop-shadow-[0_0_12px_#ec4899] font-bold"
+                >
+                  <Gamepad2
+                    className="text-[#ffff00] md:h-8 md:w-8 h-6 w-6 drop-shadow-[0_0_6px_#ffff00] drop-shadow-[0_0_12px_#ffff00]"
+                  />
+                  Welcome to the Ultimate Casino
+                </p>
+              </div>
+              <h2  className="extra_font text-5xl md:text-7xl  font-black text-white mb-6 leading-tight">
+                Win Big with
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500 animate-pulse">
+                  MEGA JACKPOTS
+                </span>
               </h2>
-              <p className="text-xl md:text-2xl lg:text-3xl font-semibold opacity-95 video-text-shadow">
-                Join thousands of players in our exciting gaming community
+              <p className="text-xl md:text-2xl  font-poppins  text-white/70 mb-7 max-w-3xl mx-auto leading-relaxed">
+                 Join thousands of winners playing the most exciting casino games.
+            Get your{' '}
+            <span className="text-[#ffd700] font-bold">$500 welcome bonus</span>{' '}
+            and
+            <span className="text-[#00f0ff] font-bold">
+              {' '}
+              100 free spins
+            </span>{' '}
+            today!
               </p>
+              <div  className="flex flex-col sm:flex-row items-center justify-center gap-4">
+             <button onClick={handleFreeSpin} className="group px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white font-bold rounded-full text-lg hover:shadow-[0_0_50px_rgba(255,215,0,0.6)] transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+              Start Playing Now
+              <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+              </div>
               {/* {!isLoggedIn && (
               <div className="flex gap-3 justify-center">
                 <Button
@@ -324,6 +370,11 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
           </div>
         </div>
       )}
+       <LoginRequiredDialog
+              isOpen={showLoginDialog}
+              onClose={() => setShowLoginDialog(false)}
+              featureName={dialogFeatureName}
+            />
     </>
   );
 }

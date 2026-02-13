@@ -54,7 +54,7 @@ export default function ForgotPassword() {
 
     setLoading(true)
     try {
-      const response = await authService.resetPasswordWithOtp({ otp })
+      const response = await authService.resetPasswordWithOtp({ email, otp })
       setMessage(response.message || "OTP verified successfully")
       setStep("password")
     } catch (err: any) {
@@ -101,7 +101,7 @@ export default function ForgotPassword() {
 
     setLoading(true)
     try {
-      const response = await authService.resetPasswordWithNewPassword({ newPassword })
+      const response = await authService.resetPasswordWithNewPassword({ email, otp, newPassword })
       setMessage(response.message || "Password reset successfully")
       setStep("done")
       setTimeout(() => navigate("/login"), 1500)
@@ -113,7 +113,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 imglogin">
       <div className="w-full max-w-md">
         <div className="space-y-6">
           <div className="text-center space-y-2">
@@ -157,7 +157,10 @@ export default function ForgotPassword() {
                   </div>
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full gap-2 h-11">
+                <Button type="submit" disabled={loading} className="w-full gap-2 h-11 bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white">
                   {loading && <Loader className="w-4 h-4 animate-spin" />}
                   {loading ? "Sending OTP..." : "Send OTP"}
                 </Button>
@@ -183,7 +186,10 @@ export default function ForgotPassword() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button type="submit" disabled={loading} className="flex-1 gap-2 h-11">
+                  <Button type="submit" disabled={loading} className="flex-1 gap-2 h-11 bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white">
                     {loading && <Loader className="w-4 h-4 animate-spin" />}
                     {loading ? "Verifying..." : "Verify OTP"}
                   </Button>
@@ -236,7 +242,10 @@ export default function ForgotPassword() {
                   </div>
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full gap-2 h-11">
+                <Button type="submit" disabled={loading} className="w-full gap-2 h-11 bg-gradient-to-r from-purple-600 to-pink-600
+drop-shadow-[0_0_1px_#38bdf8]
+drop-shadow-[0_0_2px_#a855f7]
+drop-shadow-[0_0_3px_#ec4899] text-white">
                   {loading && <Loader className="w-4 h-4 animate-spin" />}
                   {loading ? "Updating..." : "Reset Password"}
                 </Button>

@@ -17,10 +17,13 @@ export interface ResetPasswordEmailPayload {
 }
 
 export interface ResetPasswordOtpPayload {
+  email: string;
   otp: string;
 }
 
 export interface ResetPasswordNewPasswordPayload {
+  email: string;
+  otp: string;
   newPassword: string;
 }
 
@@ -166,12 +169,13 @@ export const authService = {
   async resendOtp(params: ResendOtpParams) {
     try {
       // Build URL exactly as backend expects, without encoding '@'
-      const response = await fetch(`${API_BASE_URL}/resend-otp?email=${params.email}`, {
-        method: 'GET',
+      const response = await fetch(`${API_BASE_URL}/resend-otp`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+         body: JSON.stringify(params),
       });
 
       const data = await response.json();
