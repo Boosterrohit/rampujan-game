@@ -104,7 +104,7 @@ function AppContent() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             
             {/* Catch-all route: redirect unknown routes to home if not logged in */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
           </Routes>
         </main>
         {!isAuthPage && <SocialSidebar />}

@@ -17,7 +17,6 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [dialogFeatureName, setDialogFeatureName] = useState("this feature");
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  
 
   const isHomePage = location.pathname === "/";
 
@@ -315,13 +314,11 @@ text-white
 drop-shadow-[0_0_6px_#a855f7]
 drop-shadow-[0_0_12px_#ec4899] font-bold"
                 >
-                  <Gamepad2
-                    className="text-[#ffff00] md:h-8 md:w-8 h-6 w-6 drop-shadow-[0_0_6px_#ffff00] drop-shadow-[0_0_12px_#ffff00]"
-                  />
+                  <Gamepad2 className="text-[#ffff00] md:h-8 md:w-8 h-6 w-6 drop-shadow-[0_0_6px_#ffff00] drop-shadow-[0_0_12px_#ffff00]" />
                   Welcome to the Ultimate Casino
                 </p>
               </div>
-              <h2  className="extra_font text-5xl md:text-7xl  font-black text-white mb-6 leading-tight">
+              <h2 className="extra_font text-5xl md:text-7xl  font-black text-white mb-6 leading-tight">
                 Win Big with
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500 animate-pulse">
@@ -329,24 +326,29 @@ drop-shadow-[0_0_12px_#ec4899] font-bold"
                 </span>
               </h2>
               <p className="text-xl md:text-2xl  font-poppins  text-white/70 mb-7 max-w-3xl mx-auto leading-relaxed">
-                 Join thousands of winners playing the most exciting casino games.
-            Get your{' '}
-            <span className="text-[#ffd700] font-bold">$500 welcome bonus</span>{' '}
-            and
-            <span className="text-[#00f0ff] font-bold">
-              {' '}
-              100 free spins
-            </span>{' '}
-            today!
+                Join thousands of winners playing the most exciting casino
+                games. Get your{" "}
+                <span className="text-[#ffd700] font-bold">
+                  $500 welcome bonus
+                </span>{" "}
+                and
+                <span className="text-[#00f0ff] font-bold">
+                  {" "}
+                  100 free spins
+                </span>{" "}
+                today!
               </p>
-              <div  className="flex flex-col sm:flex-row items-center justify-center gap-4">
-             <button onClick={handleFreeSpin} className="group px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={handleFreeSpin}
+                  className="group px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600
 drop-shadow-[0_0_1px_#38bdf8]
 drop-shadow-[0_0_2px_#a855f7]
-drop-shadow-[0_0_3px_#ec4899] text-white font-bold rounded-full text-lg hover:shadow-[0_0_50px_rgba(255,215,0,0.6)] transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
-              Start Playing Now
-              <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+drop-shadow-[0_0_3px_#ec4899] text-white font-bold rounded-full text-lg hover:shadow-[0_0_50px_rgba(255,215,0,0.6)] transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                >
+                  Start Playing Now
+                  <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
               {/* {!isLoggedIn && (
               <div className="flex gap-3 justify-center">
@@ -371,11 +373,11 @@ drop-shadow-[0_0_3px_#ec4899] text-white font-bold rounded-full text-lg hover:sh
           </div>
         </div>
       )}
-       <LoginRequiredDialog
-              isOpen={showLoginDialog}
-              onClose={() => setShowLoginDialog(false)}
-              featureName={dialogFeatureName}
-            />
+      <LoginRequiredDialog
+        isOpen={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        featureName={dialogFeatureName}
+      />
     </>
   );
 }
