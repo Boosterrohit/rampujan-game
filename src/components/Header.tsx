@@ -20,17 +20,25 @@ export default function Header() {
 
   const isHomePage = location.pathname === "/";
 
-  const allMenuItems = [
+  type MenuItem = {
+    label: string;
+    path?: string;
+    url?: string;
+  };
+
+  const allMenuItems: MenuItem[] = [
     { label: "Home", path: "/" },
     // { label: "Milestone", path: "/milestone" },
     { label: "About Us", path: "/about-us" },
     { label: "Free Spin", path: "/free-spin" },
     { label: "Prize Chat", path: "/prize-chat" },
+    { label: "Dashboard", path: "/dashboard/" },
   ];
 
-  const publicMenuItems = [
+  const publicMenuItems: MenuItem[] = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about-us" },
+    { label: "Dashboard", path: "/dashboard/" },
   ];
 
   const menuItems = isLoggedIn ? allMenuItems : publicMenuItems;
@@ -87,8 +95,8 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-1">
             {menuItems.map((item) => (
               <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
+                key={item.path || item.label}
+                onClick={() => navigate(item.path || "/")}
                 className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
                   location.pathname === item.path
                     ? "text-lg font-bold   text-transparent bg-clip-text   bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500"
@@ -201,9 +209,9 @@ drop-shadow-[0_0_3px_#ec4899] text-white
                 </div>
                 {menuItems.map((item) => (
                   <button
-                    key={item.path}
+                    key={item.path || item.label}
                     onClick={() => {
-                      navigate(item.path);
+                      navigate(item.path || "/");
                       setMobileOpen(false);
                     }}
                     className={`block w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
@@ -230,9 +238,9 @@ drop-shadow-[0_0_3px_#ec4899] text-white
               <>
                 {menuItems.map((item) => (
                   <button
-                    key={item.path}
+                    key={item.path || item.label}
                     onClick={() => {
-                      navigate(item.path);
+                      navigate(item.path || "/");
                       setMobileOpen(false);
                     }}
                     className={`block w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
