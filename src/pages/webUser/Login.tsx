@@ -1,7 +1,7 @@
 "use client"
 
 import { useNavigate } from "react-router-dom"
-import LoginForm from "@/components/LoginForm"
+import LoginForm from "@/components/webpage/LoginForm"
 
 export default function Login() {
   const navigate = useNavigate()

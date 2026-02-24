@@ -1,6 +1,6 @@
 export const dashboardUrls = {
     dashboard: '/dashboard',
-    adminManagement: '/dashboard/admin-management',
+    adminManagement: '/dashboard/agent-management',
     playerManagement: '/dashboard/players-management',
     rouletteGift: '/dashboard/roulette-gifts',
     rouletteChampaigns: '/dashboard/roulette-campaigns',

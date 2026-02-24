@@ -1,6 +1,6 @@
 
-import { ArrowBigLeft, Bell, Menu, X } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { Mail, Menu, X } from "lucide-react";
+import { Avatar, AvatarFallback} from "../../ui/avatar";
 import { Link } from "react-router-dom";
 
 interface HeaderProps {
@@ -33,7 +33,7 @@ const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
       </div>
       <div className="flex items-center gap-2">
         <div className="relative cursor-pointer hover:bg-gray-500  rounded-md p-2">
-          <Bell className="w-5 h-5 text-white" />
+          <Mail className="w-5 h-5 text-white" />
           <div className="h-3 w-3 bg-red-600 rounded-full absolute top-1 border-white border-2 right-1"></div>
         </div>
         <div className="h-10 bg-gray-600 w-0.5 mx-2 "></div>

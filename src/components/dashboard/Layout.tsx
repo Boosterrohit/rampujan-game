@@ -2,6 +2,7 @@
 import React from "react";
 import Sidebar from "./menu/Sidebar";
 import Header from "./menu/Header";
+import { DialogProvider } from "./element/DialogContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface LayoutProps {
 
 const Layout = ({ children, isSidebarOpen, toggleSidebar, closeSidebar }: LayoutProps) => {
   return (
+    <DialogProvider>
     <main className="flex flex-row h-screen w-screen overflow-hidden bg-[#1b1f29]">
       <aside className="flex-shrink-0">
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
@@ -23,6 +25,7 @@ const Layout = ({ children, isSidebarOpen, toggleSidebar, closeSidebar }: Layout
         </main>
       </section>
     </main>
+    </DialogProvider>
   );
 };
 

@@ -6,7 +6,7 @@ import { Menu, X, Gamepad2, LogOut, User, Play, ShipWheel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
-import video1 from "../asset/video1.mp4";
+import video1 from "../../asset/video1.mp4";
 import LoginRequiredDialog from "./LoginRequiredDialog";
 
 export default function Header() {
@@ -304,7 +304,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white"
             loop
             playsInline
             className="w-full h-full object-cover"
-            poster="/api/placeholder/1200/400"
+            // poster="/api/placeholder/1200/400"
           >
             <source src={video1} type="video/mp4" />
             Your browser does not support the video tag.
@@ -323,7 +323,7 @@ drop-shadow-[0_0_6px_#a855f7]
 drop-shadow-[0_0_12px_#ec4899] font-bold"
                 >
                   <Gamepad2 className="text-[#ffff00] md:h-8 md:w-8 h-6 w-6 drop-shadow-[0_0_6px_#ffff00] drop-shadow-[0_0_12px_#ffff00]" />
-                  Welcome to the Ultimate Casino
+                  Welcome to the RowGaming
                 </p>
               </div>
               <h2 className="extra_font text-5xl md:text-7xl  font-black text-white mb-6 leading-tight">

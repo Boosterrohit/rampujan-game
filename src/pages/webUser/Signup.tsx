@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
-import SignupForm from "@/components/SignupForm"
-import OTPVerify from "@/components/OTPVerify"
+import SignupForm from "@/components/webpage/SignupForm"
+import OTPVerify from "@/components/webpage/OTPVerify"
 
 export default function Signup() {
   const navigate = useNavigate()

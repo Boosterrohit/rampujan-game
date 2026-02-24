@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CheckCircle2, Lock, Trophy, Star, Target, Zap, Crown, Award, TrendingUp, Gift, Medal, Flame } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import ProgressBar from "@/components/ProgressBar"
+import ProgressBar from "@/components/webpage/ProgressBar"
 
 interface Milestone {
   id: number

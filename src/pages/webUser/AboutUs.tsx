@@ -51,7 +51,7 @@ export default function AboutUs() {
           loop
           playsInline
           className="w-full h-full object-cover"
-          poster="/api/placeholder/1200/400"
+          // poster="/api/placeholder/1200/400"
         >
           <source src={video1} type="video/mp4" />
           Your browser does not support the video tag.

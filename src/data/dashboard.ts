@@ -19,12 +19,12 @@ export const MENU = [
   },
   {
     id: 2,
-    name: "ADMIN MANAGEMENT",
+    name: "Agent MANAGEMENT",
     SUBMENU: [
       {
         id: 2,
-        title: "Admin Management",
-        slug: "/admin-management",
+        title: "Agent Management",
+        slug: "/agent-management",
         icons: Settings,
       },
     ],

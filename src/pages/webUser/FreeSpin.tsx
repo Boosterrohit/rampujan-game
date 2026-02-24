@@ -5,7 +5,8 @@ import { useState, useEffect } from "react"
 import { RotateCw, Star, Zap, Trophy, Target, Coins, Sparkles, Crown, Award, TrendingUp, Gift, Timer, Gamepad2, Diamond, Flame, Sword } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import RouletteWheel from "./spinner/RouletteWheel"
+import RouletteWheel from "./RouletteWheel"
+// import RouletteWheel from "./webUser/RouletteWheel"
 
 interface SpinResult {
   reward: string

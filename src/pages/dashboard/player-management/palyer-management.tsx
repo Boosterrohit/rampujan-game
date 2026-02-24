@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {  Trash2, Edit, Plus, Eye } from "lucide-react"
+import { useDialog } from "@/components/dashboard/element/DialogContext"
+import PlayerForm from "./playerForm"
 
 const admins = [
   { id: 1, name: "John Admin", email: "john@casino.com", role: "Super Admin", status: "Active" },
@@ -13,6 +15,7 @@ const admins = [
 ]
 
 export function PlayerManagement() {
+   const { openDialog } = useDialog();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -20,7 +23,7 @@ export function PlayerManagement() {
           <h2 className="text-base md:text-3xl font-bold text-white">Player Management</h2>
           <p className="text-gray-400 mt-1 md:text:base text-xs">Manage admin users and their permissions</p>
         </div>
-         <Button className="flex items-center !bg-[#615ed6] hover:!bg-[#4e48c9] !outline-none w-32 md:w-auto" >
+         <Button className="flex items-center !bg-[#615ed6] hover:!bg-[#4e48c9] !outline-none w-32 md:w-auto" onClick={() => openDialog(<PlayerForm/>)}>
             <Plus className="w-5 h-5" />
             <span className="md:ml-2 text-sm md:text-base">Add Player</span>
          </Button>
