@@ -59,6 +59,25 @@ export default function FreeSpin() {
       difficulty: "Easy",
       spinsRequired: 1,
       rewards: [
+        { reward: "$0", amount: 100, rarity: "common", icon: Coins },
+        { reward: "$2", amount: 250, rarity: "rare", icon: Gift },
+        { reward: "$5", amount: 500, rarity: "epic", icon: Trophy },
+        { reward: "$0", amount: 1000, rarity: "legendary", icon: Crown },
+        { reward: "$1", amount: 150, rarity: "common", icon: Coins },
+        { reward: "$0", amount: 750, rarity: "epic", icon: Target },
+        { reward: "$3", amount: 300, rarity: "rare", icon: Sparkles },
+        { reward: "$4", amount: 200, rarity: "common", icon: Award },
+      ]
+    },
+    {
+      id: "bonus",
+      name: "Bonus Spin",
+      description: "Special bonus spins with higher rewards",
+      icon: Gift,
+      color: "from-green-400 to-orange-500",
+      difficulty: "Medium",
+      spinsRequired: 1,
+      rewards: [
         { reward: "5%", amount: 100, rarity: "common", icon: Coins },
         { reward: "50%", amount: 250, rarity: "rare", icon: Gift },
         { reward: "25%", amount: 500, rarity: "epic", icon: Trophy },
@@ -115,10 +134,10 @@ export default function FreeSpin() {
                   <div
                     key={campaign.id}
                     className={`relative group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-900/40 backdrop-blur-sm border transition-all duration-300 p-4 ${
-                      selectedCampaign?.id === campaign.id
-                        ? 'border-purple-500/60 shadow-lg shadow-purple-500/50'
-                        : 'border-purple-500/30 hover:border-purple-500/60'
-                    }`}
+  campaign.id === "bonus"
+    ? "from-green-900/20 via-emerald-500/20 to-green-900/40"
+    : "from-purple-500/20 via-pink-500/20 to-purple-900/40"
+}`}
                     onClick={() => setSelectedCampaign(campaign)}
                   >
                     {/* Glow effect */}
@@ -208,7 +227,7 @@ export default function FreeSpin() {
               <div className="flex items-center justify-center gap-8 mt-6">
                 <div className="flex items-center gap-2 text-sm bg-primary/10 px-4 py-2 rounded-full border border-primary/30">
                   <Timer className="w-4 h-4 text-primary" />
-                  <span className="font-semibold text-primary">3 spins left</span>
+                  <span className="font-semibold text-primary">1 spin per day</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm bg-secondary/10 px-4 py-2 rounded-full border border-secondary/30">
                   <TrendingUp className="w-4 h-4 text-secondary" />
@@ -269,16 +288,7 @@ export default function FreeSpin() {
 
               {/* Spin Button */}
               <div className="text-center space-y-4">
-                {/* <Button
-                  onClick={handleSpin}
-                  disabled={isSpinning || !selectedCampaign}
-                  size="lg"
-                  className="gap-3 px-10 py-2 text-xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl hover:shadow-primary/25 transition-all duration-300 transform hover:scale-105 border-2 border-primary"
-                >
-                  <RotateCw className={`w-7 h-7 ${isSpinning ? "animate-spin" : "hidden"}`} />
-                  {isSpinning ? "Spinning..." : selectedCampaign ? `SPIN` : "SELECT CAMPAIGN"}
-                  {!isSpinning && selectedCampaign && <Sparkles className="w-6 h-6" />}
-                </Button> */}
+                
                 <Button
                     variant="default"
                     size="sm"

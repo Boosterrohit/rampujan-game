@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Zap, ShipWheel, Trophy, Star, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { winnersService } from "@/services/winnersService";
 
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -23,74 +24,56 @@ export default function MegaWinners() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const megaWinners = [
-    {
-      id: 1,
-      name: "Rampujan",
-      prize: "Jackpot Winner",
-      amount: "$50,000",
-      game: "Mega Spin",
-      avatar: "RB",
-      badge: Crown,
-      gradient: "from-yellow-400 to-orange-500",
-      rarity: "legendary",
-    },
-    {
-      id: 2,
-      name: "Dipak Bdshk",
-      prize: "Daily Champion",
-      amount: "$25,000",
-      game: "Free Spins",
-      avatar: "DB",
-      badge: Trophy,
-      gradient: "from-purple-400 to-pink-500",
-      rarity: "epic",
-    },
-    {
-      id: 3,
-      name: "Rohit Sir",
-      prize: "Spin Master",
-      amount: "$15,000",
-      game: "Progress Quest",
-      avatar: "RS",
-      badge: Star,
-      gradient: "from-blue-400 to-cyan-500",
-      rarity: "rare",
-    },
-    {
-      id: 4,
-      name: "Sarah Chen",
-      prize: "Lucky Seven",
-      amount: "$35,000",
-      game: "Lucky Slots",
-      avatar: "SC",
-      badge: Crown,
-      gradient: "from-green-400 to-emerald-500",
-      rarity: "legendary",
-    },
-    {
-      id: 5,
-      name: "Mike Johnson",
-      prize: "Bonus Beast",
-      amount: "$18,000",
-      game: "Wheel of Fortune",
-      avatar: "MJ",
-      badge: Trophy,
-      gradient: "from-red-400 to-rose-500",
-      rarity: "epic",
-    },
-    {
-      id: 6,
-      name: "Lisa Anderson",
-      prize: "Spin Master",
-      amount: "$22,000",
-      game: "Ultra Panda",
-      avatar: "LA",
-      badge: Star,
-      gradient: "from-indigo-400 to-purple-500",
-      rarity: "rare",
-    },
+  // state to hold winners coming from backend
+  const [megaWinners, setMegaWinners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // helper gradients and badge list to give some variety
+  const gradients = [
+    "from-yellow-400 to-orange-500",
+    "from-purple-400 to-pink-500",
+    "from-blue-400 to-cyan-500",
+    "from-green-400 to-emerald-500",
+    "from-red-400 to-rose-500",
+    "from-indigo-400 to-purple-500",
   ];
+  const badges = [Crown, Trophy, Star, ShipWheel];
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await winnersService.fetchWinners();
+        // convert api winners to the shape that the card expects
+        const converted = data.map((w, index) => {
+          const initials = w.playerName
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase();
+          return {
+            id: index,
+            name: w.playerName,
+            prize: `${w.gameName} Winner`,
+            amount: `$${w.prizeAmount}`,
+            game: w.gameName,
+            avatar: initials,
+            badge: badges[index % badges.length],
+            gradient: gradients[index % gradients.length],
+            rarity: "common",
+          };
+        });
+        setMegaWinners(converted);
+      } catch (err) {
+        console.error("failed to load mega winners", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
 
   // Render function for slider items
   const renderSliderItems = () => {
@@ -189,6 +172,23 @@ export default function MegaWinners() {
       );
     });
   };
+
+  if (loading) {
+    // simple loading placeholder
+    return (
+      <section className="px-4 text-center py-8">
+        <p className="text-lg font-medium">Loading winners...</p>
+      </section>
+    );
+  }
+
+  if (!loading && megaWinners.length === 0) {
+    return (
+      <section className="px-4 text-center py-8">
+        <p className="text-lg font-medium">No winners found.</p>
+      </section>
+    );
+  }
 
   return (
     <section className="px-4">
