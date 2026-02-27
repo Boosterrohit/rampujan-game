@@ -6,6 +6,7 @@ import { RotateCw, Star, Zap, Trophy, Target, Coins, Sparkles, Crown, Award, Tre
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RouletteWheel from "./RouletteWheel"
+import { spinService } from "@/services/spinService";
 // import RouletteWheel from "./webUser/RouletteWheel"
 
 interface SpinResult {
@@ -35,6 +36,7 @@ export default function FreeSpin() {
   const [bestWin, setBestWin] = useState(1000)
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
   const [prizeNumber, setPrizeNumber] = useState(0)
+  const [spinLoading, setSpinLoading] = useState(false);
 
   const rewards = selectedCampaign?.rewards || []
 
@@ -97,12 +99,47 @@ export default function FreeSpin() {
     }
   }, [campaigns, selectedCampaign])
 
-  const handleSpin = () => {
-    if (isSpinning) return
+  const handleSpin = async () => {
+    if (isSpinning || spinLoading) return;
 
-    setIsSpinning(true)
-    const randomIndex = Math.floor(Math.random() * rewards.length)
-    setPrizeNumber(randomIndex)
+    setSpinLoading(true);
+    try {
+      let index = Math.floor(Math.random() * rewards.length);
+
+      // for classic campaign, request server to determine win
+      if (selectedCampaign?.id === "classic") {
+        const resp = await spinService.freeSpin();
+        const winAmount = resp.winAmount;
+
+        // attempt to interpret winAmount as the dollar value shown on the wheel
+        if (typeof winAmount === "number") {
+          const label = `$${winAmount}`;
+          const byLabel = rewards.findIndex((r) => r.reward === label);
+          if (byLabel !== -1) {
+            index = byLabel;
+          } else if (winAmount >= 0 && winAmount < rewards.length) {
+            // maybe the backend returned an index
+            index = winAmount;
+          } else {
+            // fallback match on internal amount field if it's meaningful
+            const match = rewards.findIndex((r) => r.amount === winAmount);
+            if (match !== -1) {
+              index = match;
+            } else {
+              console.warn("winAmount not found on wheel, using random index", winAmount);
+            }
+          }
+        }
+      }
+
+      setPrizeNumber(index);
+    } catch (err) {
+      console.error("spin attempt failed", err);
+      // could show toast here
+    } finally {
+      setSpinLoading(false);
+      setIsSpinning(true);
+    }
   }
 
   const handleStopSpinning = () => {
@@ -294,7 +331,7 @@ export default function FreeSpin() {
                     size="sm"
 
                     onClick={handleSpin}
-                    disabled={isSpinning || !selectedCampaign}
+                    disabled={isSpinning || spinLoading || !selectedCampaign}
                     className=" gap-3 px-10 py-2 text-xl font-bold
               bg-gradient-to-r from-purple-600 to-pink-600
 drop-shadow-[0_0_1px_#38bdf8]
@@ -302,9 +339,9 @@ drop-shadow-[0_0_2px_#a855f7]
 drop-shadow-[0_0_3px_#ec4899] text-white
                 "
                   >
-                    <RotateCw className={`w-7 h-7 ${isSpinning ? "animate-spin" : "hidden"}`} />
-                  {isSpinning ? "Spinning..." : selectedCampaign ? `SPIN` : "SELECT CAMPAIGN"}
-                  {!isSpinning && selectedCampaign && <Sparkles className="w-6 h-6" />}
+                    <RotateCw className={`w-7 h-7 ${isSpinning || spinLoading ? "animate-spin" : "hidden"}`} />
+                  {spinLoading ? "Processing..." : isSpinning ? "Spinning..." : selectedCampaign ? `SPIN` : "SELECT CAMPAIGN"}
+                  {!isSpinning && !spinLoading && selectedCampaign && <Sparkles className="w-6 h-6" />}
                   </Button>
                 <p className="text-sm text-muted-foreground font-medium">
                   {isSpinning ? "🎰 Good luck!" : selectedCampaign ? `🎰 ${selectedCampaign.spinsRequired} spin${selectedCampaign.spinsRequired > 1 ? 's' : ''} required • ${3 - (spinCount % selectedCampaign.spinsRequired)} remaining` : "🎰 Choose a campaign to start spinning"}
