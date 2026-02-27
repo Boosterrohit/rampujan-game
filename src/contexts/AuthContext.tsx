@@ -65,6 +65,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('tokenExpiry');
     localStorage.removeItem('otpEmail');
     localStorage.removeItem('otpTimestamp');
+    // Clear any cached agent assignment so next login/user
+    // can see the correct state from the backend.
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key === 'assignedAgent' || key.startsWith('assignedAgent_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch {
+      // ignore storage errors
+    }
   };
 
   const isTokenValid = () => {

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.1.99:5000/api/v1/auth';
+const API_BASE_URL = '/api/v1/auth';
 
 const SESSION_EXPIRED_EVENT = 'session-expired';
 

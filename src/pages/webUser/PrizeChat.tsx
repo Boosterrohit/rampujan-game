@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import { Gift, MessageCircle, Clock, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface ChatMessage {
   id: number
@@ -36,6 +37,8 @@ export default function PrizeChat() {
     phone?: string
     activeChatCount?: number
   }
+
+  const { user } = useAuth()
 
   const [availableAgents, setAvailableAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
@@ -71,48 +74,51 @@ export default function PrizeChat() {
     container.scrollTop = container.scrollHeight
   }, [messages])
 
-  // when component mounts figure out whether user already has an assigned agent
+  // when user/logged-in player changes, figure out whether they already have an assigned agent
   useEffect(() => {
-    const stored = localStorage.getItem('assignedAgent')
-    if (stored) {
-      try {
-        const obj = JSON.parse(stored) as { agentId: string; username: string }
-        setSelectedAgentId(obj.agentId)
-        setAssignedAgentName(obj.username)
-        setIsAssigned(true)
-      } catch {
-        // ignore parse errors
-        localStorage.removeItem('assignedAgent')
-      }
-      // we've already assigned; no need to fetch the agent list
+    // no logged-in player, reset UI
+    if (!user) {
+      setIsAssigned(false)
+      setAssignedAgentName(null)
+      setSelectedAgentId(null)
+      setAvailableAgents([])
       return
     }
 
-    // Fetch available agents for dropdown if not assigned
+    // Fetch current assignment/available agents from backend
     const loadAgents = async () => {
       try {
-        const backend = 'http://192.168.1.99:5000'
         const token = localStorage.getItem('accessToken')
         const headers: any = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
 
-        const res = await fetch(`${backend}/api/v1/agents/available`, {
+        const res = await fetch(`/api/v1/chat/agents/available`, {
           method: 'GET',
           credentials: 'include',
           headers,
         })
         const data = await res.json()
-        if (res.ok && data?.data?.agents) {
-          setAvailableAgents(data.data?.agents)
+
+        // If backend says this player already has an assigned agent, respect that
+        if (res.ok && data?.data?.assignedAgent) {
+          const assigned = data.data.assignedAgent as { _id: string; username: string }
+          setIsAssigned(true)
+          setAssignedAgentName(assigned.username)
+          setSelectedAgentId(assigned._id)
+          return
         }
-      } catch (err) {
+
+        // Otherwise show the list of available agents (if any)
+        if (res.ok && data?.data?.agents) {
+          setAvailableAgents(data.data.agents as Agent[])
+        }
+      } catch {
         // ignore silently for now
       }
     }
 
     loadAgents()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [user])
 
   const availablePrizes: AvailablePrize[] = [
     { id: 1, name: "Premium Badge", coins: 500, points: "500 pts", time: "Instant" },
@@ -212,12 +218,11 @@ export default function PrizeChat() {
     if (!selectedAgentId) return
     setAssigning(true)
     try {
-      const backend = 'http://192.168.1.99:5000'
       const token = localStorage.getItem('accessToken')
       const headers: any = { 'Content-Type': 'application/json' }
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch(`${backend}/api/v1/chat/assign-agent`, {
+      const res = await fetch(`/api/v1/chat/assign-agent`, {
         method: 'POST',
         headers,
         credentials: 'include',
@@ -230,15 +235,9 @@ export default function PrizeChat() {
         const assigned = availableAgents.find((a) => a._id === selectedAgentId)
         const name = assigned ? assigned.username : ''
 
-        // mark as assigned and persist
+        // mark as assigned
         setIsAssigned(true)
         setAssignedAgentName(name)
-        try {
-          localStorage.setItem(
-            'assignedAgent',
-            JSON.stringify({ agentId: selectedAgentId, username: name })
-          )
-        } catch {}
 
         setMessages((prev) => [
           ...prev,

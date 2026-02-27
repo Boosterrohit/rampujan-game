@@ -71,37 +71,30 @@ const [messages, setMessages] = useState<Message[]>([
     setIsChatOpen(false);
   }, [location.pathname]);
 
-  // when chat popup opens read assignment from storage and load agents if needed
+  // when chat popup opens load agents from backend
   useEffect(() => {
     if (!isChatOpen) return;
-
-    const stored = localStorage.getItem('assignedAgent');
-    if (stored) {
-      try {
-        const obj = JSON.parse(stored) as { agentId: string; username: string };
-        setSelectedAgentId(obj.agentId);
-        setAssignedAgentName(obj.username);
-        setIsAssigned(true);
-      } catch {
-        localStorage.removeItem('assignedAgent');
-      }
-      // already assigned; no agent list needed
-      return;
-    }
 
     const load = async () => {
       setAgentsLoading(true);
       try {
-        const backend = "http://192.168.1.99:5000";
         const token = localStorage.getItem("accessToken");
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const res = await fetch(`${backend}/api/v1/agents/available`, {
+        const res = await fetch(`/api/v1/chat/agents/available`, {
           credentials: "include",
           headers,
         });
         const data = await res.json();
-        if (res.ok && data?.data?.agents) setAvailableAgents(data.data.agents);
+        if (res.ok && data?.data?.assignedAgent) {
+          const assigned = data.data.assignedAgent as { _id: string; username: string };
+          setSelectedAgentId(assigned._id);
+          setAssignedAgentName(assigned.username);
+          setIsAssigned(true);
+        } else if (res.ok && data?.data?.agents) {
+          setAvailableAgents(data.data.agents);
+          setIsAssigned(false);
+        }
       } catch (err) {
         // ignore for now
       } finally {
@@ -179,12 +172,11 @@ const [messages, setMessages] = useState<Message[]>([
     if (!selectedAgentId) return;
     setAssigning(true);
     try {
-      const backend = "http://192.168.1.99:5000";
       const token = localStorage.getItem("accessToken");
       const headers: any = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`${backend}/api/v1/chat/assign-agent`, {
+      const res = await fetch(`/api/v1/chat/assign-agent`, {
         method: "POST",
         credentials: "include",
         headers,
@@ -197,9 +189,6 @@ const [messages, setMessages] = useState<Message[]>([
         const name = assigned ? assigned.username : '';
         setAssignedAgentName(name);
         setIsAssigned(true);
-        try {
-          localStorage.setItem('assignedAgent', JSON.stringify({ agentId: selectedAgentId, username: name }));
-        } catch {}
 
         setMessages((prev) => [
           ...prev,
