@@ -435,9 +435,9 @@ const handleRemoveImage = () => {
                     onChange={(e) => setSelectedAgentId(e.target.value || null)}
                     className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
                   >
-                    <option value="">Select agent</option>
+                    <option value="" className="text-black">Select agent</option>
                     {availableAgents.map((a) => (
-                      <option key={a._id} value={a._id}>
+                      <option key={a._id} value={a._id} className="text-black">
                         {a.username}
                       </option>
                     ))}

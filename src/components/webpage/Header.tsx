@@ -132,9 +132,9 @@ export default function Header() {
                         <p className="text-xs text-muted-foreground">
                           {user?.email}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        {/* <p className="text-xs text-muted-foreground mt-1">
                           Wallet: ${user?.walletBalance || 0}
-                        </p>
+                        </p> */}
                       </div>
                       <button
                         onClick={() => {
@@ -203,9 +203,9 @@ drop-shadow-[0_0_3px_#ec4899] text-white
                 <div className="px-4 py-3 rounded-lg bg-muted mb-3">
                   <p className="text-sm font-medium">{user?.username}</p>
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {/* <p className="text-xs text-muted-foreground mt-1">
                     Wallet: ${user?.walletBalance || 0}
-                  </p>
+                  </p> */}
                 </div>
                 {menuItems.map((item) => (
                   <button
