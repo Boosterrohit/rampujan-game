@@ -30,6 +30,8 @@ export default function SocialSidebar() {
   }
   const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [assignedAgentName, setAssignedAgentName] = useState<string | null>(null);
+  const [isAssigned, setIsAssigned] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -69,9 +71,24 @@ const [messages, setMessages] = useState<Message[]>([
     setIsChatOpen(false);
   }, [location.pathname]);
 
-  // Load available agents when chat opens
+  // when chat popup opens read assignment from storage and load agents if needed
   useEffect(() => {
     if (!isChatOpen) return;
+
+    const stored = localStorage.getItem('assignedAgent');
+    if (stored) {
+      try {
+        const obj = JSON.parse(stored) as { agentId: string; username: string };
+        setSelectedAgentId(obj.agentId);
+        setAssignedAgentName(obj.username);
+        setIsAssigned(true);
+      } catch {
+        localStorage.removeItem('assignedAgent');
+      }
+      // already assigned; no agent list needed
+      return;
+    }
+
     const load = async () => {
       setAgentsLoading(true);
       try {
@@ -126,7 +143,7 @@ const [messages, setMessages] = useState<Message[]>([
   // };
 
   const handleSendMessage = () => {
-  if (!selectedAgentId) return;
+  if (!isAssigned) return;
   if (newMessage.trim() || selectedImage) {
     const message = {
       id: messages.length + 1,
@@ -175,6 +192,15 @@ const [messages, setMessages] = useState<Message[]>([
       });
       const data = await res.json();
       if (res.ok) {
+        // store assigned agent information
+        const assigned = availableAgents.find((a) => a._id === selectedAgentId);
+        const name = assigned ? assigned.username : '';
+        setAssignedAgentName(name);
+        setIsAssigned(true);
+        try {
+          localStorage.setItem('assignedAgent', JSON.stringify({ agentId: selectedAgentId, username: name }));
+        } catch {}
+
         setMessages((prev) => [
           ...prev,
           {
@@ -427,7 +453,11 @@ const handleRemoveImage = () => {
             {/* Agent selector */}
             <div className="p-3 border-t bg-white dark:bg-gray-800">
               <div className="flex items-center space-x-2">
-                {agentsLoading ? (
+                {isAssigned ? (
+                  <p className="text-sm text-gray-500">
+                    Assigned to <span className="font-semibold">{assignedAgentName}</span>
+                  </p>
+                ) : agentsLoading ? (
                   <div className="text-sm text-gray-500">Loading agents...</div>
                 ) : availableAgents.length > 0 ? (
                   <select
@@ -446,14 +476,16 @@ const handleRemoveImage = () => {
                   <div className="text-sm text-gray-500">Agent not found</div>
                 )}
 
-                <Button
-                  onClick={handleAssignAgent}
-                  size="sm"
-                  className="bg-green-500 hover:bg-green-600"
-                  disabled={assigning || !selectedAgentId}
-                >
-                  {assigning ? "Assigning..." : "Assign"}
-                </Button>
+                {!isAssigned && (
+                  <Button
+                    onClick={handleAssignAgent}
+                    size="sm"
+                    className="bg-green-500 hover:bg-green-600"
+                    disabled={assigning || !selectedAgentId}
+                  >
+                    {assigning ? "Assigning..." : "Assign"}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -481,9 +513,9 @@ const handleRemoveImage = () => {
               <div className="flex space-x-2 items-center">
                 <div>
   <div
-    onClick={selectedAgentId ? handleIconClick : undefined}
+    onClick={isAssigned ? handleIconClick : undefined}
     className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-      selectedAgentId ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+      isAssigned ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
     }`}
   >
     <Plus size={15} className="text-gray-400" />
@@ -496,14 +528,14 @@ const handleRemoveImage = () => {
     ref={fileInputRef}
     onChange={handleFileChange}
     className="hidden"
-    disabled={!selectedAgentId}
+    disabled={!isAssigned}
   />
 </div>
                 <div className="md:hidden block">
   <div
-    onClick={selectedAgentId ? handleCameraClick : undefined}
+    onClick={isAssigned ? handleCameraClick : undefined}
     className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-      selectedAgentId ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+      isAssigned ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
     }`}
   >
     <Camera size={15} className="text-gray-400" />
@@ -517,7 +549,7 @@ const handleRemoveImage = () => {
     ref={fileInputRef}
     onChange={handleCapture}
     className="hidden"
-    disabled={!selectedAgentId}
+    disabled={!isAssigned}
   />
 </div>
                 <input
@@ -527,11 +559,11 @@ const handleRemoveImage = () => {
                     setNewMessage(e.target.value)
                   }
                   placeholder={
-                    selectedAgentId
+                    isAssigned
                       ? "Type your message..."
-                      : "Select an agent to start chat"
+                      : "Assign an agent to start chat"
                   }
-                  disabled={!selectedAgentId}
+                  disabled={!isAssigned}
                   onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
                     e.key === "Enter" && handleSendMessage()
                   }
@@ -541,7 +573,7 @@ const handleRemoveImage = () => {
                   onClick={handleSendMessage}
                   size="sm"
                   className="bg-green-500 hover:bg-green-600 py-2 px-2"
-                  disabled={!selectedAgentId || !newMessage.trim()}
+                  disabled={!isAssigned || !newMessage.trim()}
                 >
                   <Send className="w-4 h-4" />
                 </Button>

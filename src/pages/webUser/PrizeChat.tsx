@@ -39,6 +39,8 @@ export default function PrizeChat() {
 
   const [availableAgents, setAvailableAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
+  const [assignedAgentName, setAssignedAgentName] = useState<string | null>(null)
+  const [isAssigned, setIsAssigned] = useState(false)
   const [assigning, setAssigning] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -69,8 +71,24 @@ export default function PrizeChat() {
     container.scrollTop = container.scrollHeight
   }, [messages])
 
-  // Fetch available agents for dropdown (include Authorization header if available)
+  // when component mounts figure out whether user already has an assigned agent
   useEffect(() => {
+    const stored = localStorage.getItem('assignedAgent')
+    if (stored) {
+      try {
+        const obj = JSON.parse(stored) as { agentId: string; username: string }
+        setSelectedAgentId(obj.agentId)
+        setAssignedAgentName(obj.username)
+        setIsAssigned(true)
+      } catch {
+        // ignore parse errors
+        localStorage.removeItem('assignedAgent')
+      }
+      // we've already assigned; no need to fetch the agent list
+      return
+    }
+
+    // Fetch available agents for dropdown if not assigned
     const loadAgents = async () => {
       try {
         const backend = 'http://192.168.1.99:5000'
@@ -85,7 +103,7 @@ export default function PrizeChat() {
         })
         const data = await res.json()
         if (res.ok && data?.data?.agents) {
-          setAvailableAgents(data.data.agents)
+          setAvailableAgents(data.data?.agents)
         }
       } catch (err) {
         // ignore silently for now
@@ -93,6 +111,7 @@ export default function PrizeChat() {
     }
 
     loadAgents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const availablePrizes: AvailablePrize[] = [
@@ -154,7 +173,7 @@ export default function PrizeChat() {
   const [newMessage, setNewMessage] = useState("")
 
   const handleSendMessage = () => {
-    if (!selectedAgentId) return
+    if (!isAssigned) return
     if (!newMessage.trim()) return
 
     const time = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
@@ -207,6 +226,20 @@ export default function PrizeChat() {
 
       const data = await res.json()
       if (res.ok) {
+        // lookup agent username for display/storage
+        const assigned = availableAgents.find((a) => a._id === selectedAgentId)
+        const name = assigned ? assigned.username : ''
+
+        // mark as assigned and persist
+        setIsAssigned(true)
+        setAssignedAgentName(name)
+        try {
+          localStorage.setItem(
+            'assignedAgent',
+            JSON.stringify({ agentId: selectedAgentId, username: name })
+          )
+        } catch {}
+
         setMessages((prev) => [
           ...prev,
           {
@@ -279,23 +312,33 @@ export default function PrizeChat() {
             {/* Agent selector */}
             <div className="flex items-center justify-between gap-3 p-4 border-b border-primary/10">
               <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-300">Select Agent</label>
-                <select
-                  className="bg-card/40 text-sm text-white px-3 py-1 rounded-md"
-                  value={selectedAgentId ?? ''}
-                  onChange={(e) => setSelectedAgentId(e.target.value || null)}
-                >
-                  <option value="">-- Choose an agent --</option>
-                  {availableAgents.map((a) => (
-                    <option key={a._id} value={a._id}>{a.username} {a.activeChatCount ? `(${a.activeChatCount})` : ''}</option>
-                  ))}
-                </select>
-              </div>
+              {isAssigned ? (
+                <p className="text-sm text-gray-300">
+                  Assigned to <span className="font-semibold">{assignedAgentName}</span>
+                </p>
+              ) : (
+                <>
+                  <label className="text-sm text-gray-300">Select Agent</label>
+                  <select
+                    className="bg-card/40 text-sm text-white px-3 py-1 rounded-md"
+                    value={selectedAgentId ?? ''}
+                    onChange={(e) => setSelectedAgentId(e.target.value || null)}
+                  >
+                    <option value="">-- Choose an agent --</option>
+                    {availableAgents.map((a) => (
+                      <option key={a._id} value={a._id}>{a.username} {a.activeChatCount ? `(${a.activeChatCount})` : ''}</option>
+                    ))}
+                  </select>
+                </>
+              )}
+            </div>
+            {!isAssigned && (
               <div>
                 <Button size="sm" onClick={handleAssignAgent} disabled={!selectedAgentId || assigning}>
                   {assigning ? 'Assigning...' : 'Assign Agent'}
                 </Button>
               </div>
+            )}
             </div>
             {/* Messages */}
             <div
@@ -361,12 +404,12 @@ export default function PrizeChat() {
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={selectedAgentId ? "Type your message..." : "Select an agent to start chat"}
-                  disabled={!selectedAgentId}
+                  placeholder={isAssigned ? "Type your message..." : "Assign an agent to start chat"}
+                  disabled={!isAssigned}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   className="flex-1 h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <Button onClick={handleSendMessage} disabled={!selectedAgentId || !newMessage.trim()}>
+                <Button onClick={handleSendMessage} disabled={!isAssigned || !newMessage.trim()}>
                   Send
                 </Button>
               </div>
