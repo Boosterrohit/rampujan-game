@@ -153,7 +153,11 @@ export function AdminManagement() {
               </tbody>
             </table>
             <AppPagination
-              count={totalPages ?? 1}
+              count={totalPages ?? 0}
+              currentPage={paginationState.page}
+              totalPages={totalPages}
+              hasNextPage={paginationState.page < (totalPages ?? 0)}
+              hasPreviousPage={paginationState.page > 1}
               onPaginationChange={handlePaginationChange}
             />
           </div>

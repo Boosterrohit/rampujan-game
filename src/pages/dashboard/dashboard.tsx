@@ -98,7 +98,7 @@ export function Dashboard() {
             </span>
           </p>
           <div className="w-full h-[300px] sm:h-[350px] overflow-auto">
-            {safeAgentPlayers.length === 0 ? (
+            {totalPlayers === 0 ? (
               <div className="flex items-center justify-center h-full text-gray-400">
                 No players available
               </div>
@@ -198,8 +198,14 @@ export function Dashboard() {
             )}
              
             </table>
-            <AppPagination count={totalPages ?? 1}  // total pages from redux, not agentPlayers.length
-  onPaginationChange={handlePaginationChange} />
+            <AppPagination
+              count={totalPages ?? 0}
+              currentPage={paginationState.page}
+              totalPages={totalPages}
+              hasNextPage={paginationState.page < (totalPages ?? 0)}
+              hasPreviousPage={paginationState.page > 1}
+              onPaginationChange={handlePaginationChange}
+            />
                       </div>
         </CardContent>
       </Card>
