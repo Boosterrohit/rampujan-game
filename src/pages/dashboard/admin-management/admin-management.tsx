@@ -12,6 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Trash2, Edit, Plus, Eye } from "lucide-react";
 import { useDialog } from "@/components/dashboard/element/DialogContext";
 import AdminForm from "./admin-form";
+import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
+import { useEffect, useState } from "react";
+import { dashboardSelector } from "../redux/selector";
+import { playerListRequest } from "../redux/dashboardSlice";
+import AppPagination from "@/components/dashboard/element/AppPagination";
+import useDebounce from "@/hooks/useDebounce";
 
 const admins = [
   {
@@ -46,6 +52,24 @@ const admins = [
 
 export function AdminManagement() {
   const { openDialog } = useDialog();
+  const dispatch = useAppDispatch();
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+    const [paginationState, setPaginationState] = useState({
+      limit: '10',
+      page: 1,
+    });
+    const { agentPlayers, loading, totalPages } = useAppSelector(dashboardSelector);
+    const handlePaginationChange = (perPage: string, currentPage: number) => {
+      setPaginationState({ limit: perPage, page: currentPage });
+    };
+      useEffect(() => {
+        dispatch(playerListRequest({
+          limit: paginationState.limit,
+          page: paginationState.page,
+          search: debouncedSearchTerm
+        }));
+      }, [dispatch, paginationState, debouncedSearchTerm]);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2">
@@ -75,6 +99,7 @@ export function AdminManagement() {
             <Input
               placeholder="Search agents..."
               className="max-w-sm text-white border-white"
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="overflow-x-auto">
@@ -99,31 +124,37 @@ export function AdminManagement() {
                 </tr>
               </thead>
               <tbody>
-                {admins.map((admin) => (
+                
+                {agentPlayers.map((admin) => (
                   <tr
-                    key={admin.id}
+                    key={admin.agent._id}
                     className="border-b hover:bg-gray-700 border-gray-600"
                   >
-                    <td className="py-3 px-4 text-gray-300">{admin.name}</td>
-                    <td className="py-3 px-4 text-gray-300">{admin.email}</td>
+                    <td className="py-3 px-4 text-gray-300">{admin.agent.username}</td>
+                    <td className="py-3 px-4 text-gray-300">{
+  admin.agent.email.length > 25
+    ? admin.agent.email.slice(0, 25) + "..."
+    : admin.agent.email
+}</td>
                     <td className="py-3 px-4">
                       <span className="bg-gray-500 text-white px-2 py-1 rounded text-sm">
-                        {admin.role}
+                        {/* {admin.agent.role} */}Agent
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center">
                       <span
-                        className={`px-2 py-1 rounded text-sm ${admin.status === "Active" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}`}
+                        className={`px-2 py-1 rounded text-sm bg-green-200 text-green-700`} //${admin.status === "Active" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}
                       >
-                        {admin.status}
+                        {/* {admin.status} */}
+                        Active
                       </span>
                     </td>
                     <td className="py-3 px-4 flex items-center justify-center gap-2">
-                      <Button className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0">
+                      {/* <Button className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0">
                         <Eye className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
 
-                      <Button className="text-green-700 bg-green-200 rounded-full w-9 h-9 hover:bg-green-300 p-0">
+                      <Button className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0">
                         <Edit className="w-4 h-4" />
                       </Button>
 
@@ -135,6 +166,8 @@ export function AdminManagement() {
                 ))}
               </tbody>
             </table>
+            <AppPagination count={totalPages ?? 1}  // total pages from redux, not agentPlayers.length
+  onPaginationChange={handlePaginationChange} />
           </div>
         </CardContent>
       </Card>

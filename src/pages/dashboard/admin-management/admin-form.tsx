@@ -2,22 +2,33 @@ import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import AppInput from "@/components/dashboard/element/AppInput";
 import AppButton from "@/components/dashboard/element/AppButton";
+import { AgentCreationData } from "../redux/types";
+import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
+import { dashboardSelector } from "../redux/selector";
+import { createAgentRequest } from "../redux/dashboardSlice";
+import { useDialog } from "@/components/dashboard/element/DialogContext";
+import { useState } from "react";
+import useDebounce from "@/hooks/useDebounce";
 const AdminForm = () => {
-  const initialState = {
+  const dispatch = useAppDispatch();
+   const { closeDialog } = useDialog();
+    
+  const {loading} = useAppSelector(dashboardSelector)
+  const initialState: AgentCreationData = {
     email: "",
     password: "",
     username: "",
-    initalBalance: "",
+    walletBalance: 0,
   };
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string().required("Password is required"),
     username: Yup.string().required("Username is required"),
-    initalBalance: Yup.string().required("Initial balance is required"),
+    walletBalance: Yup.number().required("Initial balance is required"),
   });
 
-  const handleSubmit = async (values: any) => {
-    console.log(values)
+   const handleSubmit = async (values: AgentCreationData) => {
+    dispatch(createAgentRequest({ ...values, onSuccess: closeDialog })); // pass closeDialog as callback
   };
   return <div>
 <Formik initialValues={initialState} validationSchema={validationSchema} onSubmit={handleSubmit}>
@@ -57,12 +68,12 @@ const AdminForm = () => {
                          <AppInput
                     id="initialBalance"
                     label="Initial Balance"
-                    name="initalBalance"
-                    value={values?.initalBalance}
+                    name="walletBalance"
+                    value={values?.walletBalance.toString()}
                     required
                     className="w-full"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setFieldValue('initalBalance', e.target.value);
+                      setFieldValue('walletBalance', e.target.value);
                     }}
                   />
                     </div>
@@ -81,7 +92,7 @@ const AdminForm = () => {
                   </div>
                    </div>
                  
-            <AppButton label='Submit'  type='submit' className='w-full rounded-md text-white !bg-[#615ed6] hover:!bg-[#4e48c9] !outline-none'/>
+            <AppButton label='Submit'  type='submit' className='w-full rounded-md text-white !bg-[#615ed6] hover:!bg-[#4e48c9] !outline-none' loading={loading} disabled={loading}/>
           
           </Form>
         )}

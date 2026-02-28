@@ -78,13 +78,13 @@ const AppPagination: React.FC<AppPaginationProps> = ({
 
   return (
     <div className="flex items-center justify-end space-x-2 py-4">
-      <div className="flex-1 text-sm text-muted-foreground">{`Page ${currentPage} of ${totalPages}`}</div>
+      <div className="flex-1 text-sm text-gray-400">{`Page ${currentPage} of ${totalPages}`}</div>
       <div className="space-x-2 flex items-center gap-4">
         <div className="flex items-center gap-2 w-full">
-          <span className="text-sm text-muted-foreground lg:block hidden">Rows per page</span>
+          <span className="text-sm text-gray-400 lg:block hidden">Rows per page</span>
 
           <Select onValueChange={handleRowPerPageChange} value={perPage}>
-            <SelectTrigger className="w-[70px] h-[30px] pe-1">
+            <SelectTrigger className="w-[70px] h-[30px] pe-1 border border-gray-600 bg-transparent rounded-md">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -97,16 +97,16 @@ const AppPagination: React.FC<AppPaginationProps> = ({
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline"  disabled={isPrevDisabled} onClick={() => handlePagination("first")}>
+          <Button className="border border-white bg-transparent"  disabled={isPrevDisabled} onClick={() => handlePagination("first")}>
             <ChevronsLeft />
           </Button>
-          <Button variant="outline"  disabled={isPrevDisabled} onClick={() => handlePagination("prev")}>
+          <Button className="border border-white bg-transparent"  disabled={isPrevDisabled} onClick={() => handlePagination("prev")}>
             <ChevronLeft />
           </Button>
-          <Button variant="outline"  disabled={isNextDisabled} onClick={() => handlePagination("next")}>
+          <Button className="border border-white bg-transparent"  disabled={isNextDisabled} onClick={() => handlePagination("next")}>
             <ChevronRight />
           </Button>
-          <Button variant="outline"  disabled={isNextDisabled} onClick={() => handlePagination("last")}>
+          <Button className="border border-white bg-transparent"  disabled={isNextDisabled} onClick={() => handlePagination("last")}>
             <ChevronsRight />
           </Button>
         </div>

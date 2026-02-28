@@ -22,13 +22,16 @@ export function Dashboard() {
     limit: '10',
     page: 1,
   });
-  const { agentPlayers, loading, nextPage, previousPage, totalPages } = useAppSelector(dashboardSelector);
+  const { agentPlayers, loading, totalPages } = useAppSelector(dashboardSelector);
   
    const handlePaginationChange = (perPage: string, currentPage: number) => {
   setPaginationState({ limit: perPage, page: currentPage });
 };
   useEffect(() => {
-    dispatch(playerListRequest(paginationState));
+    dispatch(playerListRequest({
+      limit: paginationState.limit,
+      page: paginationState.page,
+      search: ''}));
   }, [dispatch, paginationState]);
 
   const totalPlayers = agentPlayers.reduce((acc, group) => acc + group.players.length, 0);
