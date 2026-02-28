@@ -363,7 +363,7 @@ const handleRemoveImage = () => {
         ref={chatRef}
         className="fixed bottom-4 md:bottom-4 right-3  md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
       >
-        <Card className="w-full h-full shadow-2xl border-2">
+        <Card className="w-full h-full shadow-2xl border-2 bg-orange-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
             <CardTitle className="text-sm font-medium">
               Chat with Agent
@@ -379,7 +379,7 @@ const handleRemoveImage = () => {
           </CardHeader>
           <CardContent className="p-0 flex flex-col h-full">
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-3 overflow-hidden space-y-3 bg-gray-50 dark:bg-gray-900">
+            <div className="flex-1 overflow-y-auto p-3 overflow-hidden space-y-3 bg-card dark:bg-gray-900">
               {/* {messages.map((message) => (
                 <div
                   key={message.id}
@@ -414,7 +414,7 @@ const handleRemoveImage = () => {
       className={`max-w-[70%] p-2 rounded-lg text-sm ${
         message.sender === "user"
           ? "bg-green-500 text-white"
-          : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border"
+          : "bg-gray-800 text-white  border"
       }`}
     >
       {message.image && (
@@ -440,7 +440,7 @@ const handleRemoveImage = () => {
             </div>
 
             {/* Agent selector */}
-            <div className="p-3 border-t bg-white dark:bg-gray-800">
+            <div className="p-3 border-t bg-gray-800 dark:bg-gray-800">
               <div className="flex items-center space-x-2">
                 {isAssigned ? (
                   <p className="text-sm text-gray-500">
@@ -452,7 +452,7 @@ const handleRemoveImage = () => {
                   <select
                     value={selectedAgentId ?? ""}
                     onChange={(e) => setSelectedAgentId(e.target.value || null)}
-                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                    className="flex-1 h-9 rounded-md border border-white border-input bg-transparent px-3 py-1 text-sm"
                   >
                     <option value="" className="text-black">Select agent</option>
                     {availableAgents.map((a) => (
@@ -498,7 +498,7 @@ const handleRemoveImage = () => {
 )}
 
             {/* Input */}
-            <div className="p-3 mb-14 border-t bg-white dark:bg-gray-800">
+            <div className="p-3 mb-14 border-t bg-gray-800">
               <div className="flex space-x-2 items-center">
                 <div>
   <div
@@ -556,7 +556,7 @@ const handleRemoveImage = () => {
                   onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
                     e.key === "Enter" && handleSendMessage()
                   }
-                  className="flex-1 h-9 w-9 rounded-md border border-input border-gray-500 bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex-1 h-9 w-9 rounded-md border border-input border-white bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 <Button
                   onClick={handleSendMessage}
