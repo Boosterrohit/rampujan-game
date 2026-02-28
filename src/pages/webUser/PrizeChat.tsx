@@ -199,11 +199,12 @@ export default function PrizeChat() {
         setChatId(data.data.chat?._id || null)
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse()
+        const base = 'http://192.168.1.99:5000';
         const mapped: ChatMessage[] = source.map((m: any, idx: number) => ({
           id: idx,
           sender: m.senderRole === 'player' ? 'user' : 'system',
           message: m.content,
-          imageUrl: m.imageUrl,
+          imageUrl: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
           timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
         }))
         setMessages(mapped)
@@ -238,13 +239,14 @@ export default function PrizeChat() {
         if (res.ok && data?.data?.message) {
           const m = data.data.message
           setChatId(data.data.chatId || chatId || null)
+          const base = 'http://192.168.1.99:5000';
           setMessages((prev) => [
             ...prev,
             {
               id: prev.length + 1,
               sender: 'user',
               message: m.content,
-              imageUrl: m.imageUrl,
+              imageUrl: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
               timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
             },
           ])

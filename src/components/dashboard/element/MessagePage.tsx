@@ -143,9 +143,10 @@ export default function MessagePage() {
       if (res.ok && data?.data?.messages) {
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
+        const base = "http://192.168.1.99:5000";
         const formatted = source.map((msg: any) => ({
           text: msg.content,
-          image: msg.imageUrl || undefined,
+          image: msg.imageUrl ? `${base}${msg.imageUrl}` : undefined,
           sender: msg.senderRole === "agent" ? "me" : "other",
           timestamp: msg.createdAt
             ? new Date(msg.createdAt).toLocaleTimeString([], {
@@ -187,9 +188,10 @@ export default function MessagePage() {
 
         if (res.ok && data?.data?.message) {
           const m = data.data.message;
+          const base = "http://192.168.1.99:5000";
           const next: Message = {
             text: m.content,
-            image: m.imageUrl,
+            image: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
             sender: "me",
             timestamp: m.createdAt
               ? new Date(m.createdAt).toLocaleTimeString([], {

@@ -260,25 +260,29 @@ export default function SocialSidebar() {
         if (data?.data?.chat?._id) setChatId(data.data.chat._id);
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
-        const formattedMessages = source.map((msg: Message, idx: number) => ({
-          _id: msg._id,
-          id: idx,
-          senderId: msg.senderId,
-          senderRole: msg.senderRole,
-          messageType: msg.messageType,
-          content: msg.content,
-          imageUrl: msg.imageUrl,
-          createdAt: msg.createdAt,
-          isRead: msg.isRead,
-          sender: msg.senderRole === "player" ? "user" : "agent",
-          text: msg.content,
-          time: new Date(msg.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
-          image: msg.imageUrl || undefined,
-        }));
+        const formattedMessages = source.map((msg: Message, idx: number) => {
+          const base = "http://192.168.1.99:5000"; // could be moved to config
+          const fullImage = msg.imageUrl ? `${base}${msg.imageUrl}` : undefined;
+          return {
+            _id: msg._id,
+            id: idx,
+            senderId: msg.senderId,
+            senderRole: msg.senderRole,
+            messageType: msg.messageType,
+            content: msg.content,
+            imageUrl: msg.imageUrl,
+            createdAt: msg.createdAt,
+            isRead: msg.isRead,
+            sender: msg.senderRole === "player" ? "user" : "agent",
+            text: msg.content,
+            time: new Date(msg.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }),
+            image: fullImage,
+          };
+        });
         setMessages(formattedMessages);
       }
     } catch (err) {
@@ -319,6 +323,7 @@ export default function SocialSidebar() {
         const data = await res.json();
         if (res.ok && data?.data?.message) {
           const newMsg = data.data.message;
+          const base = "http://192.168.1.99:5000";
           const formattedMsg: LocalMessage = {
             _id: newMsg._id,
             senderId: newMsg.senderId,
@@ -334,7 +339,7 @@ export default function SocialSidebar() {
               hour: "2-digit",
               minute: "2-digit",
             }),
-            image: newMsg.imageUrl,
+            image: newMsg.imageUrl ? `${base}${newMsg.imageUrl}` : undefined,
           };
           setMessages((prev) => [...prev, formattedMsg]);
           setNewMessage("");
