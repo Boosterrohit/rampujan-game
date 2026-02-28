@@ -135,7 +135,7 @@ export default function MessagePage() {
       const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`/api/v1/chat/messages?chatId=${chatId}`, {
+      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages?chatId=${chatId}`, {
         headers,
       });
       const data = await res.json();
@@ -178,7 +178,7 @@ export default function MessagePage() {
         if (input.trim()) formData.append("content", input.trim());
         formData.append("chatId", selectedChatId);
 
-        const res = await fetch("/api/v1/chat/message/image", {
+        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/message/image", {
           method: "POST",
           headers,
           body: formData,
@@ -206,7 +206,7 @@ export default function MessagePage() {
         }
       } else {
         headers["Content-Type"] = "application/json; charset=utf-8";
-        const res = await fetch("/api/v1/chat/message", {
+        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/message", {
           method: "POST",
           headers,
           body: JSON.stringify({ content: input, chatId: selectedChatId }),

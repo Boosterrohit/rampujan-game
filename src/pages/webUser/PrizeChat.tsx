@@ -94,7 +94,7 @@ export default function PrizeChat() {
         const headers: any = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
 
-        const res = await fetch(`/api/v1/chat/agents/available`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/agents/available`, {
           method: 'GET',
           credentials: 'include',
           headers,
@@ -188,7 +188,7 @@ export default function PrizeChat() {
       const headers: any = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch(`/api/v1/chat/messages`, {
+      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages`, {
         method: 'GET',
         credentials: 'include',
         headers,
@@ -227,7 +227,7 @@ export default function PrizeChat() {
         formData.append('image', selectedImage)
         if (newMessage.trim()) formData.append('content', newMessage)
 
-        const res = await fetch(`/api/v1/chat/message/image`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message/image`, {
           method: 'POST',
           headers,
           credentials: 'include',
@@ -254,7 +254,7 @@ export default function PrizeChat() {
         }
       } else {
         headers['Content-Type'] = 'application/json; charset=utf-8'
-        const res = await fetch(`/api/v1/chat/message`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message`, {
           method: 'POST',
           headers,
           credentials: 'include',

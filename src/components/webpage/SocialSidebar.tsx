@@ -121,7 +121,7 @@ export default function SocialSidebar() {
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
         
-        const res = await fetch(`/api/v1/chat/agents/available`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/agents/available`, {
           headers,
         });
         const data = await res.json();
@@ -214,7 +214,7 @@ export default function SocialSidebar() {
       const queryParam =
         isAgent && messagesChatId ? `?chatId=${messagesChatId}` : "";
       
-      const res = await fetch(`/api/v1/chat/messages${queryParam}`, {
+      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages${queryParam}`, {
         headers,
       });
       const data = await res.json();
@@ -273,7 +273,7 @@ export default function SocialSidebar() {
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch(`/api/v1/chat/message/image`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message/image`, {
           method: "POST",
           headers,
           body: formData,
@@ -315,7 +315,7 @@ export default function SocialSidebar() {
           body.chatId = chatId;
         }
 
-        const res = await fetch(`/api/v1/chat/message`, {
+        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message`, {
           method: "POST",
           headers,
           body: JSON.stringify(body),
@@ -512,212 +512,218 @@ const handleRemoveImage = () => {
 
       {/* Chat Popup */}
       {isChatOpen && (
-        <div
-          ref={chatRef}
-          className="fixed bottom-4 md:bottom-4 right-3 md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
+  <div
+    ref={chatRef}
+    className="fixed bottom-6 right-3 md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
+  >
+    <Card className="w-full h-full shadow-2xl border-2 flex flex-col overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg flex-shrink-0">
+        <CardTitle className="text-sm font-medium">
+          Chat with Agent
+        </CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsChatOpen(false)}
+          className="h-6 w-6 p-0 text-white hover:bg-white/20"
         >
-          <Card className="w-full h-full shadow-2xl border-2">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
-            <CardTitle className="text-sm font-medium">
-              Chat with Agent
-            </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsChatOpen(false)}
-              className="h-6 w-6 p-0 text-white hover:bg-white/20"
+          <X className="h-4 w-4" />
+        </Button>
+      </CardHeader>
+
+      <CardContent className="p-0 flex flex-col flex-1 overflow-hidden min-h-0">
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 min-h-0">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0 flex flex-col h-full">
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-900">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[70%] p-2 rounded-lg text-sm ${
-                      message.sender === "user"
-                        ? "bg-green-500 text-white"
-                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border"
-                    }`}
-                  >
-                    {message.image && (
-                      <img
-                        src={message.image}
-                        alt="Sent image"
-                        className="rounded mb-2 max-w-full h-auto"
-                      />
-                    )}
-                    {message.text && <p>{message.text}</p>}
-                    <p
-                      className={`text-xs mt-1 ${
-                        message.sender === "user"
-                          ? "text-green-100"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {message.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Agent selector */}
-            <div className="p-3 border-t bg-white dark:bg-gray-800">
-              <div className="flex items-center space-x-2">
-                {isAssigned ? (
-                  <p className="text-sm text-gray-500">
-                    Assigned to <span className="font-semibold">{assignedAgentName}</span>
-                  </p>
-                ) : agentsLoading ? (
-                  <div className="text-sm text-gray-500">Loading agents...</div>
-                ) : availableAgents.length > 0 ? (
-                  <select
-                    value={selectedAgentId ?? ""}
-                    onChange={(e) => setSelectedAgentId(e.target.value || null)}
-                    className="flex-1 h-9 rounded-md border border-white border-input bg-transparent px-3 py-1 text-sm"
-                  >
-                    <option value="" className="text-black">Select agent</option>
-                    {availableAgents.map((a) => (
-                      <option key={a._id} value={a._id} className="text-black">
-                        {a.username}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="text-sm text-gray-500">Agent not found</div>
-                )}
-
-                {!isAssigned && (
-                  <Button
-                    onClick={handleAssignAgent}
-                    size="sm"
-                    className="bg-green-500 hover:bg-green-600"
-                    disabled={assigning || !selectedAgentId}
-                  >
-                    {assigning ? "Assigning..." : "Assign"}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-              {imagePreview && (
-                <div className="p-1 border-t bg-white dark:bg-gray-800">
-                  <div className="relative inline-block">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="h-40 w-40 object-cover rounded-lg border-2 border-gray-300"
-                    />
-                    <button
-                      onClick={handleRemoveImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-            {/* Input */}
-            <div className="p-3 border-t bg-white dark:bg-gray-800 relative">
-              {showEmoji && (
-                <div className="absolute bottom-full left-2 mb-1 z-50">
-                  <EmojiPicker
-                    theme={Theme.DARK}
-                    onEmojiClick={(d) => {
-                      setNewMessage((p) => p + d.emoji);
-                      setShowEmoji(false);
-                    }}
-                    width={280}
-                    height={360}
+              <div
+                className={`max-w-[70%] p-2 rounded-lg text-sm ${
+                  message.sender === "user"
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-800 text-white border"
+                }`}
+              >
+                {message.image && (
+                  <img
+                    src={message.image}
+                    alt="Sent image"
+                    className="rounded mb-2 max-w-full h-auto"
                   />
-                </div>
-              )}
-              <div className="flex space-x-2 items-center">
-                <button
-                  type="button"
-                  onClick={() => isAssigned && setShowEmoji((p) => !p)}
-                  className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-                    isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                )}
+                {message.text && <p>{message.text}</p>}
+                <p
+                  className={`text-xs mt-1 ${
+                    message.sender === "user"
+                      ? "text-green-100"
+                      : "text-gray-500"
                   }`}
                 >
-                  <Smile size={15} className="text-gray-400" />
-                </button>
-                <div>
-                  <div
-                    onClick={isAssigned ? handleIconClick : undefined}
-                    className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-                      isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-                    }`}
-                  >
-                    <Plus size={15} className="text-gray-400" />
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    disabled={!isAssigned}
-                  />
-                </div>
-                <div className="md:hidden block">
-                  <div
-                    onClick={isAssigned ? handleCameraClick : undefined}
-                    className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-                      isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-                    }`}
-                  >
-                    <Camera size={15} className="text-gray-400" />
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    ref={cameraInputRef}
-                    onChange={handleCapture}
-                    className="hidden"
-                    disabled={!isAssigned}
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setNewMessage(e.target.value)
-                  }
-                  placeholder={
-                    isAssigned
-                      ? "Type your message..."
-                      : "Assign an agent to start chat"
-                  }
-                  disabled={!isAssigned}
-                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                    e.key === "Enter" && handleSendMessage()
-                  }
-                  className="flex-1 h-9 rounded-md border border-input border-gray-500 bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  size="sm"
-                  className="bg-green-500 hover:bg-green-600 py-2 px-2"
-                  disabled={!isAssigned || (!newMessage.trim() && !selectedImage)}
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
+                  {message.time}
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-      )}
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Agent selector */}
+        <div className="p-3 border-t bg-gray-800 flex-shrink-0">
+          <div className="flex items-center space-x-2">
+            {isAssigned ? (
+              <p className="text-sm text-gray-500">
+                Assigned to <span className="font-semibold">{assignedAgentName}</span>
+              </p>
+            ) : agentsLoading ? (
+              <div className="text-sm text-gray-500">Loading agents...</div>
+            ) : availableAgents.length > 0 ? (
+              <select
+                value={selectedAgentId ?? ""}
+                onChange={(e) => setSelectedAgentId(e.target.value || null)}
+                className="flex-1 h-9 rounded-md border border-white border-input bg-transparent px-3 py-1 text-sm"
+              >
+                <option value="" className="text-black">Select agent</option>
+                {availableAgents.map((a) => (
+                  <option key={a._id} value={a._id} className="text-black">
+                    {a.username}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="text-sm text-gray-500">Agent not found</div>
+            )}
+
+            {!isAssigned && (
+              <Button
+                onClick={handleAssignAgent}
+                size="sm"
+                className="bg-green-500 hover:bg-green-600"
+                disabled={assigning || !selectedAgentId}
+              >
+                {assigning ? "Assigning..." : "Assign"}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="p-1 border-t bg-white dark:bg-gray-800 flex-shrink-0">
+            <div className="relative inline-block">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="h-40 w-40 object-cover rounded-lg border-2 border-gray-300"
+              />
+              <button
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Input */}
+        <div className="p-3 border-t bg-gray-800 relative flex-shrink-0">
+          {showEmoji && (
+            <div className="absolute bottom-full left-2 mb-1 z-50">
+              <EmojiPicker
+                theme={Theme.DARK}
+                onEmojiClick={(d) => {
+                  setNewMessage((p) => p + d.emoji);
+                  setShowEmoji(false);
+                }}
+                width={280}
+                height={360}
+              />
+            </div>
+          )}
+          <div className="flex space-x-2 items-center">
+            {/* <button
+              type="button"
+              onClick={() => isAssigned && setShowEmoji((p) => !p)}
+              className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+                isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+              }`}
+            >
+              <Smile size={15} className="text-gray-400" />
+            </button> */}
+
+            <div>
+              <div
+                onClick={isAssigned ? handleIconClick : undefined}
+                className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+                  isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <Plus size={15} className="text-gray-400" />
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                disabled={!isAssigned}
+              />
+            </div>
+
+            <div className="md:hidden block">
+              <div
+                onClick={isAssigned ? handleCameraClick : undefined}
+                className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+                  isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <Camera size={15} className="text-gray-400" />
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                ref={cameraInputRef}
+                onChange={handleCapture}
+                className="hidden"
+                disabled={!isAssigned}
+              />
+            </div>
+
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewMessage(e.target.value)
+              }
+              placeholder={
+                isAssigned
+                  ? "Type your message..."
+                  : "Assign an agent to start chat"
+              }
+              disabled={!isAssigned}
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                e.key === "Enter" && handleSendMessage()
+              }
+              className="flex-1 h-9 rounded-md border border-input border-white bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            />
+
+            <Button
+              onClick={handleSendMessage}
+              size="sm"
+              className="bg-green-500 hover:bg-green-600 py-2 px-2"
+              disabled={!isAssigned || (!newMessage.trim() && !selectedImage)}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)}
     </>
   );
 }
