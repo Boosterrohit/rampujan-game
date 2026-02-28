@@ -56,7 +56,7 @@ export default function MessagePage() {
       const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch("/api/v1/chat/agent/chats?limit=50", { headers });
+      const res = await fetch("http://192.168.1.99:5000/api/v1/chat/agent/chats?limit=50", { headers });
       if (res.status === 403) {
         setForbidden(true);
         return;

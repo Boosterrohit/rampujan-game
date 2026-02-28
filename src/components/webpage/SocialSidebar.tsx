@@ -610,7 +610,7 @@ const handleRemoveImage = () => {
 
         {/* Image Preview */}
         {imagePreview && (
-          <div className="p-1 border-t bg-white dark:bg-gray-800 flex-shrink-0">
+          <div className="p-1 border-t bg-gray-800 flex-shrink-0">
             <div className="relative inline-block">
               <img
                 src={imagePreview}
