@@ -20,6 +20,16 @@ export interface AgentWithPlayers {
   players: Player[]
 }
 // player and agent types end
+// create agent
+export interface AgentCreationData {
+  agentId?: string
+  username: string
+  email: string
+  password: string
+  walletBalance: number
+  onSuccess?: () => void
+}
+
 export interface allDashboardProps {
     agentPlayers: AgentWithPlayers[];
     loading?: boolean;
