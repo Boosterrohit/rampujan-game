@@ -25,5 +25,5 @@ export interface allDashboardProps {
     loading?: boolean;
     totalPages?: number,
     nextPage?: number,
-    previousPage?: number
+    previousPage?: number,
 }

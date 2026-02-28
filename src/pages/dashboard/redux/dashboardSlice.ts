@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allDashboardProps } from './types';
 
 const initialState: allDashboardProps = {
@@ -12,9 +12,9 @@ const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState,
     reducers:{
-        playerListRequest: (state) => {
-            state.loading = true;
-        },
+        playerListRequest: (state, action: PayloadAction<{ limit: string; page: number }>) => {
+  state.loading = true;
+},
         playerListSuccess: (state, action) => {
             state.loading = false;
             state.agentPlayers = action.payload;

@@ -472,11 +472,19 @@ const handleRemoveImage = () => {
 
       {/* Chat Popup */}
       {isChatOpen && (
+<<<<<<< HEAD
         <div
           ref={chatRef}
           className="fixed bottom-4 md:bottom-4 right-3 md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
         >
         <Card className="w-full h-full shadow-2xl border-2">
+=======
+      <div
+        ref={chatRef}
+        className="fixed bottom-4 md:bottom-4 right-3  md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
+      >
+        <Card className="w-full h-full shadow-2xl border-2 bg-orange-300">
+>>>>>>> ba2f14260dd9301510b5facc73f933da68ec9001
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
             <CardTitle className="text-sm font-medium">
               Chat with Agent
@@ -492,8 +500,17 @@ const handleRemoveImage = () => {
           </CardHeader>
           <CardContent className="p-0 flex flex-col h-full">
             {/* Messages */}
+<<<<<<< HEAD
               <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-900">
                 {messages.map((message) => (
+=======
+            <div className="flex-1 overflow-y-auto p-3 overflow-hidden space-y-3 bg-card dark:bg-gray-900">
+              {/* {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                >
+>>>>>>> ba2f14260dd9301510b5facc73f933da68ec9001
                   <div
                     key={message.id}
                     className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
@@ -524,10 +541,51 @@ const handleRemoveImage = () => {
                       </p>
                     </div>
                   </div>
+<<<<<<< HEAD
                 ))}
                 <div ref={messagesEndRef} />
               </div>
             <div className="p-3 border-t bg-white dark:bg-gray-800">
+=======
+                </div>
+              ))} */}
+              {messages.map((message) => (
+  <div
+    key={message.id}
+    className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+  >
+    <div
+      className={`max-w-[70%] p-2 rounded-lg text-sm ${
+        message.sender === "user"
+          ? "bg-green-500 text-white"
+          : "bg-gray-800 text-white  border"
+      }`}
+    >
+      {message.image && (
+        <img
+          src={message.image}
+          alt="Sent image"
+          className="rounded mb-2 max-w-full h-auto"
+        />
+      )}
+      {message.text && <p>{message.text}</p>}
+      <p
+        className={`text-xs mt-1 ${
+          message.sender === "user"
+            ? "text-green-100"
+            : "text-gray-500"
+        }`}
+      >
+        {message.time}
+      </p>
+    </div>
+  </div>
+))}
+            </div>
+
+            {/* Agent selector */}
+            <div className="p-3 border-t bg-gray-800 dark:bg-gray-800">
+>>>>>>> ba2f14260dd9301510b5facc73f933da68ec9001
               <div className="flex items-center space-x-2">
                 {isAssigned ? (
                   <p className="text-sm text-gray-500">
@@ -539,7 +597,7 @@ const handleRemoveImage = () => {
                   <select
                     value={selectedAgentId ?? ""}
                     onChange={(e) => setSelectedAgentId(e.target.value || null)}
-                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                    className="flex-1 h-9 rounded-md border border-white border-input bg-transparent px-3 py-1 text-sm"
                   >
                     <option value="" className="text-black">Select agent</option>
                     {availableAgents.map((a) => (
@@ -583,6 +641,7 @@ const handleRemoveImage = () => {
                 </div>
               )}
 
+<<<<<<< HEAD
               {/* Input */}
               <div className="p-3 border-t bg-white dark:bg-gray-800 relative">
                 {showEmoji && (
@@ -662,6 +721,69 @@ const handleRemoveImage = () => {
                     }
                     className="flex-1 h-9 rounded-md border border-input border-gray-500 bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                   />
+=======
+            {/* Input */}
+            <div className="p-3 mb-14 border-t bg-gray-800">
+              <div className="flex space-x-2 items-center">
+                <div>
+  <div
+    onClick={isAssigned ? handleIconClick : undefined}
+    className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+      isAssigned ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+    }`}
+  >
+    <Plus size={15} className="text-gray-400" />
+  </div>
+
+  {/* Hidden File Input */}
+  <input
+    type="file"
+    accept="image/*"
+    ref={fileInputRef}
+    onChange={handleFileChange}
+    className="hidden"
+    disabled={!isAssigned}
+  />
+</div>
+                <div className="md:hidden block">
+  <div
+    onClick={isAssigned ? handleCameraClick : undefined}
+    className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+      isAssigned ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+    }`}
+  >
+    <Camera size={15} className="text-gray-400" />
+  </div>
+
+  {/* Hidden Input for Camera */}
+  <input
+    type="file"
+    accept="image/*"
+    capture="environment"
+    ref={fileInputRef}
+    onChange={handleCapture}
+    className="hidden"
+    disabled={!isAssigned}
+  />
+</div>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setNewMessage(e.target.value)
+                  }
+                  placeholder={
+                    isAssigned
+                      ? "Type your message..."
+                      : "Assign an agent to start chat"
+                  }
+                  disabled={!isAssigned}
+                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                    e.key === "Enter" && handleSendMessage()
+                  }
+                  className="flex-1 h-9 w-9 rounded-md border border-input border-white bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+>>>>>>> ba2f14260dd9301510b5facc73f933da68ec9001
                 <Button
                   onClick={handleSendMessage}
                   size="sm"

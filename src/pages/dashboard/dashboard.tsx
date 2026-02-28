@@ -11,16 +11,26 @@ import BarChart from "@/components/dashboard/element/BarChart";
 import DoughnutChart from "@/components/dashboard/element/DoughnutChart";
 import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
 import { dashboardSelector } from "./redux/selector";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { playerListRequest } from "./redux/dashboardSlice";
 import { availableGames } from "@/data/dashboard";
+import AppPagination from "@/components/dashboard/element/AppPagination";
 
 export function Dashboard() {
   const dispatch = useAppDispatch();
-  const { agentPlayers, loading, nextPage, previousPage } = useAppSelector(dashboardSelector);
+  const [paginationState, setPaginationState] = useState({
+    limit: '10',
+    page: 1,
+  });
+  const { agentPlayers, loading, nextPage, previousPage, totalPages } = useAppSelector(dashboardSelector);
+  
+   const handlePaginationChange = (perPage: string, currentPage: number) => {
+  setPaginationState({ limit: perPage, page: currentPage });
+};
   useEffect(() => {
-    dispatch(playerListRequest());
-  }, [dispatch]);
+    dispatch(playerListRequest(paginationState));
+  }, [dispatch, paginationState]);
+
   const totalPlayers = agentPlayers.reduce((acc, group) => acc + group.players.length, 0);
 const totalAgents = agentPlayers.length;
   const stats = [
@@ -161,7 +171,9 @@ const totalAgents = agentPlayers.length;
                 )}
               </tbody>
             </table>
-          </div>
+            <AppPagination count={totalPages ?? 1}  // total pages from redux, not agentPlayers.length
+  onPaginationChange={handlePaginationChange} />
+                      </div>
         </CardContent>
       </Card>
     </div>
