@@ -61,6 +61,13 @@ export default function PrizeChat() {
     container.scrollTop = container.scrollHeight
   }, [messages])
 
+  // Auto-refresh messages when assigned (poll every 3s to see new agent messages)
+  useEffect(() => {
+    if (!isAssigned || !user) return;
+    const interval = setInterval(loadMessages, 3000);
+    return () => clearInterval(interval);
+  }, [isAssigned, user]);
+
   // when user/logged-in player changes, figure out whether they already have an assigned agent
   useEffect(() => {
     // no logged-in player, reset UI
@@ -182,11 +189,13 @@ export default function PrizeChat() {
 
       if (res.ok && data?.data?.messages) {
         setChatId(data.data.chat?._id || null)
-        const mapped: ChatMessage[] = data.data.messages.map((m: any, idx: number) => ({
+        // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
+        const source = data.data.messages.slice().reverse()
+        const mapped: ChatMessage[] = source.map((m: any, idx: number) => ({
           id: idx,
           sender: m.senderRole === 'player' ? 'user' : 'system',
           message: m.content,
-          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
         }))
         setMessages(mapped)
       }
@@ -221,7 +230,7 @@ export default function PrizeChat() {
             id: prev.length + 1,
             sender: 'user',
             message: m.content,
-            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
           },
         ])
         setNewMessage("")

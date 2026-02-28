@@ -60,17 +60,22 @@ export default function SocialSidebar() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
-  // Get user info from localStorage
+  // Get user info from localStorage (userInfo for dashboard, user for web player)
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      try {
+    const user = localStorage.getItem("user");
+    try {
+      if (userInfo) {
         const parsed = JSON.parse(userInfo);
         setUserRole(parsed.role);
         setUserId(parsed.userId);
-      } catch (e) {
-        console.error("Failed to parse user info", e);
+      } else if (user) {
+        const parsed = JSON.parse(user);
+        setUserRole(parsed.role);
+        setUserId(parsed.userId);
       }
+    } catch (e) {
+      console.error("Failed to parse user info", e);
     }
   }, []);
 
@@ -151,16 +156,19 @@ export default function SocialSidebar() {
 
   // Fetch messages from backend
   const fetchMessages = async (idParam?: string | null) => {
-    if (!chatId && !idParam) return;
-    
+    const isAgent = userRole === "agent";
+    const messagesChatId = idParam || chatId;
+    // Agents require a chatId, players use their own chat without specifying chatId
+    if (isAgent && !messagesChatId) return;
+
     setIsLoadingMessages(true);
     try {
       const token = localStorage.getItem("accessToken");
       const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const messagesChatId = idParam || chatId;
-      const queryParam = userRole === "agent" ? `?chatId=${messagesChatId}` : "";
+      const queryParam =
+        isAgent && messagesChatId ? `?chatId=${messagesChatId}` : "";
       
       const res = await fetch(`/api/v1/chat/messages${queryParam}`, {
         headers,
@@ -168,9 +176,12 @@ export default function SocialSidebar() {
       const data = await res.json();
       
       if (res.ok && data?.data?.messages) {
-        const formattedMessages = data.data.messages.map((msg: Message, idx: number) => ({
+        if (data?.data?.chat?._id) setChatId(data.data.chat._id);
+        // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
+        const source = data.data.messages.slice().reverse();
+        const formattedMessages = source.map((msg: Message, idx: number) => ({
           _id: msg._id,
-          id: idx, // Add numeric id for React keys
+          id: idx,
           senderId: msg.senderId,
           senderRole: msg.senderRole,
           messageType: msg.messageType,
@@ -178,11 +189,12 @@ export default function SocialSidebar() {
           imageUrl: msg.imageUrl,
           createdAt: msg.createdAt,
           isRead: msg.isRead,
-          sender: msg.senderId === userId ? "user" : "agent",
+          sender: msg.senderRole === "player" ? "user" : "agent",
           text: msg.content,
           time: new Date(msg.createdAt).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
+            hour12: true,
           }),
           image: msg.imageUrl || undefined,
         }));

@@ -6,6 +6,7 @@ interface Message {
   text?: string;
   image?: string;
   sender: "me" | "other";
+  timestamp?: string;
 }
 
 interface User {
@@ -31,9 +32,8 @@ export default function MessagePage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [agentId, setAgentId] = useState<string | null>(null);
   const [loadingChats, setLoadingChats] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
 
   // Detect mobile device
   useEffect(() => {
@@ -47,24 +47,8 @@ export default function MessagePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Load current user (agent) from localStorage
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      try {
-        const parsed = JSON.parse(userInfo);
-        setUserRole(parsed.role);
-        setAgentId(parsed.userId);
-      } catch {
-        // ignore parse errors
-      }
-    }
-  }, []);
-
   // Load agent chats (assigned players)
   useEffect(() => {
-    if (userRole !== "agent") return;
-
     const loadChats = async () => {
       setLoadingChats(true);
       try {
@@ -73,6 +57,10 @@ export default function MessagePage() {
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const res = await fetch("/api/v1/chat/agent/chats", { headers });
+        if (res.status === 403) {
+          setForbidden(true);
+          return;
+        }
         const data = await res.json();
 
         if (res.ok && data?.data?.chats) {
@@ -104,16 +92,23 @@ export default function MessagePage() {
     };
 
     loadChats();
-  }, [userRole]);
+  }, []);
 
   // Auto scroll messages only when new message is added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Auto-refresh messages when chat is selected (poll every 3s to see new player messages)
+  useEffect(() => {
+    if (!selectedChatId) return;
+    const interval = setInterval(() => fetchMessages(selectedChatId), 3000);
+    return () => clearInterval(interval);
+  }, [selectedChatId]);
+
   // Fetch messages for a given chat
   const fetchMessages = async (chatId: string) => {
-    if (!chatId || !agentId) return;
+    if (!chatId) return;
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -126,10 +121,19 @@ export default function MessagePage() {
       const data = await res.json();
 
       if (res.ok && data?.data?.messages) {
-        const formatted = data.data.messages.map((msg: any) => ({
+        // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
+        const source = data.data.messages.slice().reverse();
+        const formatted = source.map((msg: any) => ({
           text: msg.content,
           image: msg.imageUrl || undefined,
-          sender: msg.senderId === agentId ? "me" : "other",
+          sender: msg.senderRole === "agent" ? "me" : "other",
+          timestamp: msg.createdAt
+            ? new Date(msg.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : undefined,
         })) as Message[];
         setMessages(formatted);
       }
@@ -140,7 +144,7 @@ export default function MessagePage() {
 
   // Send message via backend
   const handleSend = async () => {
-    if (!input.trim() || !selectedChatId || userRole !== "agent") return;
+    if (!input.trim() || !selectedChatId) return;
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -159,6 +163,13 @@ export default function MessagePage() {
         const next: Message = {
           text: m.content,
           sender: "me",
+          timestamp: m.createdAt
+            ? new Date(m.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : undefined,
         };
         setMessages((prev) => [...prev, next]);
         setInput("");
@@ -221,7 +232,7 @@ export default function MessagePage() {
   };
 
   // Only agents can use this screen
-  if (userRole !== "agent") {
+  if (forbidden) {
     return (
       <div className="flex h-[80vh] items-center justify-center bg-slate-900 text-slate-300 rounded-md">
         Chat dashboard is available for agent accounts only.
@@ -341,6 +352,17 @@ export default function MessagePage() {
                         alt="uploaded"
                         className="rounded-lg max-w-full"
                       />
+                    )}
+                    {msg.timestamp && (
+                      <p
+                        className={`text-xs mt-1 ${
+                          msg.sender === "me"
+                            ? "text-blue-200 text-right"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {msg.timestamp}
+                      </p>
                     )}
                   </div>
                 </div>
