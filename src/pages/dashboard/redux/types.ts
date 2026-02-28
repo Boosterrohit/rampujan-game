@@ -14,9 +14,14 @@ export interface Player {
   isSuspended: boolean
   createdAt: string
 }
+
+export interface AgentWithPlayers {
+  agent: Agent
+  players: Player[]
+}
 // player and agent types end
 export interface allDashboardProps {
-    player: Player[];
+    agentPlayers: AgentWithPlayers[];
     loading?: boolean;
     totalPages?: number,
     nextPage?: number,

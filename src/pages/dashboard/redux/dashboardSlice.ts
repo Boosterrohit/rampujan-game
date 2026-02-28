@@ -3,7 +3,7 @@ import { allDashboardProps } from './types';
 
 const initialState: allDashboardProps = {
     loading: false,
-    player: [],
+    agentPlayers: [],
     totalPages: 0,
     nextPage: 0,
     previousPage: 0
@@ -17,10 +17,7 @@ const dashboardSlice = createSlice({
         },
         playerListSuccess: (state, action) => {
             state.loading = false;
-            state.player = action.payload.players;
-            state.totalPages = action.payload.totalPages;
-            state.nextPage = action.payload.nextPage;
-            state.previousPage = action.payload.previousPage;
+            state.agentPlayers = action.payload;
         },
         playerListFailure: (state) => {
             state.loading = false;
