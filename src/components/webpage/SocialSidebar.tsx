@@ -8,7 +8,9 @@ import {
   MessageSquare,
   Plus,
   Camera,
+  Smile,
 } from "lucide-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
@@ -56,6 +58,7 @@ export default function SocialSidebar() {
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -263,7 +266,7 @@ export default function SocialSidebar() {
         }
       } else {
         // Send text message
-        const headers: any = { "Content-Type": "application/json" };
+        const headers: any = { "Content-Type": "application/json; charset=utf-8" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const body: any = { content: newMessage };
@@ -581,13 +584,35 @@ const handleRemoveImage = () => {
               )}
 
               {/* Input */}
-              <div className="p-3 border-t bg-white dark:bg-gray-800">
+              <div className="p-3 border-t bg-white dark:bg-gray-800 relative">
+                {showEmoji && (
+                  <div className="absolute bottom-full left-2 mb-1 z-50">
+                    <EmojiPicker
+                      theme={Theme.DARK}
+                      onEmojiClick={(d) => {
+                        setNewMessage((p) => p + d.emoji);
+                        setShowEmoji(false);
+                      }}
+                      width={280}
+                      height={360}
+                    />
+                  </div>
+                )}
                 <div className="flex space-x-2 items-center">
+                  <button
+                    type="button"
+                    onClick={() => isAssigned && setShowEmoji((p) => !p)}
+                    className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
+                      isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                    }`}
+                  >
+                    <Smile size={15} className="text-gray-400" />
+                  </button>
                   <div>
                     <div
                       onClick={isAssigned ? handleIconClick : undefined}
                       className={`p-1 flex items-center justify-center border border-gray-500 rounded-lg ${
-                        isAssigned ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                        isAssigned ? "cursor-pointer" : "cursor-not-allowed opacity-50"
                       }`}
                     >
                       <Plus size={15} className="text-gray-400" />
@@ -641,7 +666,7 @@ const handleRemoveImage = () => {
                   onClick={handleSendMessage}
                   size="sm"
                   className="bg-green-500 hover:bg-green-600 py-2 px-2"
-                  disabled={!isAssigned || !newMessage.trim()}
+                  disabled={!isAssigned || (!newMessage.trim() && !selectedImage)}
                 >
                   <Send className="w-4 h-4" />
                 </Button>

@@ -2,7 +2,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Gift, MessageCircle, Clock, Bot, User } from "lucide-react"
+import { Gift, MessageCircle, Clock, Bot, User, Image, Smile } from "lucide-react"
+import EmojiPicker, { Theme } from "emoji-picker-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAuth } from "@/contexts/AuthContext"
@@ -11,6 +12,7 @@ interface ChatMessage {
   id: number
   sender: "user" | "system"
   message: string
+  imageUrl?: string
   prize?: string
   timestamp: string
 }
@@ -47,8 +49,11 @@ export default function PrizeChat() {
   const [assigning, setAssigning] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [chatId, setChatId] = useState<string | null>(null)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [showEmoji, setShowEmoji] = useState(false)
 
   const [userPoints] = useState(2450)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // ✅ THIS REF CONTROLS MESSAGE SCROLL ONLY
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -195,6 +200,7 @@ export default function PrizeChat() {
           id: idx,
           sender: m.senderRole === 'player' ? 'user' : 'system',
           message: m.content,
+          imageUrl: m.imageUrl,
           timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
         }))
         setMessages(mapped)
@@ -206,34 +212,67 @@ export default function PrizeChat() {
 
   const handleSendMessage = async () => {
     if (!isAssigned) return
-    if (!newMessage.trim()) return
+    if (!newMessage.trim() && !selectedImage) return
 
     try {
       const token = localStorage.getItem('accessToken')
-      const headers: any = { 'Content-Type': 'application/json' }
+      const headers: any = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch(`/api/v1/chat/message`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({ content: newMessage }),
-      })
-      const data = await res.json()
+      if (selectedImage) {
+        const formData = new FormData()
+        formData.append('image', selectedImage)
+        if (newMessage.trim()) formData.append('content', newMessage)
 
-      if (res.ok && data?.data?.message) {
-        const m = data.data.message
-        setChatId(data.data.chatId || chatId || null)
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            sender: 'user',
-            message: m.content,
-            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-          },
-        ])
-        setNewMessage("")
+        const res = await fetch(`/api/v1/chat/message/image`, {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: formData,
+        })
+        const data = await res.json()
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message
+          setChatId(data.data.chatId || chatId || null)
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: prev.length + 1,
+              sender: 'user',
+              message: m.content,
+              imageUrl: m.imageUrl,
+              timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+            },
+          ])
+          setNewMessage("")
+          setSelectedImage(null)
+          if (fileInputRef.current) fileInputRef.current.value = ""
+        }
+      } else {
+        headers['Content-Type'] = 'application/json; charset=utf-8'
+        const res = await fetch(`/api/v1/chat/message`, {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: JSON.stringify({ content: newMessage }),
+        })
+        const data = await res.json()
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message
+          setChatId(data.data.chatId || chatId || null)
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: prev.length + 1,
+              sender: 'user',
+              message: m.content,
+              timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+            },
+          ])
+          setNewMessage("")
+        }
       }
     } catch {
       // ignore for now
@@ -404,6 +443,9 @@ export default function PrizeChat() {
                         <div className="absolute inset-0 bg-gradient-to-br from-gray-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         
                         <div className="relative z-10">
+                          {msg.imageUrl && (
+                            <img src={msg.imageUrl} alt="" className="rounded-lg max-w-full max-h-48 object-contain mb-2" />
+                          )}
                           <p className="text-sm text-white leading-relaxed">{msg.message}</p>
                           {msg.prize && (
                             <div className="mt-3 pt-3 border-t border-gray-600/50 flex items-center gap-2">
@@ -422,6 +464,9 @@ export default function PrizeChat() {
                         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         
                         <div className="relative z-10">
+                          {msg.imageUrl && (
+                            <img src={msg.imageUrl} alt="" className="rounded-lg max-w-full max-h-48 object-contain mb-2" />
+                          )}
                           <p className="text-sm text-white font-medium leading-relaxed">{msg.message}</p>
                           <p className="text-xs text-white/80 mt-2 text-right">{msg.timestamp}</p>
                         </div>
@@ -440,8 +485,21 @@ export default function PrizeChat() {
             </div>
 
             {/* Message input - disabled until an agent is selected */}
-            <div className="border-t border-primary/20 p-4 bg-card/30">
+            <div className="border-t border-primary/20 p-4 bg-card/30 relative">
+              {selectedImage && (
+                <div className="mb-2 flex items-center gap-2">
+                  <img src={URL.createObjectURL(selectedImage)} alt="Preview" className="h-14 w-14 rounded object-cover border border-primary/30" />
+                  <button type="button" onClick={() => { setSelectedImage(null); fileInputRef.current && (fileInputRef.current.value = ""); }} className="text-sm text-muted-foreground hover:text-foreground">Remove</button>
+                </div>
+              )}
               <div className="flex items-center gap-2">
+                <button type="button" onClick={() => setShowEmoji((prev) => !prev)} className="p-2 rounded-md hover:bg-primary/10" disabled={!isAssigned}>
+                  <Smile className="w-5 h-5" />
+                </button>
+                <input type="file" ref={fileInputRef} accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && /^image\/(jpeg|png|gif|webp)$/i.test(f.type)) setSelectedImage(f); }} />
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 rounded-md hover:bg-primary/10" disabled={!isAssigned}>
+                  <Image className="w-5 h-5" />
+                </button>
                 <input
                   type="text"
                   value={newMessage}
@@ -451,10 +509,15 @@ export default function PrizeChat() {
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   className="flex-1 h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <Button onClick={handleSendMessage} disabled={!isAssigned || !newMessage.trim()}>
+                <Button onClick={handleSendMessage} disabled={!isAssigned || (!newMessage.trim() && !selectedImage)}>
                   Send
                 </Button>
               </div>
+              {showEmoji && (
+                <div className="absolute bottom-full left-4 mb-2 z-50">
+                  <EmojiPicker theme={Theme.DARK} onEmojiClick={(d) => { setNewMessage((p) => p + d.emoji); setShowEmoji(false); }} width={320} height={400} />
+                </div>
+              )}
             </div>
           </div>
 

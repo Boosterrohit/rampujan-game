@@ -34,6 +34,7 @@ export default function MessagePage() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [loadingChats, setLoadingChats] = useState(false);
   const [forbidden, setForbidden] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -142,55 +143,84 @@ export default function MessagePage() {
     }
   };
 
-  // Send message via backend
+  // Send message via backend (text or image)
   const handleSend = async () => {
-    if (!input.trim() || !selectedChatId) return;
+    if (!selectedChatId) return;
+    if (!input.trim() && !selectedImage) return;
 
     try {
       const token = localStorage.getItem("accessToken");
-      const headers: any = { "Content-Type": "application/json" };
+      const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch("/api/v1/chat/message", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ content: input, chatId: selectedChatId }),
-      });
-      const data = await res.json();
+      if (selectedImage) {
+        const formData = new FormData();
+        formData.append("image", selectedImage);
+        if (input.trim()) formData.append("content", input.trim());
+        formData.append("chatId", selectedChatId);
 
-      if (res.ok && data?.data?.message) {
-        const m = data.data.message;
-        const next: Message = {
-          text: m.content,
-          sender: "me",
-          timestamp: m.createdAt
-            ? new Date(m.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })
-            : undefined,
-        };
-        setMessages((prev) => [...prev, next]);
-        setInput("");
+        const res = await fetch("/api/v1/chat/message/image", {
+          method: "POST",
+          headers,
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message;
+          const next: Message = {
+            text: m.content,
+            image: m.imageUrl,
+            sender: "me",
+            timestamp: m.createdAt
+              ? new Date(m.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : undefined,
+          };
+          setMessages((prev) => [...prev, next]);
+          setInput("");
+          setSelectedImage(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      } else {
+        headers["Content-Type"] = "application/json; charset=utf-8";
+        const res = await fetch("/api/v1/chat/message", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ content: input, chatId: selectedChatId }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message;
+          const next: Message = {
+            text: m.content,
+            sender: "me",
+            timestamp: m.createdAt
+              ? new Date(m.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : undefined,
+          };
+          setMessages((prev) => [...prev, next]);
+          setInput("");
+        }
       }
     } catch (err) {
       console.error("Failed to send message", err);
     }
   };
 
-  // Image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setMessages([
-        ...messages,
-        { image: reader.result as string, sender: "me" },
-      ]);
-    };
-    reader.readAsDataURL(file);
+    if (file && /^image\/(jpeg|png|gif|webp)$/i.test(file.type)) {
+      setSelectedImage(file);
+    }
   };
 
   // Handle user selection - NO scrolling triggered
@@ -350,7 +380,7 @@ export default function MessagePage() {
                       <img
                         src={msg.image}
                         alt="uploaded"
-                        className="rounded-lg max-w-full"
+                        className="rounded-lg max-w-full max-h-64 object-contain"
                       />
                     )}
                     {msg.timestamp && (
@@ -372,6 +402,25 @@ export default function MessagePage() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-slate-700 flex-shrink-0 relative">
+              {selectedImage && (
+                <div className="mb-2 flex items-center gap-2">
+                  <img
+                    src={URL.createObjectURL(selectedImage)}
+                    alt="Preview"
+                    className="h-16 w-16 rounded object-cover border border-slate-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    className="text-slate-400 hover:text-white text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
               <div className="flex flex-col md:flex-row gap-2">
                 <div className="flex gap-2">
                   {/* Emoji Button */}
@@ -413,7 +462,8 @@ export default function MessagePage() {
                 {/* Send */}
                 <button
                   onClick={handleSend}
-                  className="p-2 rounded-lg bg-blue-600! hover:bg-blue-700! flex-shrink-0"
+                  disabled={!input.trim() && !selectedImage}
+                  className="p-2 rounded-lg bg-blue-600! hover:bg-blue-700! flex-shrink-0 disabled:opacity-50"
                 >
                   <Send size={20} />
                 </button>
