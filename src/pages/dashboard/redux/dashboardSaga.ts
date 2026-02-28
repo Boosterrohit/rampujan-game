@@ -1,7 +1,7 @@
 import { call, put } from 'redux-saga/effects';
 import { toast } from "react-toastify";
-import { createAgent, getPlayers } from './api';
-import { createAgentFailure, createAgentSuccess, playerListFailure, playerListRequest, playerListSuccess } from './dashboardSlice';
+import { createAgent, deleteAgent, getPlayers } from './api';
+import { createAgentFailure, createAgentSuccess, deleteAgentFailure, deleteAgentSuccess, playerListFailure, playerListRequest, playerListSuccess } from './dashboardSlice';
 import { AgentCreationData } from './types';
 
 function* PlayerListSaga(action: {
@@ -37,4 +37,34 @@ function* CreateAgentSaga(action: {
         yield put(createAgentFailure());
     }
 }
-export  {PlayerListSaga, CreateAgentSaga};
+// agent delete
+function* DeleteAgentSaga(action: {
+    type: string;
+    payload: string; // agentId
+}): Generator {
+    try {        const response: any = yield call(deleteAgent, action.payload);
+        toast.success("Agent deleted successfully!");
+        yield put(deleteAgentSuccess(response.data));
+        yield put(playerListRequest({ page: 1, limit: '10', search: '' }));
+    } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to delete agent");
+        yield put(deleteAgentFailure());
+    }
+}
+// agent update
+function* UpdateAgentSaga(action: {
+    type: string;
+    payload: AgentCreationData;
+}): Generator {
+    try {
+        const response: any = yield call(createAgent as any, action.payload);
+        toast.success("Agent updated successfully!");
+        yield put(createAgentSuccess(response.data));
+        yield put(playerListRequest({ page: 1, limit: '10', search: '' }));
+        action.payload.onSuccess?.();
+    } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to update agent");
+        yield put(createAgentFailure());
+    }
+}
+export  {PlayerListSaga, CreateAgentSaga, DeleteAgentSaga, UpdateAgentSaga};

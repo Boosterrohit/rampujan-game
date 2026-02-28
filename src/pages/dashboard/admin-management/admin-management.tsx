@@ -9,15 +9,63 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Edit, Plus } from "lucide-react";
+import { Trash2, Edit, Plus, AlertTriangle } from "lucide-react";
 import { useDialog } from "@/components/dashboard/element/DialogContext";
 import AdminForm from "./admin-form";
 import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
 import { useEffect, useState } from "react";
 import { dashboardSelector } from "../redux/selector";
-import { playerListRequest } from "../redux/dashboardSlice";
+import { playerListRequest, deleteAgentRequest } from "../redux/dashboardSlice";
 import AppPagination from "@/components/dashboard/element/AppPagination";
 import useDebounce from "@/hooks/useDebounce";
+// Delete Confirmation Component — uses closeDialog from global context just like AdminForm
+function DeleteConfirmDialog({
+  agentName,
+  agentId,
+}: {
+  agentName: string;
+  agentId: string;
+}) {
+  const { closeDialog } = useDialog();
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector(dashboardSelector);
+
+  const handleConfirm = () => {
+    dispatch(deleteAgentRequest(agentId));
+    closeDialog();
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-2">
+      <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-100">
+        <AlertTriangle className="w-7 h-7 text-red-600" />
+      </div>
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-white mb-1">Delete Agent</h3>
+        <p className="text-gray-400 text-sm">
+          Are you sure you want to delete{" "}
+          <span className="text-white font-medium">{agentName}</span>? This
+          action cannot be undone.
+        </p>
+      </div>
+      <div className="flex gap-3 w-full mt-2">
+        <Button
+          className="flex-1 rounded-md bg-gray-600 hover:bg-gray-500 text-white"
+          onClick={closeDialog}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="flex-1 rounded-md !bg-red-600 hover:!bg-red-700 text-white"
+          disabled={loading}
+          onClick={handleConfirm}
+        >
+          {loading ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function AdminManagement() {
   const { openDialog } = useDialog();
@@ -45,7 +93,7 @@ export function AdminManagement() {
         limit: paginationState.limit,
         page: paginationState.page,
         search: debouncedSearchTerm,
-      })
+      }),
     );
   }, [dispatch, paginationState, debouncedSearchTerm]);
 
@@ -108,10 +156,7 @@ export function AdminManagement() {
               <tbody>
                 {safeAgentPlayers.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center py-6 text-gray-400"
-                    >
+                    <td colSpan={5} className="text-center py-6 text-gray-400">
                       No agents available
                     </td>
                   </tr>
@@ -143,7 +188,17 @@ export function AdminManagement() {
                         <Button className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button className="text-red-700 bg-red-200 rounded-full w-9 h-9 hover:bg-red-300 p-0">
+                        <Button
+                          className="text-red-700 bg-red-200 rounded-full w-9 h-9 hover:bg-red-300 p-0"
+                          onClick={() =>
+                            openDialog(
+                              <DeleteConfirmDialog
+                                agentId={admin.agent._id}
+                                agentName={admin.agent.username}
+                              />,
+                            )
+                          }
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </td>
