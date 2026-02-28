@@ -48,51 +48,67 @@ export default function MessagePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Load agent chats (assigned players)
-  useEffect(() => {
-    const loadChats = async () => {
-      setLoadingChats(true);
-      try {
-        const token = localStorage.getItem("accessToken");
-        const headers: any = {};
-        if (token) headers["Authorization"] = `Bearer ${token}`;
+  // Load agent chats (assigned players) - with retry and periodic refresh
+  const loadChats = async () => {
+    setLoadingChats(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch("/api/v1/chat/agent/chats", { headers });
-        if (res.status === 403) {
-          setForbidden(true);
-          return;
-        }
-        const data = await res.json();
-
-        if (res.ok && data?.data?.chats) {
-          const mapped: User[] = data.data.chats.map((chat: any) => {
-            const name: string = chat.playerName || "Player";
-            const initials =
-              name &&
-              name
-                .split(" ")
-                .map((n: string) => n[0])
-                .join("")
-                .toUpperCase();
-            return {
-              id: chat.chatId,
-              name,
-              avatar: initials || "P",
-              lastMessage: chat.lastMessage || "",
-              online: true,
-              unreadCount: chat.unreadCount || 0,
-            };
-          });
-          setUsers(mapped);
-        }
-      } catch (err) {
-        console.error("Failed to load agent chats", err);
-      } finally {
-        setLoadingChats(false);
+      const res = await fetch("/api/v1/chat/agent/chats?limit=50", { headers });
+      if (res.status === 403) {
+        setForbidden(true);
+        return;
       }
-    };
+      const data = await res.json();
 
+      if (res.ok && data?.data?.chats) {
+        const mapped: User[] = data.data.chats.map((chat: any) => {
+          const name: string = chat.playerName || "Player";
+          const initials =
+            name &&
+            name
+              .split(" ")
+              .map((n: string) => n[0])
+              .join("")
+              .toUpperCase();
+          return {
+            id: chat.chatId,
+            name,
+            avatar: initials || "P",
+            lastMessage: chat.lastMessage || "",
+            online: true,
+            unreadCount: chat.unreadCount || 0,
+          };
+        });
+        setUsers(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to load agent chats", err);
+    } finally {
+      setLoadingChats(false);
+    }
+  };
+
+  useEffect(() => {
     loadChats();
+    // Retry once after 2s in case auth wasn't ready on first load
+    const retryId = setTimeout(loadChats, 2000);
+    return () => clearTimeout(retryId);
+  }, []);
+
+  // Refresh chat list when user returns to tab and periodically (every 60s)
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") loadChats();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    const interval = setInterval(onVisibilityChange, 60000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearInterval(interval);
+    };
   }, []);
 
   // Auto scroll messages only when new message is added
@@ -100,10 +116,13 @@ export default function MessagePage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Auto-refresh messages when chat is selected (poll every 3s to see new player messages)
+  // Auto-refresh messages when chat is selected (poll every 20s when tab visible)
   useEffect(() => {
     if (!selectedChatId) return;
-    const interval = setInterval(() => fetchMessages(selectedChatId), 3000);
+    const refresh = () => {
+      if (document.visibilityState === "visible") fetchMessages(selectedChatId);
+    };
+    const interval = setInterval(refresh, 20000);
     return () => clearInterval(interval);
   }, [selectedChatId]);
 

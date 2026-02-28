@@ -1,8 +1,10 @@
 
-import { Mail, Menu, X } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
 import { Avatar, AvatarFallback} from "../../ui/avatar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { dashboardUrls } from "@/config/dashboard-urls";
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -10,7 +12,45 @@ interface HeaderProps {
 }
 
 const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
-  const { user} = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
+  const isAgent = user?.role === "agent";
+
+  useEffect(() => {
+    if (!isAgent) return;
+
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await fetch("/api/v1/chat/unread-count", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        if (res.ok && data?.data?.unreadCount != null) {
+          setChatUnreadCount(data.data.unreadCount);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchUnread();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") fetchUnread();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    const interval = setInterval(onVisible, 30000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(interval);
+    };
+  }, [isAgent]);
+
+  const handleNotificationClick = () => {
+    if (isAgent) navigate(dashboardUrls.chatClient);
+  };
+
   return (
     <div className="bg-[#242834] px-4 py-3 shadow flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -34,10 +74,19 @@ const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="relative cursor-pointer hover:bg-gray-500  rounded-md p-2">
-          <Mail className="w-5 h-5 text-white" />
-          <div className="h-3 w-3 bg-red-600 rounded-full absolute top-1 border-white border-2 right-1"></div>
-        </div>
+        {isAgent && (
+          <div
+            onClick={handleNotificationClick}
+            className="relative cursor-pointer hover:bg-gray-500 rounded-md p-2"
+          >
+            <Bell className="w-5 h-5 text-white" />
+            {chatUnreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-600 text-white text-xs font-bold rounded-full px-1">
+                {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+              </span>
+            )}
+          </div>
+        )}
         <div className="h-10 bg-gray-600 w-0.5 mx-2 "></div>
         <Avatar className="">
           {/* <AvatarImage src="https://github.com/shadcn.png" /> */}

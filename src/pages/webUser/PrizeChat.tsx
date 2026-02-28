@@ -66,10 +66,13 @@ export default function PrizeChat() {
     container.scrollTop = container.scrollHeight
   }, [messages])
 
-  // Auto-refresh messages when assigned (poll every 3s to see new agent messages)
+  // Auto-refresh messages when assigned (poll every 20s when tab visible)
   useEffect(() => {
     if (!isAssigned || !user) return;
-    const interval = setInterval(loadMessages, 3000);
+    const refresh = () => {
+      if (document.visibilityState === "visible") loadMessages();
+    };
+    const interval = setInterval(refresh, 20000);
     return () => clearInterval(interval);
   }, [isAssigned, user]);
 
