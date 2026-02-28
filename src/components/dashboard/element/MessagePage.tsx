@@ -6,14 +6,16 @@ interface Message {
   text?: string;
   image?: string;
   sender: "me" | "other";
+  timestamp?: string;
 }
 
 interface User {
-  id: string;
-  name: string;
+  id: string;          // chatId
+  name: string;        // player name
   avatar: string;
   lastMessage?: string;
   online: boolean;
+  unreadCount?: number;
 }
 
 export default function MessagePage() {
@@ -28,44 +30,11 @@ export default function MessagePage() {
   const userListRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Sample users data
-  const [users] = useState<User[]>([
-    {
-      id: "1",
-      name: "John Doe",
-      avatar: "JD",
-      lastMessage: "Hey! How are you?",
-      online: true,
-    },
-    {
-      id: "2",
-      name: "Sarah Smith",
-      avatar: "SS",
-      lastMessage: "See you tomorrow!",
-      online: true,
-    },
-    {
-      id: "3",
-      name: "Mike Johnson",
-      avatar: "MJ",
-      lastMessage: "Thanks for the help",
-      online: false,
-    },
-    {
-      id: "4",
-      name: "Emily Brown",
-      avatar: "EB",
-      lastMessage: "Good game!",
-      online: true,
-    },
-    {
-      id: "5",
-      name: "Alex Wilson",
-      avatar: "AW",
-      lastMessage: "Let's play later",
-      online: false,
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [loadingChats, setLoadingChats] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -79,37 +48,207 @@ export default function MessagePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Load agent chats (assigned players) - with retry and periodic refresh
+  const loadChats = async () => {
+    setLoadingChats(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch("/api/v1/chat/agent/chats?limit=50", { headers });
+      if (res.status === 403) {
+        setForbidden(true);
+        return;
+      }
+      const data = await res.json();
+
+      if (res.ok && data?.data?.chats) {
+        const mapped: User[] = data.data.chats.map((chat: any) => {
+          const name: string = chat.playerName || "Player";
+          const initials =
+            name &&
+            name
+              .split(" ")
+              .map((n: string) => n[0])
+              .join("")
+              .toUpperCase();
+          return {
+            id: chat.chatId,
+            name,
+            avatar: initials || "P",
+            lastMessage: chat.lastMessage || "",
+            online: true,
+            unreadCount: chat.unreadCount || 0,
+          };
+        });
+        setUsers(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to load agent chats", err);
+    } finally {
+      setLoadingChats(false);
+    }
+  };
+
+  useEffect(() => {
+    loadChats();
+    // Retry once after 2s in case auth wasn't ready on first load
+    const retryId = setTimeout(loadChats, 2000);
+    return () => clearTimeout(retryId);
+  }, []);
+
+  // Refresh chat list when user returns to tab and periodically (every 60s)
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") loadChats();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    const interval = setInterval(onVisibilityChange, 60000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearInterval(interval);
+    };
+  }, []);
+
   // Auto scroll messages only when new message is added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send message
-  const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { text: input, sender: "me" }]);
-    setInput("");
+  // Auto-refresh messages when chat is selected (poll every 20s when tab visible)
+  useEffect(() => {
+    if (!selectedChatId) return;
+    const refresh = () => {
+      if (document.visibilityState === "visible") fetchMessages(selectedChatId);
+    };
+    const interval = setInterval(refresh, 20000);
+    return () => clearInterval(interval);
+  }, [selectedChatId]);
+
+  // Fetch messages for a given chat
+  const fetchMessages = async (chatId: string) => {
+    if (!chatId) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`/api/v1/chat/messages?chatId=${chatId}`, {
+        headers,
+      });
+      const data = await res.json();
+
+      if (res.ok && data?.data?.messages) {
+        // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
+        const source = data.data.messages.slice().reverse();
+        const formatted = source.map((msg: any) => ({
+          text: msg.content,
+          image: msg.imageUrl || undefined,
+          sender: msg.senderRole === "agent" ? "me" : "other",
+          timestamp: msg.createdAt
+            ? new Date(msg.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : undefined,
+        })) as Message[];
+        setMessages(formatted);
+      }
+    } catch (err) {
+      console.error("Failed to load messages", err);
+    }
   };
 
-  // Image upload
+  // Send message via backend (text or image)
+  const handleSend = async () => {
+    if (!selectedChatId) return;
+    if (!input.trim() && !selectedImage) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      if (selectedImage) {
+        const formData = new FormData();
+        formData.append("image", selectedImage);
+        if (input.trim()) formData.append("content", input.trim());
+        formData.append("chatId", selectedChatId);
+
+        const res = await fetch("/api/v1/chat/message/image", {
+          method: "POST",
+          headers,
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message;
+          const next: Message = {
+            text: m.content,
+            image: m.imageUrl,
+            sender: "me",
+            timestamp: m.createdAt
+              ? new Date(m.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : undefined,
+          };
+          setMessages((prev) => [...prev, next]);
+          setInput("");
+          setSelectedImage(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      } else {
+        headers["Content-Type"] = "application/json; charset=utf-8";
+        const res = await fetch("/api/v1/chat/message", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ content: input, chatId: selectedChatId }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data?.data?.message) {
+          const m = data.data.message;
+          const next: Message = {
+            text: m.content,
+            sender: "me",
+            timestamp: m.createdAt
+              ? new Date(m.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : undefined,
+          };
+          setMessages((prev) => [...prev, next]);
+          setInput("");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setMessages([
-        ...messages,
-        { image: reader.result as string, sender: "me" },
-      ]);
-    };
-    reader.readAsDataURL(file);
+    if (file && /^image\/(jpeg|png|gif|webp)$/i.test(file.type)) {
+      setSelectedImage(file);
+    }
   };
 
   // Handle user selection - NO scrolling triggered
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    setMessages([]); // Clear messages when switching users
+    setSelectedChatId(user.id);
+    setMessages([]);
     setShowUserList(false); // Hide user list on mobile
+    fetchMessages(user.id);
   };
 
   // Handle back to user list on mobile
@@ -140,6 +279,15 @@ export default function MessagePage() {
       setShowEmoji(!showEmoji);
     }
   };
+
+  // Only agents can use this screen
+  if (forbidden) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center bg-slate-900 text-slate-300 rounded-md">
+        Chat dashboard is available for agent accounts only.
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[80vh] bg-slate-900 text-white overflow-hidden rounded-md overflow-hidden">
@@ -251,8 +399,19 @@ export default function MessagePage() {
                       <img
                         src={msg.image}
                         alt="uploaded"
-                        className="rounded-lg max-w-full"
+                        className="rounded-lg max-w-full max-h-64 object-contain"
                       />
+                    )}
+                    {msg.timestamp && (
+                      <p
+                        className={`text-xs mt-1 ${
+                          msg.sender === "me"
+                            ? "text-blue-200 text-right"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {msg.timestamp}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -262,6 +421,25 @@ export default function MessagePage() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-slate-700 flex-shrink-0 relative">
+              {selectedImage && (
+                <div className="mb-2 flex items-center gap-2">
+                  <img
+                    src={URL.createObjectURL(selectedImage)}
+                    alt="Preview"
+                    className="h-16 w-16 rounded object-cover border border-slate-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    className="text-slate-400 hover:text-white text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
               <div className="flex flex-col md:flex-row gap-2">
                 <div className="flex gap-2">
                   {/* Emoji Button */}
@@ -303,7 +481,8 @@ export default function MessagePage() {
                 {/* Send */}
                 <button
                   onClick={handleSend}
-                  className="p-2 rounded-lg bg-blue-600! hover:bg-blue-700! flex-shrink-0"
+                  disabled={!input.trim() && !selectedImage}
+                  className="p-2 rounded-lg bg-blue-600! hover:bg-blue-700! flex-shrink-0 disabled:opacity-50"
                 >
                   <Send size={20} />
                 </button>
