@@ -38,10 +38,15 @@ export default function Header() {
   const publicMenuItems: MenuItem[] = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about-us" },
-    { label: "Dashboard", path: "/dashboard/" },
   ];
 
-  const menuItems = isLoggedIn ? allMenuItems : publicMenuItems;
+  // hide dashboard link for logged‑in users with the "player" role
+  const menuItems = isLoggedIn
+    ? allMenuItems.filter(
+        (item) =>
+          item.label !== "Dashboard" || (user && user.role !== "player")
+      )
+    : publicMenuItems;
 
   const handleLogout = async () => {
     try {

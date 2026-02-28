@@ -1,7 +1,9 @@
 import { MENU } from "@/data/dashboard";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronRight, LogOut} from "lucide-react";
 import { useEffect, useState } from "react";
+import { authService } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +13,8 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     MENU.forEach((section) => {
@@ -33,6 +37,18 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       onClose();
     }
   };
+
+  const handleLogout = async () => {
+      try {
+        await authService.logout();
+      } catch (error) {
+        console.error("Logout API failed (expected if token expired):", error);
+        // Continue with logout even if API fails (token might be expired)
+      } finally {
+        logout();
+        navigate("/");
+      }
+    };
 
   return (
     <>
@@ -102,7 +118,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             );
           })}
         </nav>
-        <div className="p-4 border-t bg-black border-sidebar-border flex items-center gap-2 text-sm cursor-pointer hover:bg-[#5B2C3D]">
+        <div className="p-4 border-t bg-black border-sidebar-border flex items-center gap-2 text-sm cursor-pointer hover:bg-[#5B2C3D]" onClick={() => {
+                          handleLogout();
+                          // setUserMenuOpen(false);
+                        }}>
           <LogOut className="w-4 h-4" />
           Logout
         </div>

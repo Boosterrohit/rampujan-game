@@ -2,6 +2,7 @@
 import { Mail, Menu, X } from "lucide-react";
 import { Avatar, AvatarFallback} from "../../ui/avatar";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
+  const { user} = useAuth();
   return (
     <div className="bg-[#242834] px-4 py-3 shadow flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -39,11 +41,11 @@ const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
         <div className="h-10 bg-gray-600 w-0.5 mx-2 "></div>
         <Avatar className="">
           {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback className="uppercase">{user?.username?.substring(0,2)}</AvatarFallback>
         </Avatar>
         <div className="flex-col hidden md:flex">
-          <span className="text-sm text-white">Rampujan Bhadwa </span>
-          <span className="text-xs text-gray-300">Admin</span>
+          <span className="text-sm text-white">{user?.username}</span>
+          <span className="text-xs text-gray-300">{user?.role}</span>
         </div>
       </div>
     </div>

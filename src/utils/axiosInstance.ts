@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import axios from "axios"
 import { toast } from "react-toastify"
 
@@ -21,21 +22,34 @@ const deleteCookie = (name: string) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
 }
 
+// build the base URL using Vite environment variables. Vite exposes any
+// variable prefixed with `VITE_` via `import.meta.env`. We also provide a
+// fallback to an empty string so the expression never produces `undefined`.
+const BASE_URL =
+  `${import.meta.env.VITE_BASE_URL || ""}${import.meta.env.VITE_API_VERSION || ""}`
+
 export const axiosInstance = axios.create({
-    baseURL: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_VERSION}`,
-  })
-  
-  export const axiosInstanceWithoutToken = axios.create({
-    baseURL: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_VERSION}`,
-  })
+  baseURL: BASE_URL,
+})
+
+export const axiosInstanceWithoutToken = axios.create({
+  baseURL: BASE_URL,
+})
 axiosInstance.interceptors.request.use(
   (config: any) => {
     if (!window.navigator.onLine) {
       return Promise.reject("No Internet")
     } else {
       const contentType = determineContentType(config.data)
+
+      // first try cookie (legacy), otherwise fall back to localStorage token
+      let token = getCookie("access_token")
+      if (!token) {
+        token = localStorage.getItem("accessToken") || ""
+      }
+
       config.headers = {
-        Authorization: getCookie("access_token") ? `Bearer ${getCookie("access_token")}` : "",
+        Authorization: token ? `Bearer ${token}` : "",
         "Content-Type": contentType,
       }
       return config

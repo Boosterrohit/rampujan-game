@@ -9,6 +9,10 @@ import {
 } from "@/components/ui/card";
 import BarChart from "@/components/dashboard/element/BarChart";
 import DoughnutChart from "@/components/dashboard/element/DoughnutChart";
+import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
+import { dashboardSelector } from "./redux/selector";
+import { useEffect } from "react";
+import { playerListRequest } from "./redux/dashboardSlice";
 
 const topPlayers = [
   {
@@ -49,6 +53,11 @@ const topPlayers = [
 ];
 
 export function Dashboard() {
+  const dispatch = useAppDispatch();
+  const {player, loading} = useAppSelector(dashboardSelector);
+  useEffect(() => {
+    dispatch(playerListRequest())
+  }, [dispatch]);
   const stats = [
     {
       title: "Total Revenue",
@@ -148,29 +157,29 @@ export function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {topPlayers.map((player) => (
+                {player.map((player) => (
                   <tr
-                    key={player.id}
+                    key={player._id}
                     className="border-b  border-gray-600 hover:bg-gray-700 transition-colors"
                   >
                     <td className="py-2 sm:py-3 px-3 sm:px-4 font-medium whitespace-nowrap text-gray-300">
-                      {player.name}
+                      {player.username}
                     </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-4 font-semibold  whitespace-nowrap text-gray-400">
-                      {player.totalBets}
+                      {/* {player.totalBets} */}test
                     </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-4 font-semibold text-green-300 whitespace-nowrap">
-                      {player.winnings}
+                      {player.email}
                     </td>
                     <td className="py-2 sm:py-3 px-3 sm:px-4">
                       <span
                         className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                          player.status === "Active"
+                          player.isVerified === true
                             ? "bg-green-200 text-green-800"
                             : "bg-gray-300 text-gray-800"
                         }`}
                       >
-                        {player.status}
+                        {player.isVerified === true ? "Verified" : "Not Verified"}
                       </span>
                     </td>
                   </tr>

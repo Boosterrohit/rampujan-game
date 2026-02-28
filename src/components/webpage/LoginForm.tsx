@@ -44,8 +44,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       })
 
       if (response.success && response.data) {
-        // If backend returned an accessToken, extract its expiry and pass it to context
-        const token = (response as any).data?.accessToken
+        // Determine token from whichever location the backend chose.
+        const token =
+          (response as any).data?.accessToken || (response as any).accessToken;
         let expiry: number | undefined = undefined
         if (token) {
           try {
