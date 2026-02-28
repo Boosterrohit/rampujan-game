@@ -36,4 +36,7 @@ export interface allDashboardProps {
     totalPages?: number,
     nextPage?: number,
     previousPage?: number,
+    // optional metadata from response
+    totalAgents?: number;
+    totalDepositedByAllAgents?: number;
 }

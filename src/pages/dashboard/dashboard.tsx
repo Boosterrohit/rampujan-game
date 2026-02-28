@@ -23,19 +23,22 @@ export function Dashboard() {
     page: 1,
   });
   const { agentPlayers, loading, totalPages } = useAppSelector(dashboardSelector);
-  
-   const handlePaginationChange = (perPage: string, currentPage: number) => {
-  setPaginationState({ limit: perPage, page: currentPage });
-};
+
+  // ensure we always work with an array to avoid runtime errors when API returns null/undefined
+  const safeAgentPlayers = Array.isArray(agentPlayers) ? agentPlayers : [];
+
+  const handlePaginationChange = (perPage: string, currentPage: number) => {
+    setPaginationState({ limit: perPage, page: currentPage });
+  };
   useEffect(() => {
     dispatch(playerListRequest({
       limit: paginationState.limit,
       page: paginationState.page,
-      search: ''}));
+      search: '' }));
   }, [dispatch, paginationState]);
 
-  const totalPlayers = agentPlayers.reduce((acc, group) => acc + group.players.length, 0);
-const totalAgents = agentPlayers.length;
+  const totalPlayers = safeAgentPlayers.reduce((acc, group) => acc + group.players.length, 0);
+  const totalAgents = safeAgentPlayers.length;
   const stats = [
      {
     title: "Total Agents",
@@ -95,7 +98,13 @@ const totalAgents = agentPlayers.length;
             </span>
           </p>
           <div className="w-full h-[300px] sm:h-[350px] overflow-auto">
-            <BarChart />
+            {safeAgentPlayers.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                No players available
+              </div>
+            ) : (
+              <BarChart />
+            )}
           </div>
         </div>
         <div className="bg-[#1e232e] p-4 shadow-md border-2 border-gray-600 rounded-md lg:col-span-1">
@@ -141,8 +150,21 @@ const totalAgents = agentPlayers.length;
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {agentPlayers.map((group) =>
+                {safeAgentPlayers.length === 0 ? (
+             <tbody>
+    <tr>
+      <td
+        colSpan={4}
+        className="text-center py-6 text-gray-400 w-full"
+      >
+        No players available
+      </td>
+    </tr>
+  </tbody>
+            ) : (
+               <tbody>
+               
+                {safeAgentPlayers.map((group) =>
                   group.players.map((player) => (
                     <tr
                       key={player._id}
@@ -173,6 +195,8 @@ const totalAgents = agentPlayers.length;
                   )),
                 )}
               </tbody>
+            )}
+             
             </table>
             <AppPagination count={totalPages ?? 1}  // total pages from redux, not agentPlayers.length
   onPaginationChange={handlePaginationChange} />

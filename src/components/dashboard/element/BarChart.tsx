@@ -9,9 +9,11 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 export default function BarChart() {
   const { agentPlayers } = useAppSelector(dashboardSelector);
 
-  const labels = agentPlayers.map((group) => group.agent.username);
-  const playerCounts = agentPlayers.map((group) => group.players.length);
-  const verifiedCounts = agentPlayers.map(
+  const safeAgentPlayers = Array.isArray(agentPlayers) ? agentPlayers : [];
+
+  const labels = safeAgentPlayers.map((group) => group.agent.username);
+  const playerCounts = safeAgentPlayers.map((group) => group.players.length);
+  const verifiedCounts = safeAgentPlayers.map(
     (group) => group.players.filter((p) => p.isVerified).length
   );
 
@@ -59,6 +61,14 @@ export default function BarChart() {
       },
     },
   };
+
+  if (safeAgentPlayers.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center text-gray-400">
+        No data to display
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", margin: "auto" }}>

@@ -17,7 +17,13 @@ const dashboardSlice = createSlice({
 },
         playerListSuccess: (state, action) => {
             state.loading = false;
-            state.agentPlayers = action.payload;
+            // payload contains { agents: AgentWithPlayers[], pagination: {...}, depositSummary: {...} }
+            state.agentPlayers = action.payload?.agents || [];
+            if (action.payload?.pagination) {
+              state.totalPages = action.payload.pagination.totalPages || state.totalPages;
+              state.nextPage = action.payload.pagination.hasNextPage ? (state.nextPage ?? 0) + 1 : (state.nextPage ?? 0);
+              state.previousPage = action.payload.pagination.hasPrevPage ? (state.previousPage ?? 0) + 1 : (state.previousPage ?? 0);
+            }
         },
         playerListFailure: (state) => {
             state.loading = false;
