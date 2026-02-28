@@ -62,7 +62,7 @@ export function PlayerManagement() {
           onClick={() => openDialog(<PlayerForm />)}
         >
           <Plus className="w-5 h-5" />
-          <span className="md:ml-2 text-sm md:text-base">Add Player</span>
+          <span className="md:ml-2 text-sm md:text-base">Add Deposite</span>
         </Button>
       </div>
 

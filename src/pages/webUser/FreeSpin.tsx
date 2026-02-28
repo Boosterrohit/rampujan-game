@@ -81,7 +81,7 @@ export default function FreeSpin() {
   const campaigns: Campaign[] = [
     {
       id: "classic",
-      name: "Classic Spin",
+      name: "Free Spin",
       description: "Traditional spinning experience with balanced rewards",
       icon: Gamepad2,
       color: "from-primary to-secondary",

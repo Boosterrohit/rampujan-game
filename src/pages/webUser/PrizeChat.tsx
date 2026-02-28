@@ -2,11 +2,38 @@
 "use client"
 
 import { useState, useEffect, useRef, CSSProperties } from "react"
-import { Gift, MessageCircle, Clock, Bot, User, Image, Smile, X, ZoomIn, ZoomOut } from "lucide-react"
+import { Gift, MessageCircle, Clock, Bot, User, Image, Smile, X, ZoomIn, ZoomOut, Panda, Zap } from "lucide-react"
 import EmojiPicker, { Theme } from "emoji-picker-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAuth } from "@/contexts/AuthContext"
+import panda from "../../asset/panda.jpg";
+import fire from "../../asset/firekirin.jpg";
+import gameroom from "../../asset/gameroom.jpg";
+import vblink from "../../asset/vblink.jpg";
+import yolo from "../../asset/yolo.jpg";
+import valut from "../../asset/vault.jpg";
+import juwa from "../../asset/juwa.jpg";
+import a777 from "../../asset/777.jpg";
+import vegas from "../../asset/vegas.jpg";
+import milky from "../../asset/milkyway.jpg";
+import orion from "../../asset/orion.jpg";
+import juwa2 from "../../asset/juwa2.jpg";
+import vegasSweeps from "../../asset/vegassweeps.jpg";
+import fb1 from "../../asset/fb1.jpg";
+import fb2 from "../../asset/fb2.png";
+import cashFrenzy from "../../asset/CashFrenzy.png";
+import fortuneNexus from "../../asset/FortuneNexus.png";
+import funStation from "../../asset/FunStation1.png";
+import goldenTreasure from "../../asset/GoldenTreasure.png";
+import hofoo from "../../asset/Hofoo.png";
+import kingOfPop from "../../asset/KingOfPop.png";
+import luckyStars from "../../asset/LuckyStars.png";
+import mafia from "../../asset/Mafia.png";
+import maio from "../../asset/MAIO.png";
+import pandaMaster from "../../asset/PandaMaster.png";
+import winnerClub from "../../asset/WinnerClub.png";
+import winstar from "../../asset/winstar.png";
 
 interface ChatMessage {
   id: number
@@ -424,6 +451,351 @@ export default function PrizeChat() {
     }
   }
 
+
+  const availableGames = [
+    {
+      id: 1,
+      name: "Ultra Panda",
+      category: "Slots",
+      icon: Panda,
+      players: "1.2K",
+      prize: "$10K",
+      color: "from-red-500 to-pink-500",
+      bgImage: panda,
+      slug: "https://www.ultrapanda.mobi/",
+      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 2,
+      name: "Fire Kirin",
+      category: "Wheel",
+      icon: fire,
+      players: "856",
+      prize: "$5K",
+      color: "from-blue-500 to-cyan-500",
+      bgImage: fire,
+      slug: "https://www.firekirin.mobi/",
+      borderColor: "border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 3,
+      name: "Game Room Online",
+      category: "Adventure",
+      icon: gameroom,
+      players: "2.1K",
+      prize: "$15K",
+      color: "from-yellow-500 to-orange-500",
+      bgImage: gameroom,
+      slug: "https://www.gameroom777.com/",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 4,
+      name: "Vblink",
+      category: "Cards",
+      icon: vblink,
+      players: "743",
+      prize: "$3K",
+      color: "from-purple-500 to-indigo-500",
+      bgImage: vblink,
+      slug: "https://www.vblink777.club/",
+      borderColor: "border-blue-400 shadow-[0_0_15px_rgba(52,152,219,0.5)]",
+      type: ["all","new"],
+    },
+    {
+      id: 5,
+      name: "YOLO 777",
+      category: "Dice",
+      icon: yolo,
+      players: "1.8K",
+      prize: "$8K",
+      color: "from-green-500 to-teal-500",
+      bgImage: yolo,
+      slug: "https://h5.yolo777.top/YOLO/",
+      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]",
+      type: ["all","hot"],
+    },
+    {
+      id: 6,
+      name: "Game Vault",
+      category: "Casino",
+      icon: valut,
+      players: "956",
+      prize: "$12K",
+      color: "from-red-600 to-red-800",
+      bgImage: valut,
+      slug: "https://gamevault.download/",
+      borderColor: "border-red-600 shadow-[0_0_15px_rgba(185,28,28,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 7,
+      name: "Juwa",
+      category: "Cards",
+      icon: juwa,
+      players: "1.3K",
+      prize: "$6K",
+      color: "from-gray-700 to-gray-900",
+      bgImage: juwa,
+      slug: "https://dl.juwa777.com/?fbclid=IwY2xjawFtFvZleHRuA2FlbQIxMAABHWaygnEZ03842WW0UPnpbLBvrrDeM0VGWCXmkQMvpm6jioyCs1jJB70ZqA_aem_2jIRv6mHNu0HMx5wefr0Kw",
+      borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 8,
+      name: "Juwa - 2.0",
+      category: "Bingo",
+      icon: juwa2,
+      players: "2.5K",
+      prize: "$4K",
+      color: "from-pink-500 to-rose-500",
+      bgImage: juwa2,
+      slug: "https://m.juwa2.com/",
+      borderColor: "border-blue-800 shadow-[0_0_15px_rgba(52,152,219,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 9,
+      name: "777 River Sweeps",
+      category: "Slots",
+      icon: a777,
+      players: "3.1K",
+      prize: "$25K",
+      color: "from-yellow-400 to-orange-500",
+      bgImage: a777,
+      slug: "https://river777.net/",
+      borderColor: "border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 10,
+      name: "Vegas X",
+      category: "Casino",
+      icon: vegas,
+      players: "1.9K",
+      prize: "$18K",
+      color: "from-purple-600 to-pink-600",
+      bgImage: vegas,
+      slug: "https://www.vegas-x.org/",
+      borderColor: "border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 11,
+      name: "Milky Way",
+      category: "Slots",
+      icon: milky,
+      players: "2.2K",
+      prize: "$14K",
+      color: "from-blue-600 to-indigo-600",
+      hot: true,
+      bgImage: milky,
+      slug: "https://milkywayapp.xyz/",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 12,
+      name: "Orion Stars",
+      category: "Adventure",
+      icon: orion,
+      players: "1.7K",
+      prize: "$9K",
+      color: "from-cyan-500 to-blue-500",
+      bgImage: orion,
+      slug: "https://start.orionstars.vip:8888/index.html",
+      borderColor: "border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)]",
+      type: ["all", "popular"],
+    },
+    // New Games
+    {
+      id: 13,
+      name: "Cash Frenzy",
+      category: "Slots",
+      icon: cashFrenzy,
+      players: "2.8K",
+      prize: "$22K",
+      color: "from-emerald-500 to-teal-500",
+      bgImage: cashFrenzy,
+      slug: "https://www.cashfrenzy777.com/",
+      borderColor: "border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 14,
+      name: "Fortune Nexus",
+      category: "Casino",
+      icon: fortuneNexus,
+      players: "1.5K",
+      prize: "$16K",
+      color: "from-indigo-500 to-purple-500",
+      bgImage: fortuneNexus,
+      slug: "https://www.fortunenexus.vip/",
+      borderColor: "border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 15,
+      name: "Fun Station",
+      category: "Arcade",
+      icon: funStation,
+      players: "3.2K",
+      prize: "$28K",
+      color: "from-rose-500 to-red-500",
+      bgImage: funStation,
+      slug: "https://www.funstation.site/",
+      borderColor: "border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 16,
+      name: "Golden Treasure",
+      category: "Slots",
+      icon: goldenTreasure,
+      players: "2.0K",
+      prize: "$20K",
+      color: "from-yellow-500 to-amber-500",
+      bgImage: goldenTreasure,
+      slug: "https://www.goldentreasure.mobi/",
+      borderColor: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 17,
+      name: "Hofoo",
+      category: "Cards",
+      icon: hofoo,
+      players: "1.1K",
+      prize: "$7K",
+      color: "from-blue-500 to-purple-500",
+      bgImage: hofoo,
+      slug: "https://game.hofoo.top/web-mobile/",
+      borderColor: "border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 18,
+      name: "King Of Pop",
+      category: "Slots",
+      icon: kingOfPop,
+      players: "2.7K",
+      prize: "$19K",
+      color: "from-pink-500 to-purple-500",
+      bgImage: kingOfPop,
+      slug: "https://www.slots88888.com/",
+      borderColor: "border-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 19,
+      name: "Lucky Stars",
+      category: "Casino",
+      icon: luckyStars,
+      players: "2.4K",
+      prize: "$17K",
+      color: "from-violet-500 to-purple-500",
+      bgImage: luckyStars,
+      slug: "https://luckystars.mobi/",
+      borderColor: "border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.5)]",
+      type: ["all", "hot"],
+    },
+    {
+      id: 20,
+      name: "Mafia",
+      category: "Adventure",
+      icon: mafia,
+      players: "1.6K",
+      prize: "$11K",
+      color: "from-gray-600 to-black",
+      bgImage: mafia,
+      slug: "https://www.mafia77777.com/",
+      borderColor: "border-gray-600 shadow-[0_0_15px_rgba(75,85,99,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 21,
+      name: "MAIO",
+      category: "Dice",
+      icon: maio,
+      players: "1.9K",
+      prize: "$13K",
+      color: "from-orange-500 to-red-500",
+      bgImage: maio,
+      slug: "https://www.mrallinone777.com/",
+      borderColor: "border-orange-400 shadow-[0_0_15px_rgba(251,146,60,0.5)]",
+      type: ["all", "new"],
+    },
+    {
+      id: 22,
+      name: "Panda Master",
+      category: "Slots",
+      icon: pandaMaster,
+      players: "3.0K",
+      prize: "$26K",
+      color: "from-black to-gray-700",
+      bgImage: pandaMaster,
+      slug: "https://pandamaster.vip:8888/index.html",
+      borderColor: "border-black shadow-[0_0_15px_rgba(31,41,55,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 23,
+      name: "Winner Club",
+      category: "Casino",
+      icon: winnerClub,
+      players: "2.6K",
+      prize: "$21K",
+      color: "from-amber-500 to-yellow-500",
+      bgImage: winnerClub,
+      slug: "https://www.winnersclub777.com/",
+      borderColor: "border-amber-400 shadow-[0_0_15px_rgba(217,119,6,0.5)]",
+      type: ["all", "popular"],
+    },
+    {
+      id: 24,
+      name: "Winstar",
+      category: "Slots",
+      icon: winstar,
+      players: "2.9K",
+      prize: "$24K",
+      color: "from-cyan-500 to-blue-500",
+      bgImage: winstar,
+      slug: "http://server.winstar99999.com:8009/",
+      borderColor: "border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]",
+      type: ["all", "hot"],
+    },
+    // Facebook Tab Games
+    {
+      id: 25,
+      name: "Sophie Cliffton",
+      category: "Facebook",
+      icon: fb1,
+      players: "5.2K",
+      prize: "$35K",
+      color: "from-blue-600 to-blue-800",
+      bgImage: fb1,
+      slug: "https://www.facebook.com/sophie.cliffton?rdid=bQPsNmXcPPpEV35z&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DDrATbLTx%2F#",
+      borderColor: "border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.5)]",
+      type: ["facebook"],
+    },
+    {
+      id: 26,
+      name: "Jackpot Zone",
+      category: "Facebook",
+      icon: fb2,
+      players: "4.8K",
+      prize: "$32K",
+      color: "from-blue-700 to-indigo-600",
+      bgImage: fb2,
+      slug: "https://www.facebook.com/people/Jackpot-Zone/61581237008726/?rdid=YFSQXc0UL3ChZuoM&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CAsMQKRys%2F",
+      borderColor: "border-green-700 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
+      type: ["facebook"],
+    },
+  ];
+
   return (
     <main className=" overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8 h-full flex flex-col">
@@ -432,7 +804,7 @@ export default function PrizeChat() {
           <h1 className="text-4xl font-bold flex items-center gap-3">
             <MessageCircle className="w-10 h-10 text-primary" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
-              Prize Chat
+              Agent Chat
             </span>
           </h1>
           <p className="text-muted-foreground">Chat, claim, and track your prizes</p>
@@ -445,8 +817,8 @@ export default function PrizeChat() {
           
           <div className="flex justify-between items-center relative z-10">
             <div>
-              <p className="text-sm text-gray-300 mb-1">Available Coins</p>
-              <p className="text-3xl font-bold text-white">{userPoints.toLocaleString()}</p>
+              <p className="text-sm text-gray-300 mb-1">Available Game</p>
+              <p className="text-3xl font-bold text-white">26+</p>
             </div>
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
               <Gift className="w-7 h-7 text-white" />
@@ -614,63 +986,63 @@ export default function PrizeChat() {
           {/* Prizes */}
           <div className="overflow-y-auto pr-2 h-[100vh] hide-scrollbar">
             <h3 className="font-bold text-xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
-              Available Prizes
+              Available Game
             </h3>
-            <div className="space-y-4 ">
-              {availablePrizes.map((prize, index) => {
-                const scheme = prizeColorSchemes[index % prizeColorSchemes.length]
-                const canAfford = userPoints >= prize.coins
-                
-                return (
-                  <div 
-                    key={prize.id} 
-                    className={`relative  group rounded-2xl overflow-hidden ${scheme.bg} backdrop-blur-sm border ${scheme.border} transition-all duration-300 p-4 ${!canAfford ? 'opacity-50' : ''}`}
-                  >
-                    {/* Glow effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${scheme.glow} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                    
-                    <div className="relative z-10">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${scheme.iconBg} flex items-center justify-center shadow-lg ${scheme.iconShadow}`}>
-                          <Gift className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-white text-sm mb-1">{prize.name}</p>
-                          <p className="text-xs text-gray-300">{prize.points}</p>
-                        </div>
+            <div className="grid grid-cols-2 gap-1">
+             {availableGames.map((game) => {
+              return(
+                <Card
+                  key={game.id}
+                  className={`group border-2 overflow-hidden rounded-lg shadow-lg cursor-pointer flex flex-col ${game.borderColor}`}
+                >
+                  {/* Image / cover */}
+                  <div className="relative w-full h-36 md:h-48">
+                    <img
+                      src={game.bgImage}
+                      alt={game.name}
+                      className="w-full h-full object-cover block"
+                    />
+                    <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:bg-black/40" />
+                    {game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        🔥 HOT
                       </div>
-                      
-                      <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
-                        <Clock className="w-3 h-3" />
-                        <span>{prize.time}</span>
+                    )}
+                    {game.type.includes("new") && !game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        ⭐ NEW
                       </div>
-                      
-                      {/* <Button
-                        size="sm"
-                        className="w-full text-xs font-semibold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-                        disabled={!canAfford}
-                        onClick={() => handleClaimPrize(prize)}
-                      >
-                        {canAfford ? "Claim Prize" : `Need ${prize.coins - userPoints} more`}
-                      </Button> */}
-                       <Button
-                    variant="default"
-                    size="sm"
-                    disabled={!canAfford}
-                    onClick={() => handleClaimPrize(prize)}
-                    className=" w-full text-xs font-semibold
-              bg-gradient-to-r from-purple-600 to-pink-600
-drop-shadow-[0_0_1px_#38bdf8]
-drop-shadow-[0_0_2px_#a855f7]
-drop-shadow-[0_0_3px_#ec4899] text-white
-                "
-                  >
-                    {canAfford ? "Claim Prize" : `Need ${prize.coins - userPoints} more`}
-                  </Button>
+                    )}
+                    {game.type.includes("popular") && !game.type.includes("hot") && (
+                      <div className="absolute top-3 right-3 bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        🌟 POPULAR
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info bar */}
+                  <div className="bg-black px-4 md:px-6 py-2 flex flex-col items-center gap-3">
+                    <h3 className="text-white text-center text-xs font-bold w-full">
+                      {game.name}
+                    </h3>
+
+                    <div className="w-full md:w-3/4">
+                      <div className="p-[2px] rounded-xl bg-gradient-to-r from-cyan-500 to-pink-500">
+                        <button
+                          onClick={() => {
+                            window.open(game.slug, "_blank");
+                          }}
+                          className="w-full rounded-lg py-2 text-xs bg-[#0b0b0b] text-white font-semibold flex items-center justify-center gap-2"
+                        >
+                          {/* <Zap className="w-4 h-4" /> */}
+                          PLAY NOW
+                        </button>
+                      </div>
                     </div>
                   </div>
-                )
-              })}
+                </Card>
+              )
+             })}
             </div>
           </div>
         </div>
