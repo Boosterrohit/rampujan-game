@@ -10,6 +10,7 @@ import {
 import BarChart from "@/components/dashboard/element/BarChart";
 import DoughnutChart from "@/components/dashboard/element/DoughnutChart";
 import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
+import { useAuth } from "@/contexts/AuthContext";
 import { dashboardSelector } from "./redux/selector";
 import { useEffect, useState } from "react";
 import { playerListRequest } from "./redux/dashboardSlice";
@@ -18,6 +19,7 @@ import AppPagination from "@/components/dashboard/element/AppPagination";
 
 export function Dashboard() {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const [paginationState, setPaginationState] = useState({
     limit: '10',
     page: 1,
@@ -34,8 +36,10 @@ export function Dashboard() {
     dispatch(playerListRequest({
       limit: paginationState.limit,
       page: paginationState.page,
-      search: '' }));
-  }, [dispatch, paginationState]);
+      search: '',
+      role: user?.role,
+    }));
+  }, [dispatch, paginationState, user?.role]);
 
   const totalPlayers = safeAgentPlayers.reduce((acc, group) => acc + group.players.length, 0);
   const totalAgents = safeAgentPlayers.length;

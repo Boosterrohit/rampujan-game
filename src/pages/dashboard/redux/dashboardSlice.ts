@@ -14,7 +14,7 @@ const dashboardSlice = createSlice({
   reducers: {
     playerListRequest: (
       state,
-      action: PayloadAction<{ limit: string; page: number; search: string }>,
+      action: PayloadAction<{ limit: string; page: number; search: string; role?: string }>,
     ) => {
       state.loading = true;
     },
