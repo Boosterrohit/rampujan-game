@@ -97,6 +97,23 @@ export function AdminManagement() {
     );
   }, [dispatch, paginationState, debouncedSearchTerm]);
 
+  // when editing, supply existing agent details
+  const handleEdit = (agentGroup: any) => {
+    const { agent } = agentGroup;
+    openDialog(
+      <AdminForm
+        initialValues={{
+          agentId: agent._id,
+          username: agent.username,
+          email: agent.email,
+          walletBalance: 0, // backend doesn't return balance; leave default
+          password: "", // blank unless changed
+        }}
+        isEdit
+      />
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2">
@@ -185,7 +202,10 @@ export function AdminManagement() {
                         </span>
                       </td>
                       <td className="py-3 px-4 flex items-center justify-center gap-2">
-                        <Button className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0">
+                        <Button
+                          className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0"
+                          onClick={() => handleEdit(admin)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
