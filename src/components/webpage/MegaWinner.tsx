@@ -155,13 +155,13 @@ export default function MegaWinners() {
                 </div>
 
                 {/* CTA Button */}
-                <Button
+                {/* <Button
                   className={`w-full bg-gradient-to-r ${winner.gradient} hover:opacity-90 text-white border-0 shadow-lg group-hover:shadow-xl transition-all duration-300`}
                   onClick={() => navigate("/free-spin")}
                 >
                   <Zap className="w-4 h-4 mr-2" />
                   Try Your Luck
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
 

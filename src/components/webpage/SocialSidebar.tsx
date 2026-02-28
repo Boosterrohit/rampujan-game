@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageCircle,
   X,
@@ -36,6 +37,8 @@ interface LocalMessage extends Message {
 
 export default function SocialSidebar() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  // track authentication via context to immediately react to logout
+  const { user } = useAuth();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   
@@ -64,29 +67,62 @@ export default function SocialSidebar() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
-  // Get user info from localStorage (userInfo for dashboard, user for web player)
-  useEffect(() => {
+  // helper for reading user data from storage (legacy fallback)
+  const refreshUser = () => {
     const userInfo = localStorage.getItem("userInfo");
-    const user = localStorage.getItem("user");
+    const userStr = localStorage.getItem("user");
     try {
       if (userInfo) {
         const parsed = JSON.parse(userInfo);
         setUserRole(parsed.role);
         setUserId(parsed.userId);
-      } else if (user) {
-        const parsed = JSON.parse(user);
+      } else if (userStr) {
+        const parsed = JSON.parse(userStr);
         setUserRole(parsed.role);
         setUserId(parsed.userId);
+      } else {
+        setUserRole(null);
+        setUserId(null);
       }
     } catch (e) {
       console.error("Failed to parse user info", e);
+      setUserRole(null);
+      setUserId(null);
     }
+  };
+
+  // keep local state in sync with auth context
+  useEffect(() => {
+    if (user) {
+      setUserRole(user.role);
+      setUserId(user.userId);
+    } else {
+      setUserRole(null);
+      setUserId(null);
+      setIsChatOpen(false);
+    }
+  }, [user]);
+
+  // initial load for non-context cases
+  useEffect(() => {
+    refreshUser();
   }, []);
 
   // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // listen for storage events in case another tab logs the user out
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "userInfo" || e.key === "user") {
+        refreshUser();
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   // Close chat when clicking outside
   useEffect(() => {
@@ -105,9 +141,10 @@ export default function SocialSidebar() {
     };
   }, [isChatOpen]);
 
-  // Close chat when route changes
+  // Close chat when route changes and re-read user info (handles logout/navigation)
   useEffect(() => {
     setIsChatOpen(false);
+    refreshUser();
   }, [location.pathname]);
 
   // When chat opens, load agents and check assignment
@@ -457,10 +494,9 @@ const handleRemoveImage = () => {
   if (cameraInputRef.current) cameraInputRef.current.value = "";
 };
 
-  // Only render for players, not agents or admins
-  if (userRole === "agent" || userRole === "admin") {
-    return null;
-  }
+  // don't hide social icons for agents/admins; we just prevent chat UI from showing
+  // the component will always render the sidebar links. Chat button/popup will
+  // be gated by user role later in the JSX.
 
   return (
     <>
@@ -491,30 +527,32 @@ const handleRemoveImage = () => {
           );
         })}
 
-        {/* Chat Button */}
-        <div className="group relative">
-          <button
-            onClick={() => setIsChatOpen(true)}
-            className="w-10 h-10 md:w-12 md:h-12 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-125 hover:shadow-xl border-l-4 border-white/20"
-            title="Chat with Agent"
-          >
-            <MessageSquare className="w-4 h-4 md:w-6 md:h-6" />
-          </button>
-          {/* Tooltip */}
-          <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
-              Chat with Agent
+        {/* Chat Button (only for authenticated players) */}
+        {(userId && userRole !== "agent" && userRole !== "admin") && (
+          <div className="group relative">
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="w-10 h-10 md:w-12 md:h-12 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-125 hover:shadow-xl border-l-4 border-white/20"
+              title="Chat with Agent"
+            >
+              <MessageSquare className="w-4 h-4 md:w-6 md:h-6" />
+            </button>
+            {/* Tooltip */}
+            <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-gray-800 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
+                Chat with Agent
+              </div>
+              <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
             </div>
-            <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Chat Popup */}
-      {isChatOpen && (
+      {/* Chat Popup (authenticated players only) */}
+      {isChatOpen && userId && userRole !== "agent" && userRole !== "admin" && (
   <div
     ref={chatRef}
-    className="fixed bottom-6 right-3 md:right-5 z-50 w-full px-8 md:w-96 h-96 md:h-96"
+    className="fixed bottom-6 right-3 md:right-5 z-50 w-full px-8 md:w-96 h-[450px] md:h-[450px]"
   >
     <Card className="w-full h-full shadow-2xl border-2 flex flex-col overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg flex-shrink-0">
@@ -533,7 +571,7 @@ const handleRemoveImage = () => {
 
       <CardContent className="p-0 flex flex-col flex-1 overflow-hidden min-h-0">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 min-h-0">
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 min-h-0 overflow-x-hidden">
           {messages.map((message) => (
             <div
               key={message.id}
