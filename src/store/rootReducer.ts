@@ -1,9 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
-// import authReducer from "../view/auth/redux/authSlice";
-// import mapReducer from '../view/dashboard/map/redux/mapSlice'
+import dashboardReducer from "../pages/dashboard/redux/dashboardSlice";
 
 const rootReducer = combineReducers({
-    // auth: authReducer,
-    // map: mapReducer,
+    dashboard: dashboardReducer,
 });
 export default rootReducer

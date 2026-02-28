@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Mail, Lock, Loader } from "lucide-react"
+import { Mail, Lock, Loader, EyeOff, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/services/authService"
 import { useAuth } from "@/contexts/AuthContext"
@@ -19,6 +19,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const { login } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,8 +44,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       })
 
       if (response.success && response.data) {
-        // If backend returned an accessToken, extract its expiry and pass it to context
-        const token = (response as any).data?.accessToken
+        // Determine token from whichever location the backend chose.
+        const token =
+          (response as any).data?.accessToken || (response as any).accessToken;
         let expiry: number | undefined = undefined
         if (token) {
           try {
@@ -93,7 +95,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <div className="relative">
           <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
           <input
-            type="password"
+          type={showPassword ? "text" : "password"}
+            // type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
@@ -101,6 +104,18 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             required
             disabled={loading}
           />
+           <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute right-3 top-3 text-muted-foreground"
+        disabled={loading}
+      >
+        {showPassword ? (
+          <EyeOff className="w-4 h-4" />
+        ) : (
+          <Eye className="w-4 h-4" />
+        )}
+      </button>
         </div>
         <div>
           <Link to="/forgot-password" className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">

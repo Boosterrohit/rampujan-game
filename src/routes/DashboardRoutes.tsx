@@ -1,5 +1,6 @@
 import { Suspense, useState } from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 import Layout from "@/components/dashboard/Layout"
 import { Dashboard } from "@/pages/dashboard/dashboard"
 import { AdminManagement } from "@/pages/dashboard/admin-management/admin-management"
@@ -14,6 +15,13 @@ import MessagePage from "@/components/dashboard/element/MessagePage"
 import { dashboardUrls } from "@/config/dashboard-urls"
 
 const DashboardRoutes = () => {
+  const { user, isLoggedIn } = useAuth();
+
+  // protect all dashboard paths: redirect home when not authorized or role is "player"
+  if (!isLoggedIn || user?.role === "player") {
+    return <Navigate to="/" replace />;
+  }
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {

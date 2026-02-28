@@ -7,6 +7,13 @@ export interface FreeSpinResponse {
   spinType: string;
 }
 
+// the bonus endpoint can return the same shape as FreeSpinResponse
+// or it might return an error object containing a message property.
+export type BonusSpinResponse = FreeSpinResponse & {
+  // message will be present when the backend cannot calculate a bonus spin
+  message?: string;
+};
+
 export const spinService = {
   async freeSpin(): Promise<FreeSpinResponse> {
     // this method is still called "freeSpin" in the UI but it uses the
@@ -34,6 +41,42 @@ export const spinService = {
       return data;
     } catch (error) {
       console.error('spinService.freeSpin error', error);
+      throw error;
+    }
+  },
+
+  async bonusSpin(): Promise<BonusSpinResponse> {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/spin/bonus`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+      });
+      const data: BonusSpinResponse = await response.json();
+
+      // treat any message from the server as an error condition unless
+      // the success flag is truthy.  The API may return just `{ message: ... }`
+      // without a `success` property, so we consider that a failure as well.
+      if (
+        !response.ok ||
+        (data.message && !data.success)
+      ) {
+        const err = new Error(data.message || 'Bonus spin failed');
+        (err as any).message = data.message;
+        throw err;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('spinService.bonusSpin error', error);
       throw error;
     }
   },

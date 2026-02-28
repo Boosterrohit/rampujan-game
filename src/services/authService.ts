@@ -104,9 +104,23 @@ export const authService = {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Store access token in localStorage if backend returned it
-      if (data?.data?.accessToken) {
-        localStorage.setItem('accessToken', data.data.accessToken);
+      // Store access token in localStorage if backend returned it.  Some
+      // endpoints send it nested under `data.accessToken` while others may
+      // return it at the top level.  We handle both to avoid missing the value
+      // (which was causing 401s when the header was empty).
+      const tokenFromNested = data?.data?.accessToken;
+      const tokenFromRoot = (data as any)?.accessToken;
+      const token = tokenFromNested || tokenFromRoot;
+      if (token) {
+        // store in both localStorage and a simple cookie so the axios interceptor
+        // (which looks for `access_token` cookie for backwards compatibility)
+        // can pick it up.
+        localStorage.setItem('accessToken', token);
+        try {
+          document.cookie = `access_token=${token}; path=/;`;
+        } catch {
+          // ignore if cookie writing fails (e.g. server side rendering)
+        }
       }
 
       return data;

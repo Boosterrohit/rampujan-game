@@ -1,55 +1,57 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Mail, Lock, User, Loader } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { authService } from "@/services/authService"
+import { useState } from "react";
+import { Mail, Lock, User, Loader, EyeOff, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { authService } from "@/services/authService";
 
 interface SignupFormProps {
-  onSuccess: (email: string) => void
+  onSuccess: (email: string) => void;
 }
 
 export default function SignupForm({ onSuccess }: SignupFormProps) {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     // Validation
     if (!username.trim()) {
-      setError("Username is required")
-      return
+      setError("Username is required");
+      return;
     }
 
     if (!email.trim()) {
-      setError("Email is required")
-      return
+      setError("Email is required");
+      return;
     }
 
     if (!password) {
-      setError("Password is required")
-      return
+      setError("Password is required");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters")
-      return
+      setError("Password must be at least 6 characters");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       const response = await authService.register({
@@ -57,24 +59,28 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         email,
         password,
         confirmPassword,
-      })
+      });
 
       // Set OTP session for 1 minute
-      authService.setOTPSession(email)
+      authService.setOTPSession(email);
 
       // Pass email to parent to show OTP verification
-      onSuccess(email)
+      onSuccess(email);
     } catch (err) {
-      const error = err as any
-      setError(error.message || "Registration failed. Please try again.")
+      const error = err as any;
+      setError(error.message || "Registration failed. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <div className="p-3 rounded-lg bg-accent/10 border border-accent text-accent text-sm">{error}</div>}
+      {error && (
+        <div className="p-3 rounded-lg bg-accent/10 border border-accent text-accent text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="space-y-2">
         <label className="text-sm font-medium">Username</label>
@@ -113,7 +119,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         <div className="relative">
           <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
           <input
-            type="password"
+            // type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
@@ -121,6 +128,18 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             required
             disabled={loading}
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-3 text-muted-foreground"
+            disabled={loading}
+          >
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -129,7 +148,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         <div className="relative">
           <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
           <input
-            type="password"
+            // type="password"
+            type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="••••••••"
@@ -137,16 +157,32 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             required
             disabled={loading}
           />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-3 top-3 text-muted-foreground"
+            disabled={loading}
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full gap-2 hover:opacity-90 h-12 mt-2  bg-gradient-to-r from-purple-600 to-pink-600
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full gap-2 hover:opacity-90 h-12 mt-2  bg-gradient-to-r from-purple-600 to-pink-600
 drop-shadow-[0_0_1px_#38bdf8]
 drop-shadow-[0_0_2px_#a855f7]
-drop-shadow-[0_0_3px_#ec4899] text-white">
+drop-shadow-[0_0_3px_#ec4899] text-white"
+      >
         {loading && <Loader className="w-4 h-4 animate-spin" />}
         {loading ? "Creating account..." : "Sign Up"}
       </Button>
     </form>
-  )
+  );
 }
