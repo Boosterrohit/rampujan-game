@@ -1,8 +1,8 @@
 
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Gift, MessageCircle, Clock, Bot, User, Image, Smile } from "lucide-react"
+import { useState, useEffect, useRef, CSSProperties } from "react"
+import { Gift, MessageCircle, Clock, Bot, User, Image, Smile, X, ZoomIn, ZoomOut } from "lucide-react"
 import EmojiPicker, { Theme } from "emoji-picker-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -50,6 +50,7 @@ export default function PrizeChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [chatId, setChatId] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [zoomImage, setZoomImage] = useState<string | null>(null)
   const [showEmoji, setShowEmoji] = useState(false)
 
   const [userPoints] = useState(2450)
@@ -181,6 +182,68 @@ export default function PrizeChat() {
   // No quick message options — users must select an agent and type messages
 
   const [newMessage, setNewMessage] = useState("")
+
+  // simple image modal component
+  const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
+    const [scale, setScale] = useState(1);
+    const handleWheel = (e: React.WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      setScale((s) => Math.min(3, Math.max(0.5, s + delta)));
+    };
+    const reset = () => setScale(1);
+    const style: CSSProperties = {
+      transform: `scale(${scale})`,
+      transition: "transform 0.1s",
+      maxWidth: "90vw",
+      maxHeight: "90vh",
+      objectFit: "contain",
+      cursor: "grab",
+    };
+    return (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg flex items-center justify-center z-[9999]"
+        onClick={onClose}
+      >
+        <div onClick={(e) => e.stopPropagation()} className="relative">
+          <img
+            src={src}
+            alt="Preview"
+            style={style}
+            onWheel={handleWheel}
+            className="rounded-md shadow-lg"
+          />
+          {/* top-right buttons */}
+          <div className="absolute top-2 right-2 flex space-x-2">
+            <button
+              onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+              className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+            >
+              <ZoomIn size={16} />
+            </button>
+            <button
+              onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
+              className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+            >
+              <ZoomOut size={16} />
+            </button>
+            <button
+              onClick={reset}
+              className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+            >
+              Reset
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const loadMessages = async () => {
     try {
@@ -429,7 +492,7 @@ export default function PrizeChat() {
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-6 space-y-6"
+              className="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar"
             >
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
@@ -449,7 +512,18 @@ export default function PrizeChat() {
                         
                         <div className="relative z-10">
                           {msg.imageUrl && (
-                            <img src={msg.imageUrl} alt="" className="rounded-lg max-w-full max-h-48 object-contain mb-2" />
+                            <img
+  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`}
+  alt=""
+  className="rounded-lg max-w-full max-h-48 object-contain mb-2 cursor-pointer"
+  onClick={() =>
+    setZoomImage(
+      msg.imageUrl?.startsWith('http')
+        ? msg.imageUrl
+        : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`
+    )
+  }
+/>
                           )}
                           <p className="text-sm text-white leading-relaxed">{msg.message}</p>
                           {msg.prize && (
@@ -470,7 +544,18 @@ export default function PrizeChat() {
                         
                         <div className="relative z-10">
                           {msg.imageUrl && (
-                            <img src={msg.imageUrl} alt="" className="rounded-lg max-w-full max-h-48 object-contain mb-2" />
+                                              <img
+  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`}
+  alt=""
+  className="rounded-lg max-w-full max-h-48 object-contain mb-2 cursor-pointer"
+  onClick={() =>
+    setZoomImage(
+      msg.imageUrl?.startsWith('http')
+        ? msg.imageUrl
+        : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`
+    )
+  }
+/>
                           )}
                           <p className="text-sm text-white font-medium leading-relaxed">{msg.message}</p>
                           <p className="text-xs text-white/80 mt-2 text-right">{msg.timestamp}</p>
@@ -527,11 +612,11 @@ export default function PrizeChat() {
           </div>
 
           {/* Prizes */}
-          <div className="overflow-y-auto pr-2 h-[100vh]">
+          <div className="overflow-y-auto pr-2 h-[100vh] hide-scrollbar">
             <h3 className="font-bold text-xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-400 to-pink-500">
               Available Prizes
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {availablePrizes.map((prize, index) => {
                 const scheme = prizeColorSchemes[index % prizeColorSchemes.length]
                 const canAfford = userPoints >= prize.coins
@@ -539,7 +624,7 @@ export default function PrizeChat() {
                 return (
                   <div 
                     key={prize.id} 
-                    className={`relative group rounded-2xl overflow-hidden ${scheme.bg} backdrop-blur-sm border ${scheme.border} transition-all duration-300 p-4 ${!canAfford ? 'opacity-50' : ''}`}
+                    className={`relative  group rounded-2xl overflow-hidden ${scheme.bg} backdrop-blur-sm border ${scheme.border} transition-all duration-300 p-4 ${!canAfford ? 'opacity-50' : ''}`}
                   >
                     {/* Glow effect */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${scheme.glow} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
@@ -590,6 +675,7 @@ drop-shadow-[0_0_3px_#ec4899] text-white
           </div>
         </div>
       </div>
+      {zoomImage && <ImageModal src={zoomImage} onClose={() => setZoomImage(null)} />}
     </main>
   )
 }

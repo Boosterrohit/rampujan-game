@@ -23,7 +23,7 @@ const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
     const fetchUnread = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("/api/v1/chat/unread-count", {
+        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/unread-count", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();

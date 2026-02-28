@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, CSSProperties } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageCircle,
@@ -10,6 +10,8 @@ import {
   Plus,
   Camera,
   Smile,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
@@ -33,6 +35,74 @@ interface LocalMessage extends Message {
   text?: string;
   time?: string;
   image?: string;
+}
+
+// reusable modal for displaying and zooming an image
+function ImageModal({
+  src,
+  onClose,
+}: {
+  src: string;
+  onClose: () => void;
+}) {
+  const [scale, setScale] = useState(1);
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    setScale((s) => Math.min(3, Math.max(0.5, s + delta)));
+  };
+  const reset = () => setScale(1);
+  const style: CSSProperties = {
+    transform: `scale(${scale})`,
+    transition: 'transform 0.1s',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+    objectFit: 'contain',
+    cursor: 'grab',
+  };
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg flex items-center justify-center z-[9999]"
+      onClick={onClose}
+    >
+      <div onClick={(e) => e.stopPropagation()} className="relative">
+        <img
+          src={src}
+          alt="Preview"
+          style={style}
+          onWheel={handleWheel}
+          className="rounded-md shadow-lg"
+        />
+        {/* top-right buttons */}
+        <div className="absolute top-2 right-2 flex space-x-2">
+          <button
+            onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <button
+            onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <ZoomOut size={16} />
+          </button>
+          <button
+            onClick={reset}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            Reset
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function SocialSidebar() {
@@ -65,6 +135,7 @@ export default function SocialSidebar() {
   const [showEmoji, setShowEmoji] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [zoomImage, setZoomImage] = useState<string | null>(null);
   const location = useLocation();
 
   // helper for reading user data from storage (legacy fallback)
@@ -212,7 +283,7 @@ export default function SocialSidebar() {
         const token = localStorage.getItem("accessToken");
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const res = await fetch("/api/v1/chat/unread-count", { headers });
+        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/unread-count", { headers });
         const data = await res.json();
         if (res.ok && data?.data?.unreadCount > 0) {
           setIsChatOpen(true);
@@ -574,16 +645,16 @@ const handleRemoveImage = () => {
         </Button>
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col flex-1 overflow-hidden min-h-0">
+      <CardContent className="p-0 flex flex-col flex-1 overflow-hidden min-h-0 ">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 min-h-0 overflow-x-hidden">
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 min-h-0 overflow-x-hidden hide-scrollbar">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] p-2 rounded-lg text-sm ${
+                className={`max-w-[70%]  p-2 rounded-lg text-sm ${
                   message.sender === "user"
                     ? "bg-green-500 text-white"
                     : "bg-gray-800 text-white border"
@@ -593,7 +664,8 @@ const handleRemoveImage = () => {
                   <img
                     src={message.image}
                     alt="Sent image"
-                    className="rounded mb-2 max-w-full h-auto"
+                    className="rounded mb-2 max-w-full h-auto cursor-pointer"
+                    onClick={() => setZoomImage(message.image!)}
                   />
                 )}
                 {message.text && <p>{message.text}</p>}
@@ -767,6 +839,9 @@ const handleRemoveImage = () => {
     </Card>
   </div>
 )}
+
+      {/* image zoom modal */}
+      {zoomImage && <ImageModal src={zoomImage} onClose={() => setZoomImage(null)} />}
     </>
   );
 }

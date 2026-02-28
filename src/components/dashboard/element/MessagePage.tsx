@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, CSSProperties } from "react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
-import { Send, Image, Smile, ArrowLeft, Menu } from "lucide-react";
+import { Send, Image, Smile, ArrowLeft, Menu, X, ZoomIn, ZoomOut } from "lucide-react";
 
 interface Message {
   text?: string;
@@ -16,6 +16,67 @@ interface User {
   lastMessage?: string;
   online: boolean;
   unreadCount?: number;
+}
+
+// image modal shared by many chat screens
+function ImageModal({ src, onClose }: { src: string; onClose: () => void }) {
+  const [scale, setScale] = useState(1);
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    setScale((s) => Math.min(3, Math.max(0.5, s + delta)));
+  };
+  const reset = () => setScale(1);
+  const style: CSSProperties = {
+    transform: `scale(${scale})`,
+    transition: "transform 0.1s",
+    maxWidth: "90vw",
+    maxHeight: "90vh",
+    objectFit: "contain",
+    cursor: "grab",
+  };
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg flex items-center justify-center z-[9999]"
+      onClick={onClose}
+    >
+      <div onClick={(e) => e.stopPropagation()} className="relative">
+        <img
+          src={src}
+          alt="Preview"
+          style={style}
+          onWheel={handleWheel}
+          className="rounded-md shadow-lg"
+        />
+        <div className="absolute top-2 right-2 flex space-x-2">
+          <button
+            onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <button
+            onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <ZoomOut size={16} />
+          </button>
+          <button
+            onClick={reset}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            Reset
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white rounded-full p-1"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function MessagePage() {
@@ -35,6 +96,7 @@ export default function MessagePage() {
   const [loadingChats, setLoadingChats] = useState(false);
   const [forbidden, setForbidden] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [zoomImage, setZoomImage] = useState<string | null>(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -292,6 +354,7 @@ export default function MessagePage() {
   }
 
   return (
+    <>
     <div className="flex h-[80vh] bg-slate-900 text-white overflow-hidden rounded-md overflow-hidden">
       {/* User List Sidebar */}
       <div
@@ -401,7 +464,8 @@ export default function MessagePage() {
                       <img
                         src={msg.image}
                         alt="uploaded"
-                        className="rounded-lg max-w-full max-h-64 object-contain"
+                        className="rounded-lg max-w-full max-h-64 object-contain cursor-pointer"
+                        onClick={() => setZoomImage(msg.image!)}
                       />
                     )}
                     {msg.timestamp && (
@@ -515,5 +579,7 @@ export default function MessagePage() {
         )}
       </div>
     </div>
+    {zoomImage && <ImageModal src={zoomImage} onClose={() => setZoomImage(null)} />}
+    </>
   );
 }
