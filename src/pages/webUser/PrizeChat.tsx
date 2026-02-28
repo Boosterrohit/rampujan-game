@@ -45,21 +45,8 @@ export default function PrizeChat() {
   const [assignedAgentName, setAssignedAgentName] = useState<string | null>(null)
   const [isAssigned, setIsAssigned] = useState(false)
   const [assigning, setAssigning] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      sender: "system",
-      message: "Welcome to Prize Chat! You have 2,450 coins available to claim prizes.",
-      timestamp: "10:30 AM",
-    },
-    {
-      id: 2,
-      sender: "system",
-      message: 'You earned "Spun Master" milestone! Claim your 500 coins reward.',
-      prize: "500 Coins",
-      timestamp: "10:35 AM",
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [chatId, setChatId] = useState<string | null>(null)
 
   const [userPoints] = useState(2450)
 
@@ -92,7 +79,7 @@ export default function PrizeChat() {
         const headers: any = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
 
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/agents/available`, {
+        const res = await fetch(`/api/v1/chat/agents/available`, {
           method: 'GET',
           credentials: 'include',
           headers,
@@ -105,6 +92,8 @@ export default function PrizeChat() {
           setIsAssigned(true)
           setAssignedAgentName(assigned.username)
           setSelectedAgentId(assigned._id)
+          // load existing chat/messages for this player
+          await loadMessages()
           return
         }
 
@@ -178,23 +167,68 @@ export default function PrizeChat() {
 
   const [newMessage, setNewMessage] = useState("")
 
-  const handleSendMessage = () => {
+  const loadMessages = async () => {
+    try {
+      const token = localStorage.getItem('accessToken')
+      const headers: any = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      const res = await fetch(`/api/v1/chat/messages`, {
+        method: 'GET',
+        credentials: 'include',
+        headers,
+      })
+      const data = await res.json()
+
+      if (res.ok && data?.data?.messages) {
+        setChatId(data.data.chat?._id || null)
+        const mapped: ChatMessage[] = data.data.messages.map((m: any, idx: number) => ({
+          id: idx,
+          sender: m.senderRole === 'player' ? 'user' : 'system',
+          message: m.content,
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        }))
+        setMessages(mapped)
+      }
+    } catch {
+      // ignore for now
+    }
+  }
+
+  const handleSendMessage = async () => {
     if (!isAssigned) return
     if (!newMessage.trim()) return
 
-    const time = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    try {
+      const token = localStorage.getItem('accessToken')
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        sender: "user",
-        message: newMessage.trim(),
-        timestamp: time,
-      },
-    ])
+      const res = await fetch(`/api/v1/chat/message`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({ content: newMessage }),
+      })
+      const data = await res.json()
 
-    setNewMessage("")
+      if (res.ok && data?.data?.message) {
+        const m = data.data.message
+        setChatId(data.data.chatId || chatId || null)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            sender: 'user',
+            message: m.content,
+            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ])
+        setNewMessage("")
+      }
+    } catch {
+      // ignore for now
+    }
   }
 
   const handleClaimPrize = (prize: AvailablePrize) => {

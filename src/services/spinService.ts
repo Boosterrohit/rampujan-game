@@ -9,6 +9,10 @@ export interface FreeSpinResponse {
 
 export const spinService = {
   async freeSpin(): Promise<FreeSpinResponse> {
+    // this method is still called "freeSpin" in the UI but it uses the
+    // `/spin` endpoint which now applies the new assignment/deposit
+    // eligibility and daily-limit rules. `/spin/free` will continue to work
+    // for a while but will return the same response via alias.
     try {
       const token = localStorage.getItem('accessToken');
       const headers: any = {
@@ -18,14 +22,14 @@ export const spinService = {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_BASE_URL}/spin/free`, {
+      const response = await fetch(`${API_BASE_URL}/spin`, {
         method: 'POST',
         headers,
         credentials: 'include',
       });
       const data: FreeSpinResponse = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error('Free spin failed');
+        throw new Error('Spin failed');
       }
       return data;
     } catch (error) {

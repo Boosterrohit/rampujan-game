@@ -9,11 +9,12 @@ interface Message {
 }
 
 interface User {
-  id: string;
-  name: string;
+  id: string;          // chatId
+  name: string;        // player name
   avatar: string;
   lastMessage?: string;
   online: boolean;
+  unreadCount?: number;
 }
 
 export default function MessagePage() {
@@ -28,44 +29,11 @@ export default function MessagePage() {
   const userListRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Sample users data
-  const [users] = useState<User[]>([
-    {
-      id: "1",
-      name: "John Doe",
-      avatar: "JD",
-      lastMessage: "Hey! How are you?",
-      online: true,
-    },
-    {
-      id: "2",
-      name: "Sarah Smith",
-      avatar: "SS",
-      lastMessage: "See you tomorrow!",
-      online: true,
-    },
-    {
-      id: "3",
-      name: "Mike Johnson",
-      avatar: "MJ",
-      lastMessage: "Thanks for the help",
-      online: false,
-    },
-    {
-      id: "4",
-      name: "Emily Brown",
-      avatar: "EB",
-      lastMessage: "Good game!",
-      online: true,
-    },
-    {
-      id: "5",
-      name: "Alex Wilson",
-      avatar: "AW",
-      lastMessage: "Let's play later",
-      online: false,
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  const [loadingChats, setLoadingChats] = useState(false);
 
   // Detect mobile device
   useEffect(() => {
@@ -79,16 +47,125 @@ export default function MessagePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Load current user (agent) from localStorage
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      try {
+        const parsed = JSON.parse(userInfo);
+        setUserRole(parsed.role);
+        setAgentId(parsed.userId);
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
+
+  // Load agent chats (assigned players)
+  useEffect(() => {
+    if (userRole !== "agent") return;
+
+    const loadChats = async () => {
+      setLoadingChats(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const headers: any = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch("/api/v1/chat/agent/chats", { headers });
+        const data = await res.json();
+
+        if (res.ok && data?.data?.chats) {
+          const mapped: User[] = data.data.chats.map((chat: any) => {
+            const name: string = chat.playerName || "Player";
+            const initials =
+              name &&
+              name
+                .split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase();
+            return {
+              id: chat.chatId,
+              name,
+              avatar: initials || "P",
+              lastMessage: chat.lastMessage || "",
+              online: true,
+              unreadCount: chat.unreadCount || 0,
+            };
+          });
+          setUsers(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to load agent chats", err);
+      } finally {
+        setLoadingChats(false);
+      }
+    };
+
+    loadChats();
+  }, [userRole]);
+
   // Auto scroll messages only when new message is added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send message
-  const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { text: input, sender: "me" }]);
-    setInput("");
+  // Fetch messages for a given chat
+  const fetchMessages = async (chatId: string) => {
+    if (!chatId || !agentId) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`/api/v1/chat/messages?chatId=${chatId}`, {
+        headers,
+      });
+      const data = await res.json();
+
+      if (res.ok && data?.data?.messages) {
+        const formatted = data.data.messages.map((msg: any) => ({
+          text: msg.content,
+          image: msg.imageUrl || undefined,
+          sender: msg.senderId === agentId ? "me" : "other",
+        })) as Message[];
+        setMessages(formatted);
+      }
+    } catch (err) {
+      console.error("Failed to load messages", err);
+    }
+  };
+
+  // Send message via backend
+  const handleSend = async () => {
+    if (!input.trim() || !selectedChatId || userRole !== "agent") return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: any = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch("/api/v1/chat/message", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ content: input, chatId: selectedChatId }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data?.data?.message) {
+        const m = data.data.message;
+        const next: Message = {
+          text: m.content,
+          sender: "me",
+        };
+        setMessages((prev) => [...prev, next]);
+        setInput("");
+      }
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
   };
 
   // Image upload
@@ -108,8 +185,10 @@ export default function MessagePage() {
   // Handle user selection - NO scrolling triggered
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    setMessages([]); // Clear messages when switching users
+    setSelectedChatId(user.id);
+    setMessages([]);
     setShowUserList(false); // Hide user list on mobile
+    fetchMessages(user.id);
   };
 
   // Handle back to user list on mobile
@@ -140,6 +219,15 @@ export default function MessagePage() {
       setShowEmoji(!showEmoji);
     }
   };
+
+  // Only agents can use this screen
+  if (userRole !== "agent") {
+    return (
+      <div className="flex h-[80vh] items-center justify-center bg-slate-900 text-slate-300 rounded-md">
+        Chat dashboard is available for agent accounts only.
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[80vh] bg-slate-900 text-white overflow-hidden rounded-md overflow-hidden">
