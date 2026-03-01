@@ -66,7 +66,7 @@ export const getPlayerTransactions = (
 export const addGamerPlayer = (data: any) =>
   axiosInstance.post(`/agent/gamers/add-player`, data);
 
-export const loadWallet = (data: { playerId?: string; playerEmail?: string; amount: number; description?: string }) =>
+export const loadWallet = (data: { playerId?: string; playerEmail?: string; amount: number; description?: string; agentId?: string }) =>
   axiosInstance.post(`/agent/load-wallet`, data);
 
 // agent endpoint to list only their assigned players

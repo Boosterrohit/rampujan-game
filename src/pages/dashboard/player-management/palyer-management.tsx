@@ -13,6 +13,7 @@ import { Plus, Eye } from "lucide-react";
 import { useDialog } from "@/components/dashboard/element/DialogContext";
 import PlayerForm from "./playerForm";
 import PlayerPreview from "./PlayerPreview";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { useEffect, useState } from "react";
 import useDebounce from "@/hooks/useDebounce";
 import AppPagination from "@/components/dashboard/element/AppPagination";
@@ -25,6 +26,7 @@ export function PlayerManagement() {
   const dispatch = useAppDispatch();
   const { openDialog } = useDialog();
   const { players, pagination, agents, loading } = useAppSelector(playerSelector);
+  const safePlayers = Array.isArray(players) ? players : [];
   const { user } = useAuth();
 
   const [searchTerm, setSearch] = useState("");
@@ -62,11 +64,19 @@ export function PlayerManagement() {
   }, [dispatch, user]);
 
   const openDeposit = () => {
-    openDialog(<PlayerForm />);
+    openDialog(
+      <ErrorBoundary>
+        <PlayerForm />
+      </ErrorBoundary>
+    );
   };
 
   const openPreview = (playerId: string) => {
-    openDialog(<PlayerPreview playerId={playerId} />);
+    openDialog(
+      <ErrorBoundary>
+        <PlayerPreview playerId={playerId} />
+      </ErrorBoundary>
+    );
   };
 
   return (
@@ -111,7 +121,7 @@ export function PlayerManagement() {
                 className="bg-gray-800 text-white rounded p-1"
               >
                 <option value="">All agents</option>
-                {agents.map((a) => (
+                {(Array.isArray(agents) ? agents : []).map((a) => (
                   <option key={a._id} value={a._id}>
                     {a.username}
                   </option>
@@ -143,7 +153,7 @@ export function PlayerManagement() {
                     </tr>
                   </thead>
                   <tbody>
-                    {players.length === 0 ? (
+                    {safePlayers.length === 0 ? (
                       <tr>
                         <td
                           colSpan={4}
@@ -153,7 +163,7 @@ export function PlayerManagement() {
                         </td>
                       </tr>
                     ) : (
-                      players.map((p) => (
+                      safePlayers.map((p) => (
                         <tr
                           key={p._id}
                           className="border-b hover:bg-gray-700 border-gray-600"

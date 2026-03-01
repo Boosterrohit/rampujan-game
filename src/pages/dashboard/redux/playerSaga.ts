@@ -113,7 +113,7 @@ function* TransactionSaga(action: any): Generator {
       endDate,
     });
     const transactions = Array.isArray(response.data.data)
-      ? response.data.data
+      ? response.data.data.filter((t: any) => t != null)
       : [];
     yield put(fetchTransactionsSuccess(transactions));
   } catch (error: any) {

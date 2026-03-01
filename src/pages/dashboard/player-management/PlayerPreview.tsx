@@ -69,14 +69,27 @@ const PlayerPreview: React.FC<Props> = ({ playerId }) => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((t) => (
-              <tr key={t._id} className="border-b border-gray-700">
-                <td className="py-1">{new Date(t.createdAt).toLocaleString()}</td>
-                <td className="py-1">{t.type}</td>
-                <td className="py-1">{t.amount}</td>
-                <td className="py-1">{t.description || "-"}</td>
+            {transactions && transactions.length > 0 ? (
+              transactions.map((t, idx) => {
+                if (!t || !t._id) return null;
+                return (
+                  <tr key={t._id} className="border-b border-gray-700">
+                    <td className="py-1">
+                      {t.createdAt ? new Date(t.createdAt).toLocaleString() : "-"}
+                    </td>
+                    <td className="py-1">{t.type || "-"}</td>
+                    <td className="py-1">{t.amount ?? "-"}</td>
+                    <td className="py-1">{t.description || "-"}</td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center py-4">
+                  No transactions found.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       )}
