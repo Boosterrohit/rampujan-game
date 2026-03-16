@@ -1,6 +1,6 @@
 import { call, put } from 'redux-saga/effects';
 import { toast } from "react-toastify";
-import { createAgent, deleteAgent, getPlayers, updateAgent } from './api';
+import { createAgent, deleteAgent, getPlayers, getMyAgentPlayers, updateAgent } from './api';
 import { createAgentFailure, createAgentSuccess, deleteAgentFailure, deleteAgentSuccess, playerListFailure, playerListRequest, playerListSuccess, updateAgentFailure, updateAgentSuccess } from './dashboardSlice';
 import { AgentCreationData } from './types';
 
@@ -8,16 +8,45 @@ function* PlayerListSaga(action: {
     type: string;
     payload: {
         page: number;
-        limit: number;
+        limit: number | string;
         search: string;
+        role?: string;
     }
 }): Generator {
     try{
-        const response = yield call(getPlayers, action.payload);
-        // const players = response.data;
-        yield put(playerListSuccess(response.data.data));
+        const { role, ...params } = action.payload;
+        let response: any;
+        
+        // If agent, use their own players endpoint; otherwise admin sees all agents-with-players
+        if (role === 'agent') {
+            response = yield call(getMyAgentPlayers, { 
+                page: Number(params.page), 
+                limit: Number(params.limit), 
+                search: params.search 
+            });
+            // Transform flat players list into the grouped format for dashboard
+            const responseData = response.data.data;
+            const playersList = responseData.players || [];
+            // Use single "Self" agent entry for agents viewing their own dashboard
+            const transformedData = {
+                agents: [{
+                    agent: { _id: "self", username: 'Your Players', email: '' },
+                    players: playersList
+                }],
+                pagination: responseData.pagination,
+            };
+            yield put(playerListSuccess(transformedData));
+        } else {
+            // Admin gets agents with players
+            response = yield call(getPlayers, { 
+                page: Number(params.page), 
+                limit: Number(params.limit), 
+                search: params.search 
+            });
+            yield put(playerListSuccess(response.data.data));
+        }
     }catch(error: any) {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || 'Failed to load players');
         yield put(playerListFailure())
     }
 }
