@@ -47,6 +47,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function PlayerOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+  if (user?.role === "admin") {
+    return <Navigate to="/dashboard" replace />
+  }
+  return <>{children}</>
+}
+
 function AppContent() {
   const location = useLocation()
   const { isLoggedIn } = useAuth()
@@ -91,7 +99,9 @@ function AppContent() {
                 path="/prize-chat"
                 element={
                   <ProtectedRoute>
-                    <PrizeChat />
+                    <PlayerOnlyRoute>
+                      <PrizeChat />
+                    </PlayerOnlyRoute>
                   </ProtectedRoute>
                 }
               />
@@ -100,7 +110,9 @@ function AppContent() {
                 path="/free-chat"
                 element={
                   <ProtectedRoute>
-                    <PrizeChat />
+                    <PlayerOnlyRoute>
+                      <PrizeChat />
+                    </PlayerOnlyRoute>
                   </ProtectedRoute>
                 }
               />

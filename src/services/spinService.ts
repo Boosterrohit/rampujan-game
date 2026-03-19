@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.1.99:5000/api/v1/player';
+const API_BASE_URL = `${import.meta.env.VITE_BASE_URL || 'https://api.rowgaming669.com'}${import.meta.env.VITE_API_VERSION || '/api/v1'}/player`;
 
 export interface FreeSpinResponse {
   success: boolean;

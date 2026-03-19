@@ -6,6 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { dashboardUrls } from "@/config/dashboard-urls";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com";
+const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1";
+const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`;
+
 interface HeaderProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
@@ -23,7 +27,7 @@ const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
     const fetchUnread = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/unread-count", {
+        const res = await fetch(`${CHAT_API_BASE}/unread-count`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();

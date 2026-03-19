@@ -13,7 +13,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,6 +72,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         <nav className="flex-1 overflow-y-auto py-4 scrollbar-hide bg-black">
           {MENU.map((section) => {
+            const visibleItems = section.SUBMENU.filter((item) => {
+              if (user?.role === "admin" && item.slug === "/chat") return false;
+              return true;
+            });
+            if (visibleItems.length === 0) return null;
+
             const isOpenSection = openSection === section.name;
 
             return (
@@ -92,7 +98,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     isOpenSection ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  {section.SUBMENU.map((item) => {
+                  {visibleItems.map((item) => {
                     const isActive = location.pathname === `/dashboard${item.slug}`;
 
                     return (
