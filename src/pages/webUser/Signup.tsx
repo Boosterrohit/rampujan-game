@@ -2,13 +2,11 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/contexts/AuthContext"
 import SignupForm from "@/components/webpage/SignupForm"
 import OTPVerify from "@/components/webpage/OTPVerify"
 
 export default function Signup() {
   const navigate = useNavigate()
-  const { login } = useAuth()
   const [showOTP, setShowOTP] = useState(false)
   const [otpEmail, setOtpEmail] = useState("")
 
@@ -17,10 +15,10 @@ export default function Signup() {
     setShowOTP(true)
   }
 
-  const handleOTPSuccess = (userData: any) => {
-    // Login the user with the data from OTP verification
-    login(userData)
-    navigate("/")
+  const handleOTPSuccess = () => {
+    setShowOTP(false)
+    setOtpEmail("")
+    navigate("/login", { replace: true })
   }
 
   const handleBackToSignup = () => {

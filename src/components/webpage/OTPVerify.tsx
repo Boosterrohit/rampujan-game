@@ -8,7 +8,7 @@ import { authService } from "@/services/authService"
 
 interface OTPVerifyProps {
   email: string
-  onSuccess: (userData: any) => void
+  onSuccess: () => void
   onBackClick: () => void
 }
 
@@ -78,7 +78,7 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
 
       if (response.data) {
         authService.clearOTPSession()
-        onSuccess(response.data)
+        onSuccess()
       }
     } catch (err) {
       const error = err as any
