@@ -61,19 +61,30 @@ export const getAgentPlayers = (params: { page?: number; limit?: number } = {}) 
 export const calculateCredit = (deposit: number) =>
   axiosInstance.get(`/agent/calculate-credit?deposit=${deposit}`);
 
-export const getPlayerById = (playerId: string) =>
-  axiosInstance.get(`/admin/users/${playerId}`);
+export const getPlayerById = (playerId: string, role?: string) => {
+  const normalizedRole = String(role || "").toLowerCase();
+  if (normalizedRole === "agent") {
+    return axiosInstance.get(`/agent/players/${playerId}`);
+  }
+
+  return axiosInstance.get(`/admin/users/${playerId}`);
+};
 
 // transactions for preview
 export const getPlayerTransactions = (
   playerId: string,
-  _role?: string,
+  role?: string,
   options: { startDate?: string; endDate?: string } = {},
 ) => {
+  const normalizedRole = String(role || "").toLowerCase();
   const { startDate, endDate } = options;
   let qs = `userId=${encodeURIComponent(playerId)}`;
   if (startDate) qs += `&startDate=${encodeURIComponent(startDate)}`;
   if (endDate) qs += `${qs ? "&" : ""}endDate=${encodeURIComponent(endDate)}`;
+
+  if (normalizedRole === "agent") {
+    return axiosInstance.get(`/agent/transactions?${qs}`);
+  }
 
   return axiosInstance.get(`/admin/transactions?${qs}`);
 };

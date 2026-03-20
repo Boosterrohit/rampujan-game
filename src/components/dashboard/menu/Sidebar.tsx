@@ -15,6 +15,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const [openSection, setOpenSection] = useState<string | null>(null);
   const { logout, user } = useAuth();
+  const normalizedRole = user?.role?.toLowerCase();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,7 +77,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <nav className="flex-1 overflow-y-auto py-4 scrollbar-hide bg-black">
           {MENU.map((section) => {
             const visibleItems = section.SUBMENU.filter((item) => {
-              if (user?.role === "admin" && item.slug === "/chat") return false;
+              if (normalizedRole === "admin" && item.slug === "/chat") return false;
+              if (normalizedRole === "agent" && item.slug === "/agent-management") return false;
               return true;
             });
             if (visibleItems.length === 0) return null;

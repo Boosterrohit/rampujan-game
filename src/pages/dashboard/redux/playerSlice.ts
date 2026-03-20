@@ -84,7 +84,10 @@ const playerSlice = createSlice({
     fetchPlayersFailure: (state) => {
       state.loading = false;
     },
-    fetchPlayerByIdRequest: (state, action: PayloadAction<string>) => {
+    fetchPlayerByIdRequest: (
+      state,
+      action: PayloadAction<{ playerId: string; role?: string }>,
+    ) => {
       state.loadingPlayerDetails = true;
       state.selectedPlayer = null;
     },

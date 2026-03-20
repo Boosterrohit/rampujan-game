@@ -13,6 +13,7 @@ import { playerSelector } from "../redux/selector";
 const PlayerForm = () => {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
+  const normalizedRole = user?.role?.toLowerCase();
   const { players, agents, depositLoading, depositError } = useAppSelector(playerSelector);
 
   // defensive copies in case selector returns non-array or contains null/undefined entries
@@ -37,16 +38,18 @@ const PlayerForm = () => {
   });
 
   useEffect(() => {
+    if (!normalizedRole) return;
+
     // clear any previous deposit status when dialog opens
     dispatch(depositReset());
     // load players for dropdown, admin may specify assignedAgent later via filter
-    if (user?.role === "agent") {
-      dispatch(fetchPlayersRequest({ page: 1, limit: 100, assignedAgent: user.userId }));
+    if (normalizedRole === "agent") {
+      dispatch(fetchPlayersRequest({ page: 1, limit: 100, role: normalizedRole }));
     } else {
-      dispatch(fetchPlayersRequest({ page: 1, limit: 100 }));
+      dispatch(fetchPlayersRequest({ page: 1, limit: 100, role: normalizedRole }));
       dispatch(fetchAgentsRequest());
     }
-  }, [dispatch, user]);
+  }, [dispatch, normalizedRole, user?.userId]);
 
   const handleDepositChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -80,7 +83,7 @@ const PlayerForm = () => {
       description: values.description,
     };
     // If admin, include agentId in the request
-    if (user?.role === "admin" && selectedAgent) {
+    if (normalizedRole === "admin" && selectedAgent) {
       payload.agentId = selectedAgent;
     }
     dispatch(depositRequest(payload));
@@ -103,11 +106,13 @@ const PlayerForm = () => {
       >
         {({ setFieldValue, values }) => {
           // Filter players by selected agent if admin
-          const filteredPlayers = user?.role === "admin" && selectedAgent
+          const filteredPlayers = normalizedRole === "admin" && selectedAgent
             ? safePlayers
                 .filter((p) => p && p.assignedAgent) // drop any nulls again
                 .filter((p) => {
-                  const agentId = typeof p.assignedAgent === 'object' ? p.assignedAgent._id : p.assignedAgent;
+                  const assignedAgent = p.assignedAgent;
+                  if (!assignedAgent) return false;
+                  const agentId = typeof assignedAgent === 'object' ? assignedAgent._id : assignedAgent;
                   return agentId === selectedAgent;
                 })
             : safePlayers;
@@ -115,7 +120,7 @@ const PlayerForm = () => {
           return (
             <Form>
               <div className="my-6 gap-3">
-                {user?.role === "admin" ? (
+                {normalizedRole === "admin" ? (
                   <>
                     <div className="w-full mb-5">
                       <label className="block text-sm font-medium text-gray-200">

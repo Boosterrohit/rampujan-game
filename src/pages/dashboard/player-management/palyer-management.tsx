@@ -81,6 +81,7 @@ export function PlayerManagement() {
   const { players, pagination, agents, loading } = useAppSelector(playerSelector);
   const safePlayers = Array.isArray(players) ? players : [];
   const { user } = useAuth();
+  const normalizedRole = user?.role?.toLowerCase();
 
   const [searchTerm, setSearch] = useState("");
   const [agentFilter, setAgentFilter] = useState("");
@@ -96,25 +97,27 @@ export function PlayerManagement() {
 
   // whenever search, agent filter or pagination changes we re-query
   useEffect(() => {
+    if (!normalizedRole) return;
+
     const params: any = {
       page: paginationState.page,
       limit: paginationState.limit,
       search: debouncedSearchTerm,
-      role: user?.role,
+      role: normalizedRole,
     };
-    if (user?.role === "agent") {
+    if (normalizedRole === "agent") {
       params.assignedAgent = user.userId;
     } else if (agentFilter) {
       params.assignedAgent = agentFilter;
     }
     dispatch(fetchPlayersRequest(params));
-  }, [dispatch, paginationState, debouncedSearchTerm, agentFilter, user]);
+  }, [dispatch, paginationState, debouncedSearchTerm, agentFilter, normalizedRole, user?.userId]);
 
   useEffect(() => {
-    if (user?.role !== "agent") {
+    if (normalizedRole && normalizedRole !== "agent") {
       dispatch(fetchAgentsRequest());
     }
-  }, [dispatch, user]);
+  }, [dispatch, normalizedRole]);
 
   const openDeposit = () => {
     openDialog(

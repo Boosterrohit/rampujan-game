@@ -42,7 +42,10 @@ const DashboardRoutes = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path={dashboardUrls.dashboard} element={<Dashboard />} />
-          <Route path={dashboardUrls.adminManagement} element={<AdminManagement />} />
+          <Route
+            path={dashboardUrls.adminManagement}
+            element={normalizedRole === "admin" ? <AdminManagement /> : <Navigate to={dashboardUrls.dashboard} replace />}
+          />
           <Route path={dashboardUrls.playerManagement} element={<PlayerManagement />} />
           <Route path={dashboardUrls.rouletteGift} element={<RouletteGifts/>} />
           <Route path={dashboardUrls.rouletteChampaigns} element={<RouletteCampaigns />} />

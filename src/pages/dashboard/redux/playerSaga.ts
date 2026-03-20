@@ -40,9 +40,10 @@ function* PlayerMgmtSaga(action: any): Generator {
       assignedAgent,
       role,
     } = action.payload || {};
+    const normalizedRole = String(role || '').toLowerCase();
 
     let response: any;
-    if (role === 'agent') {
+    if (normalizedRole === 'agent') {
       // call agent-specific endpoint
       response = yield call(getMyAgentPlayers, { page, limit, search });
     } else {
@@ -136,7 +137,8 @@ function* TransactionSaga(action: any): Generator {
 
 function* PlayerDetailsSaga(action: any): Generator {
   try {
-    const response: any = yield call(getPlayerById, action.payload);
+    const { playerId, role } = action.payload || {};
+    const response: any = yield call(getPlayerById, playerId, role);
     yield put(fetchPlayerByIdSuccess(response.data?.data || response.data));
   } catch (error: any) {
     toast.error(error.response?.data?.message || 'Failed to load player details');

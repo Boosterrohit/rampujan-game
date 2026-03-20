@@ -14,20 +14,21 @@ const PlayerPreview: React.FC<Props> = ({ playerId }) => {
   const dispatch = useAppDispatch();
   const { transactions, loadingTransactions, selectedPlayer, loadingPlayerDetails } = useAppSelector(playerSelector);
   const { user } = useAuth();
+  const normalizedRole = user?.role?.toLowerCase() || "agent";
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
   const load = () => {
     dispatch(
-      fetchTransactionsRequest({ playerId, role: user?.role || "agent", startDate, endDate }),
+      fetchTransactionsRequest({ playerId, role: normalizedRole, startDate, endDate }),
     );
   };
 
   useEffect(() => {
-    dispatch(fetchPlayerByIdRequest(playerId));
+    dispatch(fetchPlayerByIdRequest({ playerId, role: normalizedRole }));
     // initial load without dates
     load();
-  }, [playerId]);
+  }, [playerId, normalizedRole]);
 
   const { closeDialog } = useDialog();
   return (
