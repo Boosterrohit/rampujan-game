@@ -2,6 +2,8 @@
 import axios from "axios"
 import { toast } from "react-toastify"
 
+const SESSION_EXPIRED_EVENT = "session-expired"
+
 // Helper functions for cookie management
 const getCookie = (name: string): string | null => {
   const value = `; ${document.cookie}`
@@ -20,6 +22,18 @@ const setCookie = (name: string, value: string, options: any = {}) => {
 
 const deleteCookie = (name: string) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+}
+
+const clearAuthStorage = () => {
+  localStorage.removeItem("accessToken")
+  localStorage.removeItem("user")
+  localStorage.removeItem("tokenExpiry")
+  deleteCookie("access_token")
+  deleteCookie("refresh_token")
+}
+
+const notifySessionExpired = () => {
+  window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT))
 }
 
 const API_HOST = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com"
@@ -84,11 +98,18 @@ axiosInstance.interceptors.response.use(
     }
 
     const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true
       try {
+        const refreshToken = getCookie("refresh_token")
+        if (!refreshToken) {
+          clearAuthStorage()
+          notifySessionExpired()
+          return Promise.reject(error)
+        }
+
         const body = JSON.stringify({
-          refresh: getCookie("refresh_token"),
+          refresh: refreshToken,
         })
         deleteCookie("access_token")
         const response = await axiosInstance.post(`/token/refresh/`, body)
@@ -102,8 +123,13 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest)
         }
       } catch (error) {
+        clearAuthStorage()
+        notifySessionExpired()
         toast.error("Your session has expired. Please log in again.")
       }
+    } else if (error.response?.status === 401) {
+      clearAuthStorage()
+      notifySessionExpired()
     }
     return Promise.reject(error)
   },

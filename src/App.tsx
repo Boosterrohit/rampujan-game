@@ -19,14 +19,43 @@ import ForgotPassword from "@/pages/webUser/ForgotPassword"
 import DashboardRoutes from "@/routes/DashboardRoutes"
 import FreeSpin from "./pages/webUser/FreeSpin"
 
+const SESSION_EXPIRED_EVENT = "session-expired"
+
+const getDefaultRouteByRole = (role?: string) => {
+  const normalizedRole = role?.toLowerCase()
+  return normalizedRole === "player" ? "/" : "/dashboard"
+}
+
 // Listen for 401 session-expired from backend and logout
 function SessionExpiryListener() {
   const { logout } = useAuth()
   useEffect(() => {
-    const handleSessionExpired = () => logout()
-    window.addEventListener("session-expired", handleSessionExpired)
-    return () => window.removeEventListener("session-expired", handleSessionExpired)
+    const handleSessionExpired = () => {
+      logout()
+      window.location.replace("/login")
+    }
+
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired)
+
+    // Fallback watchdog for idle dashboard/forms: force logout when token time passes.
+    const intervalId = window.setInterval(() => {
+      const storedUser = localStorage.getItem("user")
+      const storedExpiry = localStorage.getItem("tokenExpiry")
+
+      if (!storedUser || !storedExpiry) return
+
+      const expiry = parseInt(storedExpiry, 10)
+      if (!Number.isNaN(expiry) && Date.now() > expiry) {
+        window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT))
+      }
+    }, 5000)
+
+    return () => {
+      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired)
+      window.clearInterval(intervalId)
+    }
   }, [logout])
+
   return null
 }
 
@@ -56,6 +85,16 @@ function PlayerOnlyRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, user } = useAuth()
+
+  if (isLoggedIn) {
+    return <Navigate to={getDefaultRouteByRole(user?.role)} replace />
+  }
+
+  return <>{children}</>
+}
+
 function AppContent() {
   const location = useLocation()
   const { isLoggedIn } = useAuth()
@@ -75,9 +114,30 @@ function AppContent() {
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicOnlyRoute>
+                    <Login />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicOnlyRoute>
+                    <Signup />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route
+                path="/forgot-password"
+                element={
+                  <PublicOnlyRoute>
+                    <ForgotPassword />
+                  </PublicOnlyRoute>
+                }
+              />
               
               {/* Protected Routes - Only accessible if logged in */}
               <Route
