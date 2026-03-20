@@ -22,11 +22,15 @@ const deleteCookie = (name: string) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
 }
 
-// build the base URL using Vite environment variables. Vite exposes any
-// variable prefixed with `VITE_` via `import.meta.env`. We also provide a
-// fallback to an empty string so the expression never produces `undefined`.
-const BASE_URL =
-  `${import.meta.env.VITE_BASE_URL || ""}${import.meta.env.VITE_API_VERSION || ""}`
+const API_HOST = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com"
+const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1"
+
+const normalizedHost = API_HOST.replace(/\/+$/, "")
+const normalizedVersion = API_VERSION.startsWith("/")
+  ? API_VERSION
+  : `/${API_VERSION}`
+
+const BASE_URL = `${normalizedHost}${normalizedVersion}`
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,

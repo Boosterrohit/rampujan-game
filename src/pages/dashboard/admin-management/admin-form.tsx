@@ -50,8 +50,13 @@ const AdminForm: React.FC<AdminFormProps> = ({ initialValues, isEdit }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ setFieldValue, values }) => (
-          <Form>
+        {({ setFieldValue, values, handleSubmit: handleFormikSubmit }) => (
+          <Form
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleFormikSubmit(event);
+            }}
+          >
             <div className="my-6 flex md:flex-row flex-col gap-3">
               <div className="w-full">
                 <AppInput
