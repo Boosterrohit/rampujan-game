@@ -40,11 +40,26 @@ export default function Header() {
     { label: "About Us", path: "/about-us" },
   ];
 
-  // hide dashboard link for logged‑in users with the "player" role
+  const normalizedRole = user?.role?.toLowerCase();
+  const isAgentOrAdmin = normalizedRole === "agent" || normalizedRole === "admin";
+
+  // Hide dashboard for players; hide Free Spin and Prize Chat for agent/admin.
   const menuItems = isLoggedIn
     ? allMenuItems.filter(
-        (item) =>
-          item.label !== "Dashboard" || (user && user.role !== "player")
+        (item) => {
+          if (item.label === "Dashboard" && normalizedRole === "player") {
+            return false;
+          }
+
+          if (
+            isAgentOrAdmin &&
+            (item.label === "Free Spin" || item.label === "Prize Chat")
+          ) {
+            return false;
+          }
+
+          return true;
+        }
       )
     : publicMenuItems;
 

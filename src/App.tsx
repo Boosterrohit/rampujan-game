@@ -49,7 +49,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function PlayerOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
-  if (user?.role === "admin") {
+  const normalizedRole = user?.role?.toLowerCase()
+  if (normalizedRole === "admin" || normalizedRole === "agent") {
     return <Navigate to="/dashboard" replace />
   }
   return <>{children}</>
@@ -59,7 +60,7 @@ function AppContent() {
   const location = useLocation()
   const { isLoggedIn } = useAuth()
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password"
-  const isDashboardPage = location.pathname.startsWith("/dashboard/")
+  const isDashboardPage = location.pathname.startsWith("/dashboard")
 
   return (
     <>
@@ -91,7 +92,9 @@ function AppContent() {
                 path="/free-spin"
                 element={
                   <ProtectedRoute>
-                    <FreeSpin />
+                    <PlayerOnlyRoute>
+                      <FreeSpin />
+                    </PlayerOnlyRoute>
                   </ProtectedRoute>
                 }
               />

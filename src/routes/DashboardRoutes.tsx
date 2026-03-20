@@ -16,9 +16,10 @@ import { dashboardUrls } from "@/config/dashboard-urls"
 
 const DashboardRoutes = () => {
   const { user, isLoggedIn } = useAuth();
+  const normalizedRole = user?.role?.toLowerCase();
 
   // protect all dashboard paths: redirect home when not authorized or role is "player"
-  if (!isLoggedIn || user?.role === "player") {
+  if (!isLoggedIn || normalizedRole === "player") {
     return <Navigate to="/" replace />;
   }
 
@@ -51,7 +52,7 @@ const DashboardRoutes = () => {
           <Route path={dashboardUrls.transactionRecord} element={<TransactionRecords/>} />
           <Route
             path={dashboardUrls.chatClient}
-            element={user?.role === "admin" ? <Navigate to={dashboardUrls.dashboard} replace /> : <MessagePage/>}
+            element={normalizedRole === "admin" ? <Navigate to={dashboardUrls.dashboard} replace /> : <MessagePage/>}
           />
           <Route path="/dashboard/*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
