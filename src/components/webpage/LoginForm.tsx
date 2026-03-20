@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { authService } from "@/services/authService"
 import { useAuth } from "@/contexts/AuthContext"
 import { Link } from "react-router-dom"
+import { toast } from "react-toastify"
 
 interface LoginFormProps {
   onSuccess: () => void
@@ -58,13 +59,18 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         }
 
         login(response.data, expiry)
+        toast.success(response.message || "Login successful")
         onSuccess()
       } else {
-        setError(response.message || "Login failed")
+        const message = response.message || "Login failed"
+        setError(message)
+        toast.error(message)
       }
     } catch (err) {
       const error = err as any
-      setError(error.message || "Login failed. Please try again.")
+      const message = error.message || "Login failed. Please try again."
+      setError(message)
+      toast.error(message)
     } finally {
       setLoading(false)
     }

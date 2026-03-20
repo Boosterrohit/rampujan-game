@@ -4,6 +4,10 @@ import { createAgent, deleteAgent, getPlayers, getMyAgentPlayers, updateAgent } 
 import { createAgentFailure, createAgentSuccess, deleteAgentFailure, deleteAgentSuccess, playerListFailure, playerListRequest, playerListSuccess, updateAgentFailure, updateAgentSuccess } from './dashboardSlice';
 import { AgentCreationData } from './types';
 
+const getApiMessage = (payload: any, fallback: string) => {
+    return payload?.data?.message || payload?.message || fallback;
+};
+
 function* PlayerListSaga(action: {
     type: string;
     payload: {
@@ -57,12 +61,12 @@ function* CreateAgentSaga(action: {
 }): Generator {
     try {
         const response: any = yield call(createAgent as any, action.payload);
-        toast.success("Agent created successfully!");
+        toast.success(getApiMessage(response, "Agent created successfully!"));
         yield put(createAgentSuccess(response.data));
         yield put(playerListRequest({ page: 1, limit: '10', search: '' }));
         action.payload.onSuccess?.();
     } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to create agent");
+        toast.error(getApiMessage(error?.response, "Failed to create agent"));
         yield put(createAgentFailure());
     }
 }
@@ -72,11 +76,11 @@ function* DeleteAgentSaga(action: {
     payload: string; // agentId
 }): Generator {
     try {        const response: any = yield call(deleteAgent, action.payload);
-        toast.success("Agent deleted successfully!");
+        toast.success(getApiMessage(response, "Agent deleted successfully!"));
         yield put(deleteAgentSuccess(response.data));
         yield put(playerListRequest({ page: 1, limit: '10', search: '' }));
     } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to delete agent");
+        toast.error(getApiMessage(error?.response, "Failed to delete agent"));
         yield put(deleteAgentFailure());
     }
 }
@@ -89,12 +93,12 @@ function* UpdateAgentSaga(action: {
         // payload.agentId must be supplied when editing
         const { agentId, ...data } = action.payload as any;
         const response: any = yield call(updateAgent as any, agentId, data);
-        toast.success("Agent updated successfully!");
+        toast.success(getApiMessage(response, "Agent updated successfully!"));
         yield put(updateAgentSuccess(response.data));
         yield put(playerListRequest({ page: 1, limit: '10', search: '' }));
         action.payload.onSuccess?.();
     } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to update agent");
+        toast.error(getApiMessage(error?.response, "Failed to update agent"));
         yield put(updateAgentFailure());
     }
 }

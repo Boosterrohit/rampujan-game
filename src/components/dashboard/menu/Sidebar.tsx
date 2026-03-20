@@ -4,6 +4,7 @@ import { ChevronRight, LogOut} from "lucide-react";
 import { useEffect, useState } from "react";
 import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "react-toastify";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -41,8 +42,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const handleLogout = async () => {
       try {
         await authService.logout();
+        toast.success("Logged out successfully");
       } catch (error) {
         console.error("Logout API failed (expected if token expired):", error);
+        toast.info("Logged out locally");
         // Continue with logout even if API fails (token might be expired)
       } finally {
         logout();

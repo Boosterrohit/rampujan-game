@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Mail, Lock, User, Loader, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/services/authService";
+import { toast } from "react-toastify";
 
 interface SignupFormProps {
   onSuccess: (email: string) => void;
@@ -61,6 +62,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         confirmPassword,
       });
 
+      toast.success(response.message || "Registration successful. Please verify OTP.");
+
       // Set OTP session for 1 minute
       authService.setOTPSession(email);
 
@@ -68,7 +71,9 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
       onSuccess(email);
     } catch (err) {
       const error = err as any;
-      setError(error.message || "Registration failed. Please try again.");
+      const message = error.message || "Registration failed. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

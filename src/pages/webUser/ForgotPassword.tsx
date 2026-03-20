@@ -4,6 +4,7 @@ import { Mail, KeyRound, Lock, Loader, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/services/authService";
+import { toast } from "react-toastify";
 
 type Step = "email" | "otp" | "password" | "done";
 
@@ -35,10 +36,14 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       const response = await authService.resetPasswordWithEmail({ email });
-      setMessage(response.message || "OTP sent to your email");
+      const message = response.message || "OTP sent to your email";
+      setMessage(message);
+      toast.success(message);
       setStep("otp");
     } catch (err: any) {
-      setError(err.message || "Failed to send OTP. Please try again.");
+      const message = err.message || "Failed to send OTP. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -57,10 +62,14 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       const response = await authService.resetPasswordWithOtp({ email, otp });
-      setMessage(response.message || "OTP verified successfully");
+      const message = response.message || "OTP verified successfully";
+      setMessage(message);
+      toast.success(message);
       setStep("password");
     } catch (err: any) {
-      setError(err.message || "Invalid OTP. Please try again.");
+      const message = err.message || "Invalid OTP. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -78,9 +87,13 @@ export default function ForgotPassword() {
 
     try {
       const response = await authService.resendOtp({ email });
-      setMessage(response.message || "OTP resent to your email");
+      const message = response.message || "OTP resent to your email";
+      setMessage(message);
+      toast.success(message);
     } catch (err: any) {
-      setError(err.message || "Failed to resend OTP. Please try again.");
+      const message = err.message || "Failed to resend OTP. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setResendLoading(false);
     }
@@ -108,11 +121,15 @@ export default function ForgotPassword() {
         newPassword,
         confirmPassword,
       });
-      setMessage(response.message || "Password reset successfully");
+      const message = response.message || "Password reset successfully";
+      setMessage(message);
+      toast.success(message);
       setStep("done");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
-      setError(err.message || "Failed to reset password. Please try again.");
+      const message = err.message || "Failed to reset password. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

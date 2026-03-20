@@ -6,6 +6,7 @@ import { Menu, X, Gamepad2, LogOut, User, Play, ShipWheel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
+import { toast } from "react-toastify";
 import video1 from "../../asset/video1.mp4";
 import LoginRequiredDialog from "./LoginRequiredDialog";
 
@@ -66,8 +67,10 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout API failed (expected if token expired):", error);
+      toast.info("Logged out locally");
       // Continue with logout even if API fails (token might be expired)
     } finally {
       logout();

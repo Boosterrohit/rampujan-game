@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Mail, Lock, Loader, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/services/authService"
+import { toast } from "react-toastify"
 
 interface OTPVerifyProps {
   email: string
@@ -44,10 +45,13 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
       authService.setOTPSession(email)
       setTimeRemaining(60)
 
-      await authService.resendOtp({ email })
+      const response = await authService.resendOtp({ email })
+      toast.success(response.message || "OTP resent successfully")
     } catch (err) {
       const error = err as any
-      setError(error.message || "Failed to resend OTP. Please try again.")
+      const message = error.message || "Failed to resend OTP. Please try again."
+      setError(message)
+      toast.error(message)
     } finally {
       setResendLoading(false)
     }
@@ -78,11 +82,14 @@ export default function OTPVerify({ email, onSuccess, onBackClick }: OTPVerifyPr
 
       if (response.data) {
         authService.clearOTPSession()
+        toast.success(response.message || "OTP verified. Please login to continue.")
         onSuccess()
       }
     } catch (err) {
       const error = err as any
-      setError(error.message || "OTP verification failed")
+      const message = error.message || "OTP verification failed"
+      setError(message)
+      toast.error(message)
     } finally {
       setLoading(false)
     }
