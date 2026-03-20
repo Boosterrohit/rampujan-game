@@ -78,10 +78,10 @@ export const getMyAgentPlayers = (body: { page?: number; limit?: number; search?
 };
 
 export const createAgent = (data: AgentCreationData) =>
-  axiosInstance.post(`admin/create-agents`, data);
+  axiosInstance.post(`/admin/create-agents`, data);
 
 export const deleteAgent = (agentId: string) =>
-  axiosInstance.delete(`admin/agents/${agentId}`);
+  axiosInstance.delete(`/admin/agents/${agentId}`);
 
 export const updateAgent = (agentId: string, data: AgentCreationData) =>
-  axiosInstance.put(`admin/agents/${agentId}`, data);
+  axiosInstance.put(`/admin/agents/${agentId}`, data);
