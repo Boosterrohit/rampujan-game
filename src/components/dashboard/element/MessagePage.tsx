@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, CSSProperties } from "react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Send, Image, Smile, ArrowLeft, Menu, X, ZoomIn, ZoomOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Message {
   text?: string;
@@ -17,6 +18,10 @@ interface User {
   online: boolean;
   unreadCount?: number;
 }
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com";
+const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1";
+const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`;
 
 // image modal shared by many chat screens
 function ImageModal({ src, onClose }: { src: string; onClose: () => void }) {
@@ -80,6 +85,7 @@ function ImageModal({ src, onClose }: { src: string; onClose: () => void }) {
 }
 
 export default function MessagePage() {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -118,7 +124,7 @@ export default function MessagePage() {
       const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch("http://192.168.1.99:5000/api/v1/chat/agent/chats?limit=50", { headers });
+      const res = await fetch(`${CHAT_API_BASE}/agent/chats?limit=50`, { headers });
       if (res.status === 403) {
         setForbidden(true);
         return;
@@ -197,7 +203,7 @@ export default function MessagePage() {
       const headers: any = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages?chatId=${chatId}`, {
+      const res = await fetch(`${CHAT_API_BASE}/messages?chatId=${chatId}`, {
         headers,
       });
       const data = await res.json();
@@ -205,7 +211,7 @@ export default function MessagePage() {
       if (res.ok && data?.data?.messages) {
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
-        const base = "http://192.168.1.99:5000";
+        const base = API_BASE_URL;
         const formatted = source.map((msg: any) => ({
           text: msg.content,
           image: msg.imageUrl ? `${base}${msg.imageUrl}` : undefined,
@@ -241,7 +247,7 @@ export default function MessagePage() {
         if (input.trim()) formData.append("content", input.trim());
         formData.append("chatId", selectedChatId);
 
-        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/message/image", {
+        const res = await fetch(`${CHAT_API_BASE}/message/image`, {
           method: "POST",
           headers,
           body: formData,
@@ -250,7 +256,7 @@ export default function MessagePage() {
 
         if (res.ok && data?.data?.message) {
           const m = data.data.message;
-          const base = "http://192.168.1.99:5000";
+          const base = API_BASE_URL;
           const next: Message = {
             text: m.content,
             image: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
@@ -270,7 +276,7 @@ export default function MessagePage() {
         }
       } else {
         headers["Content-Type"] = "application/json; charset=utf-8";
-        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/message", {
+        const res = await fetch(`${CHAT_API_BASE}/message`, {
           method: "POST",
           headers,
           body: JSON.stringify({ content: input, chatId: selectedChatId }),
@@ -345,7 +351,7 @@ export default function MessagePage() {
   };
 
   // Only agents can use this screen
-  if (forbidden) {
+  if (user?.role === "admin" || forbidden) {
     return (
       <div className="flex h-[80vh] items-center justify-center bg-slate-900 text-slate-300 rounded-md">
         Chat dashboard is available for agent accounts only.

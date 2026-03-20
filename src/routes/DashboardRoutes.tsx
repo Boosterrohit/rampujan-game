@@ -49,7 +49,10 @@ const DashboardRoutes = () => {
           <Route path={dashboardUrls.redeemHistory} element={<RedeemHistory />} />
           <Route path={dashboardUrls.loadWallet} element={<LoadWallet/>} />
           <Route path={dashboardUrls.transactionRecord} element={<TransactionRecords/>} />
-          <Route path={dashboardUrls.chatClient} element={<MessagePage/>} />
+          <Route
+            path={dashboardUrls.chatClient}
+            element={user?.role === "admin" ? <Navigate to={dashboardUrls.dashboard} replace /> : <MessagePage/>}
+          />
           <Route path="/dashboard/*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>

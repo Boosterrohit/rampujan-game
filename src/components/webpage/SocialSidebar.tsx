@@ -18,6 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com";
+const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1";
+const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`;
+
 interface Message {
   _id?: string;
   senderId: string;
@@ -229,7 +233,7 @@ export default function SocialSidebar() {
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
         
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/agents/available`, {
+        const res = await fetch(`${CHAT_API_BASE}/agents/available`, {
           headers,
         });
         const data = await res.json();
@@ -283,7 +287,7 @@ export default function SocialSidebar() {
         const token = localStorage.getItem("accessToken");
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const res = await fetch("http://192.168.1.99:5000/api/v1/chat/unread-count", { headers });
+        const res = await fetch(`${CHAT_API_BASE}/unread-count`, { headers });
         const data = await res.json();
         if (res.ok && data?.data?.unreadCount > 0) {
           setIsChatOpen(true);
@@ -322,7 +326,7 @@ export default function SocialSidebar() {
       const queryParam =
         isAgent && messagesChatId ? `?chatId=${messagesChatId}` : "";
       
-      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages${queryParam}`, {
+      const res = await fetch(`${CHAT_API_BASE}/messages${queryParam}`, {
         headers,
       });
       const data = await res.json();
@@ -332,7 +336,7 @@ export default function SocialSidebar() {
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
         const formattedMessages = source.map((msg: Message, idx: number) => {
-          const base = "http://192.168.1.99:5000"; // could be moved to config
+          const base = API_BASE_URL;
           const fullImage = msg.imageUrl ? `${base}${msg.imageUrl}` : undefined;
           return {
             _id: msg._id,
@@ -385,7 +389,7 @@ export default function SocialSidebar() {
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message/image`, {
+        const res = await fetch(`${CHAT_API_BASE}/message/image`, {
           method: "POST",
           headers,
           body: formData,
@@ -394,7 +398,7 @@ export default function SocialSidebar() {
         const data = await res.json();
         if (res.ok && data?.data?.message) {
           const newMsg = data.data.message;
-          const base = "http://192.168.1.99:5000";
+          const base = API_BASE_URL;
           const formattedMsg: LocalMessage = {
             _id: newMsg._id,
             senderId: newMsg.senderId,
@@ -428,7 +432,7 @@ export default function SocialSidebar() {
           body.chatId = chatId;
         }
 
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message`, {
+        const res = await fetch(`${CHAT_API_BASE}/message`, {
           method: "POST",
           headers,
           body: JSON.stringify(body),
@@ -474,7 +478,7 @@ export default function SocialSidebar() {
       const headers: any = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`/api/v1/chat/assign-agent`, {
+      const res = await fetch(`${CHAT_API_BASE}/assign-agent`, {
         method: "POST",
         headers,
         body: JSON.stringify({ agentId: selectedAgentId }),

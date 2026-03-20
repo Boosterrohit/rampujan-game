@@ -58,6 +58,10 @@ interface MessageOption {
   response: string
 }
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com"
+const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1"
+const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`
+
 export default function PrizeChat() {
   interface Agent {
     _id: string
@@ -122,7 +126,7 @@ export default function PrizeChat() {
         const headers: any = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
 
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/agents/available`, {
+        const res = await fetch(`${CHAT_API_BASE}/agents/available`, {
           method: 'GET',
           credentials: 'include',
           headers,
@@ -278,7 +282,7 @@ export default function PrizeChat() {
       const headers: any = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/messages`, {
+      const res = await fetch(`${CHAT_API_BASE}/messages`, {
         method: 'GET',
         credentials: 'include',
         headers,
@@ -289,7 +293,7 @@ export default function PrizeChat() {
         setChatId(data.data.chat?._id || null)
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse()
-        const base = 'http://192.168.1.99:5000';
+        const base = API_BASE_URL;
         const mapped: ChatMessage[] = source.map((m: any, idx: number) => ({
           id: idx,
           sender: m.senderRole === 'player' ? 'user' : 'system',
@@ -318,7 +322,7 @@ export default function PrizeChat() {
         formData.append('image', selectedImage)
         if (newMessage.trim()) formData.append('content', newMessage)
 
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message/image`, {
+        const res = await fetch(`${CHAT_API_BASE}/message/image`, {
           method: 'POST',
           headers,
           credentials: 'include',
@@ -329,7 +333,7 @@ export default function PrizeChat() {
         if (res.ok && data?.data?.message) {
           const m = data.data.message
           setChatId(data.data.chatId || chatId || null)
-          const base = 'http://192.168.1.99:5000';
+          const base = API_BASE_URL;
           setMessages((prev) => [
             ...prev,
             {
@@ -346,7 +350,7 @@ export default function PrizeChat() {
         }
       } else {
         headers['Content-Type'] = 'application/json; charset=utf-8'
-        const res = await fetch(`http://192.168.1.99:5000/api/v1/chat/message`, {
+        const res = await fetch(`${CHAT_API_BASE}/message`, {
           method: 'POST',
           headers,
           credentials: 'include',
@@ -399,7 +403,7 @@ export default function PrizeChat() {
       const headers: any = { 'Content-Type': 'application/json' }
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch(`/api/v1/chat/assign-agent`, {
+      const res = await fetch(`${CHAT_API_BASE}/assign-agent`, {
         method: 'POST',
         headers,
         credentials: 'include',
@@ -885,14 +889,14 @@ export default function PrizeChat() {
                         <div className="relative z-10">
                           {msg.imageUrl && (
                             <img
-  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`}
+  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `${API_BASE_URL}${msg.imageUrl ?? ''}`}
   alt=""
   className="rounded-lg max-w-full max-h-48 object-contain mb-2 cursor-pointer"
   onClick={() =>
     setZoomImage(
       msg.imageUrl?.startsWith('http')
         ? msg.imageUrl
-        : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`
+        : `${API_BASE_URL}${msg.imageUrl ?? ''}`
     )
   }
 />
@@ -917,14 +921,14 @@ export default function PrizeChat() {
                         <div className="relative z-10">
                           {msg.imageUrl && (
                                               <img
-  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`}
+  src={msg.imageUrl?.startsWith('http') ? msg.imageUrl : `${API_BASE_URL}${msg.imageUrl ?? ''}`}
   alt=""
   className="rounded-lg max-w-full max-h-48 object-contain mb-2 cursor-pointer"
   onClick={() =>
     setZoomImage(
       msg.imageUrl?.startsWith('http')
         ? msg.imageUrl
-        : `http://192.168.1.99:5000/${msg.imageUrl ?? ''}`
+        : `${API_BASE_URL}${msg.imageUrl ?? ''}`
     )
   }
 />
