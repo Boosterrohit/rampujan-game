@@ -96,7 +96,7 @@ const AdminForm: React.FC<AdminFormProps> = ({ initialValues, isEdit }) => {
                   required
                   className="w-full"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFieldValue("walletBalance", e.target.value);
+                    setFieldValue("walletBalance", parseFloat(e.target.value) || 0);
                   }}
                 />
               </div>

@@ -181,27 +181,29 @@ export function PlayerManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 mb-6 flex flex-wrap gap-2">
+          <div className="space-y-4 mb-6 flex flex-wrap items-center gap-2">
             <Input
               placeholder="Search players..."
               className="max-w-sm text-white border-white"
               value={searchTerm}
               onChange={(e) => setSearch(e.target.value)}
             />
-            {user?.role !== "agent" && (
+           <div className="pb-3 md:w-auto w-full">
+             {user?.role !== "agent" && (
               <select
                 value={agentFilter}
                 onChange={(e) => setAgentFilter(e.target.value)}
-                className="bg-gray-800 text-white rounded p-1"
+                className="bg-gray-800 bg-transparent outline-none text-white w-full rounded border-white border p-1 px-2 "
               >
-                <option value="">All agents</option>
+                <option value="" className="bg-gray-600">All agents</option>
                 {(Array.isArray(agents) ? agents : []).map((a) => (
-                  <option key={a._id} value={a._id}>
+                  <option key={a._id} value={a._id} className="bg-gray-600">
                     {a.username}
                   </option>
                 ))}
               </select>
             )}
+           </div>
           </div>
 
           {loading ? (

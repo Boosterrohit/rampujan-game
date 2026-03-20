@@ -31,12 +31,12 @@ const PlayerPreview: React.FC<Props> = ({ playerId }) => {
 
   const { closeDialog } = useDialog();
   return (
-    <div className="p-4 bg-[#252937] text-white rounded-md max-w-xl">
+    <div className="md:p-4 bg-[#252937] text-white rounded-md md:max-w-3xl max-w-lg w-full">
       <div className="flex justify-between mb-4">
         <h3 className="text-lg font-bold">Player Details & Transactions</h3>
-        <Button size="sm"  onClick={closeDialog}>
+        {/* <Button size="sm"  onClick={closeDialog}>
           Close
-        </Button>
+        </Button> */}
       </div>
 
       <div className="mb-4 rounded-md border border-gray-700 p-3">
@@ -57,20 +57,20 @@ const PlayerPreview: React.FC<Props> = ({ playerId }) => {
         )}
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex md:flex-row flex-col gap-2 mb-4">
         <input
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          className="bg-gray-800 text-white p-1 rounded"
+          className="bg-gray-800 text-white p-1 rounded border border-white/50 bg-transparent"
         />
         <input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
-          className="bg-gray-800 text-white p-1 rounded"
+          className="bg-gray-800 text-white p-1 rounded border border-white/50 bg-transparent"
         />
-        <Button size="sm" onClick={load}>
+        <Button size="sm" onClick={load} className="w-full rounded-md text-white !bg-[#615ed6] hover:!bg-[#4e48c9] !outline-none">
           Filter
         </Button>
       </div>

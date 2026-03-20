@@ -24,7 +24,7 @@ export function Dashboard() {
     limit: '10',
     page: 1,
   });
-  const { agentPlayers, loading, totalPages } = useAppSelector(dashboardSelector);
+  const { agentPlayers, loading, totalPages, totalDepositedByAllAgents } = useAppSelector(dashboardSelector);
 
   // ensure we always work with an array to avoid runtime errors when API returns null/undefined
   const safeAgentPlayers = Array.isArray(agentPlayers) ? agentPlayers : [];
@@ -43,6 +43,13 @@ export function Dashboard() {
 
   const totalPlayers = safeAgentPlayers.reduce((acc, group) => acc + group.players.length, 0);
   const totalAgents = safeAgentPlayers.length;
+  const netDeposit = Number(totalDepositedByAllAgents ?? 0);
+  const formattedNetDeposit = loading
+    ? "..."
+    : `$${netDeposit.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      })}`;
   const stats = [
      {
     title: "Total Agents",
@@ -59,7 +66,7 @@ export function Dashboard() {
     { title: "Active Games", value: "26", icon: Gamepad2, change: "+5.1%" },
     {
       title: "Net Deposite",
-      value: "$8,450",
+      value: formattedNetDeposit,
       icon: TrendingUp,
       change: "+23.1%",
     },

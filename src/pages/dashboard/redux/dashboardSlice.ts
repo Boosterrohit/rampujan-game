@@ -7,6 +7,7 @@ const initialState: allDashboardProps = {
   totalPages: 0,
   nextPage: 0,
   previousPage: 0,
+  totalDepositedByAllAgents: 0,
 };
 const dashboardSlice = createSlice({
   name: "dashboard",
@@ -22,6 +23,8 @@ const dashboardSlice = createSlice({
       state.loading = false;
       // payload contains { agents: AgentWithPlayers[], pagination: {...}, depositSummary: {...} }
       state.agentPlayers = action.payload?.agents || [];
+      state.totalDepositedByAllAgents =
+        action.payload?.depositSummary?.totalDepositedByAllAgents ?? 0;
       if (action.payload?.pagination) {
         state.totalPages =
           action.payload.pagination.totalPages || state.totalPages;

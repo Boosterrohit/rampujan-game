@@ -127,11 +127,11 @@ const PlayerForm = () => {
                           setSelectedAgent(e.target.value);
                           setFieldValue("playerId", "");
                         }}
-                        className="mt-1 block w-full rounded-md bg-gray-800 border-gray-600 text-white"
+                        className="mt-1 block w-full rounded-md bg-transparent outline-none border border-white/50 px-2 py-2.5  text-white"
                       >
-                        <option value="">Choose an agent</option>
+                        <option value="" className="bg-gray-600">Choose an agent</option>
                         {safeAgents.map((a) => (
-                          <option key={a._id} value={a._id}>
+                          <option key={a._id} value={a._id} className="bg-gray-600">
                             {a.username}
                           </option>
                         ))}
@@ -147,11 +147,11 @@ const PlayerForm = () => {
                           name="playerId"
                           value={values.playerId}
                           onChange={(e) => setFieldValue("playerId", e.target.value)}
-                          className="mt-1 block w-full rounded-md bg-gray-800 border-gray-600 text-white"
+                          className="mt-1 block w-full rounded-md bg-transparent outline-none border border-white/50 px-2 py-2.5  text-white"
                         >
-                          <option value="">Select player</option>
+                          <option value="" className="bg-gray-600">Select player</option>
                           {filteredPlayers.map((p) => (
-                            <option key={p._id} value={p._id}>
+                            <option key={p._id} value={p._id} className="bg-gray-600">
                               {p.username} ({p.email})
                             </option>
                           ))}
