@@ -31,7 +31,7 @@ import orion from "../../asset/orion.jpg";
 import juwa2 from "../../asset/juwa2.jpg";
 import vegasSweeps from "../../asset/vegassweeps.jpg";
 import fb1 from "../../asset/fb1.jpg";
-import fb2 from "../../asset/fb2.png";
+import fbs2 from "../../asset/fbs2.jpg";
 import cashFrenzy from "../../asset/CashFrenzy.png";
 import fortuneNexus from "../../asset/FortuneNexus.png";
 import funStation from "../../asset/FunStation1.png";
@@ -443,11 +443,11 @@ export default function Home() {
       id: 26,
       name: "Jackpot Zone",
       category: "Facebook",
-      icon: fb2,
+      icon: fbs2,
       players: "4.8K",
       prize: "$32K",
       color: "from-blue-700 to-indigo-600",
-      bgImage: fb2,
+      bgImage: fbs2,
       slug: "https://www.facebook.com/people/Jackpot-Zone/61581237008726/?rdid=YFSQXc0UL3ChZuoM&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CAsMQKRys%2F",
       borderColor: "border-green-700 shadow-[0_0_15px_rgba(74,222,128,0.5)]",
       type: ["facebook"],
