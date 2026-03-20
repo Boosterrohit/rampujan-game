@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import RouletteWheel from "./RouletteWheel";
 import { spinService } from "@/services/spinService";
+import { useAuth } from "@/contexts/AuthContext";
 // import RouletteWheel from "./webUser/RouletteWheel"
 
 interface SpinResult {
@@ -50,6 +51,7 @@ interface Campaign {
 }
 
 export default function FreeSpin() {
+  const { user } = useAuth();
   const [isSpinning, setIsSpinning] = useState(false);
   const [lastReward, setLastReward] = useState<SpinResult | null>(null);
   const [spinCount, setSpinCount] = useState(0);
@@ -63,6 +65,8 @@ export default function FreeSpin() {
   const [spinLoading, setSpinLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [eligibilityLoading, setEligibilityLoading] = useState(true);
+  const [spinBlockedReason, setSpinBlockedReason] = useState<string | null>(null);
 
   const rewards = selectedCampaign?.rewards || [];
 
@@ -112,14 +116,19 @@ export default function FreeSpin() {
       spinsRequired: 1,
       rewards: [
         { reward: "0%", amount: 100, rarity: "common", icon: Coins },
+        { reward: "1%", amount: 150, rarity: "common", icon: Coins },
         { reward: "10%", amount: 250, rarity: "rare", icon: Gift },
         { reward: "2%", amount: 500, rarity: "epic", icon: Trophy },
+        { reward: "4%", amount: 1000, rarity: "legendary", icon: Crown },
         { reward: "5%", amount: 1000, rarity: "legendary", icon: Crown },
         { reward: "15%", amount: 150, rarity: "common", icon: Coins },
         { reward: "0%", amount: 100, rarity: "none", icon: Coins },
         { reward: "3%", amount: 300, rarity: "rare", icon: Sparkles },
         { reward: "20%", amount: 200, rarity: "common", icon: Award },
         { reward: "6%", amount: 750, rarity: "epic", icon: Target },
+        { reward: "7%", amount: 300, rarity: "rare", icon: Sparkles },
+        { reward: "8%", amount: 200, rarity: "common", icon: Award },
+        { reward: "9%", amount: 750, rarity: "epic", icon: Target },
         { reward: "25%", amount: 100, rarity: "common", icon: Coins },
         { reward: "0%", amount: 100, rarity: "none", icon: Coins },
         { reward: "50%", amount: 500, rarity: "epic", icon: Trophy },
@@ -145,8 +154,62 @@ export default function FreeSpin() {
     }
   }, [errorMessage]);
 
+  useEffect(() => {
+    const checkEligibility = async () => {
+      if (!user?.userId) return;
+      setEligibilityLoading(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const headers: Record<string, string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
+
+        const apiBase = `${import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.com"}${import.meta.env.VITE_API_VERSION || "/api/v1"}`;
+
+        // Step 1: check if player has an assigned agent
+        const agentRes = await fetch(`${apiBase}/chat/agents/available`, {
+          method: "GET",
+          credentials: "include",
+          headers,
+        });
+        const agentData = await agentRes.json();
+        const hasAssignedAgent = Boolean(agentData?.data?.assignedAgent);
+
+        if (!hasAssignedAgent) {
+          setSpinBlockedReason("Not assigned to any agent");
+          return;
+        }
+
+        // Step 2: check if player has at least one deposit transaction
+        const txRes = await fetch(
+          `${apiBase}/agent/players/${encodeURIComponent(user.userId)}/transactions?startDate=&endDate=`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers,
+          },
+        );
+        const txData = await txRes.json();
+        const transactions: any[] = Array.isArray(txData?.data) ? txData.data : [];
+        const hasDeposit = transactions.length > 0;
+
+        if (!hasDeposit) {
+          setSpinBlockedReason("No deposit from assigned agent");
+        } else {
+          setSpinBlockedReason(null);
+        }
+      } catch {
+        // do not block spins when eligibility pre-check fails unexpectedly
+        setSpinBlockedReason(null);
+      } finally {
+        setEligibilityLoading(false);
+      }
+    };
+
+    checkEligibility();
+  }, [user?.userId]);
+
   const handleSpin = async () => {
-    if (isSpinning || spinLoading) return;
+    if (isSpinning || spinLoading || eligibilityLoading || !!spinBlockedReason) return;
 
     setErrorMessage(null);
     setSpinLoading(true);
@@ -216,6 +279,13 @@ export default function FreeSpin() {
         setPrizeNumber(index);
       }
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Spin failed";
+      if (
+        message === "Not assigned to any agent" ||
+        message === "No deposit from assigned agent"
+      ) {
+        setSpinBlockedReason(message);
+      }
       console.error("spin attempt failed", err);
     } finally {
       setSpinLoading(false);
@@ -463,11 +533,15 @@ export default function FreeSpin() {
                   variant="default"
                   size="sm"
                   onClick={handleSpin}
-                  disabled={isSpinning || spinLoading || !selectedCampaign}
+                  disabled={
+                    isSpinning ||
+                    spinLoading ||
+                    !selectedCampaign ||
+                    eligibilityLoading ||
+                    !!spinBlockedReason
+                  }
                   className=" gap-3 px-10 py-2 text-xl font-bold
               bg-gradient-to-r from-purple-600 to-pink-600
-drop-shadow-[0_0_1px_#38bdf8]
-drop-shadow-[0_0_2px_#a855f7]
 drop-shadow-[0_0_3px_#ec4899] text-white
                 "
                 >
@@ -476,6 +550,10 @@ drop-shadow-[0_0_3px_#ec4899] text-white
                   />
                   {spinLoading
                     ? "Processing..."
+                    : eligibilityLoading
+                      ? "Checking..."
+                      : spinBlockedReason
+                        ? "SPIN UNAVAILABLE"
                     : isSpinning
                       ? "Spinning..."
                       : selectedCampaign
@@ -486,7 +564,9 @@ drop-shadow-[0_0_3px_#ec4899] text-white
                   )}
                 </Button>
                 <p className="text-sm text-muted-foreground font-medium">
-                  {isSpinning
+                  {spinBlockedReason
+                    ? `Spin unavailable: ${spinBlockedReason}`
+                    : isSpinning
                     ? "🎰 Good luck!"
                     : selectedCampaign
                       ? `🎰 ${selectedCampaign.spinsRequired} spin${selectedCampaign.spinsRequired > 1 ? "s" : ""} required • ${3 - (spinCount % selectedCampaign.spinsRequired)} remaining`

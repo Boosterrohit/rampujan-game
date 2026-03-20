@@ -5,6 +5,7 @@ export interface FreeSpinResponse {
   winAmount: number;
   spinId: string;
   spinType: string;
+  message?: string;
 }
 
 // the bonus endpoint can return the same shape as FreeSpinResponse
@@ -36,7 +37,7 @@ export const spinService = {
       });
       const data: FreeSpinResponse = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error('Spin failed');
+        throw new Error(data?.message || 'Spin failed');
       }
       return data;
     } catch (error) {

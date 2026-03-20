@@ -78,13 +78,15 @@ export const getPlayerTransactions = (
 ) => {
   const normalizedRole = String(role || "").toLowerCase();
   const { startDate, endDate } = options;
+
+  if (normalizedRole === "agent") {
+    const qs = `startDate=${encodeURIComponent(startDate || "")}&endDate=${encodeURIComponent(endDate || "")}`;
+    return axiosInstance.get(`/agent/players/${encodeURIComponent(playerId)}/transactions?${qs}`);
+  }
+
   let qs = `userId=${encodeURIComponent(playerId)}`;
   if (startDate) qs += `&startDate=${encodeURIComponent(startDate)}`;
   if (endDate) qs += `${qs ? "&" : ""}endDate=${encodeURIComponent(endDate)}`;
-
-  if (normalizedRole === "agent") {
-    return axiosInstance.get(`/agent/transactions?${qs}`);
-  }
 
   return axiosInstance.get(`/admin/transactions?${qs}`);
 };

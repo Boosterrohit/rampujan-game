@@ -126,7 +126,7 @@ function* TransactionSaga(action: any): Generator {
       endDate,
     });
     const transactions = Array.isArray(response.data.data)
-      ? response.data.data.filter((t: any) => t != null)
+      ? response.data.data.filter((t: any) => t != null && t.user?._id === playerId)
       : [];
     yield put(fetchTransactionsSuccess(transactions));
   } catch (error: any) {
