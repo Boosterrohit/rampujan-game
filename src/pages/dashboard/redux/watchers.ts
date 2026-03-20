@@ -4,16 +4,24 @@ import { CreateAgentSaga, DeleteAgentSaga, PlayerListSaga, UpdateAgentSaga } fro
 
 // player management imports
 import {
+  deletePlayerRequest,
+  fetchPlayerByIdRequest,
   fetchPlayersRequest,
   fetchAgentsRequest,
   depositRequest,
   fetchTransactionsRequest,
+  suspendPlayerRequest,
+  unsuspendPlayerRequest,
 } from './playerSlice';
 import {
   PlayerMgmtSaga,
   AgentsListSaga,
   DepositSaga,
   TransactionSaga,
+  PlayerDetailsSaga,
+  SuspendPlayerSaga,
+  UnsuspendPlayerSaga,
+  DeletePlayerSaga,
 } from './playerSaga';
 
 function* dashboardWatcherSaga(){
@@ -27,6 +35,10 @@ function* dashboardWatcherSaga(){
     yield takeLatest(fetchAgentsRequest.type, AgentsListSaga);
     yield takeLatest(depositRequest.type, DepositSaga);
     yield takeLatest(fetchTransactionsRequest.type, TransactionSaga);
+    yield takeLatest(fetchPlayerByIdRequest.type, PlayerDetailsSaga);
+    yield takeLatest(suspendPlayerRequest.type, SuspendPlayerSaga);
+    yield takeLatest(unsuspendPlayerRequest.type, UnsuspendPlayerSaga);
+    yield takeLatest(deletePlayerRequest.type, DeletePlayerSaga);
 }
 
 export default dashboardWatcherSaga;

@@ -3,20 +3,32 @@ import { toast } from 'react-toastify';
 import {
   fetchPlayersFailure,
   fetchPlayersSuccess,
+  fetchPlayerByIdFailure,
+  fetchPlayerByIdSuccess,
   fetchAgentsFailure,
   fetchAgentsSuccess,
   depositFailure,
   depositSuccess,
+  deletePlayerFailure,
+  deletePlayerSuccess,
   fetchTransactionsFailure,
   fetchTransactionsSuccess,
   fetchPlayersRequest,
+  suspendPlayerFailure,
+  suspendPlayerSuccess,
+  unsuspendPlayerFailure,
+  unsuspendPlayerSuccess,
 } from './playerSlice';
 import {
+  deletePlayerById,
+  getPlayerById,
   getAllPlayers,
   getAgentsList,
   loadWallet,
   getPlayerTransactions,
   getMyAgentPlayers,
+  suspendPlayer,
+  unsuspendPlayer,
 } from './api';
 
 function* PlayerMgmtSaga(action: any): Generator {
@@ -122,4 +134,83 @@ function* TransactionSaga(action: any): Generator {
   }
 }
 
-export { PlayerMgmtSaga, AgentsListSaga, DepositSaga, TransactionSaga };
+function* PlayerDetailsSaga(action: any): Generator {
+  try {
+    const response: any = yield call(getPlayerById, action.payload);
+    yield put(fetchPlayerByIdSuccess(response.data?.data || response.data));
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'Failed to load player details');
+    yield put(fetchPlayerByIdFailure());
+  }
+}
+
+function* SuspendPlayerSaga(action: any): Generator {
+  try {
+    const response: any = yield call(suspendPlayer, action.payload);
+    toast.success(response?.data?.message || 'Player suspended successfully');
+    yield put(suspendPlayerSuccess());
+
+    const lastQuery = yield select((state: any) => state.players.lastQuery || {});
+    yield put(fetchPlayersRequest({
+      page: lastQuery.page || 1,
+      limit: lastQuery.limit || 10,
+      search: lastQuery.search || '',
+      assignedAgent: lastQuery.assignedAgent,
+      role: lastQuery.role,
+    }));
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'Failed to suspend player');
+    yield put(suspendPlayerFailure());
+  }
+}
+
+function* UnsuspendPlayerSaga(action: any): Generator {
+  try {
+    const response: any = yield call(unsuspendPlayer, action.payload);
+    toast.success(response?.data?.message || 'Player unsuspended successfully');
+    yield put(unsuspendPlayerSuccess());
+
+    const lastQuery = yield select((state: any) => state.players.lastQuery || {});
+    yield put(fetchPlayersRequest({
+      page: lastQuery.page || 1,
+      limit: lastQuery.limit || 10,
+      search: lastQuery.search || '',
+      assignedAgent: lastQuery.assignedAgent,
+      role: lastQuery.role,
+    }));
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'Failed to unsuspend player');
+    yield put(unsuspendPlayerFailure());
+  }
+}
+
+function* DeletePlayerSaga(action: any): Generator {
+  try {
+    const response: any = yield call(deletePlayerById, action.payload);
+    toast.success(response?.data?.message || 'Player deleted successfully');
+    yield put(deletePlayerSuccess());
+
+    const lastQuery = yield select((state: any) => state.players.lastQuery || {});
+    yield put(fetchPlayersRequest({
+      page: lastQuery.page || 1,
+      limit: lastQuery.limit || 10,
+      search: lastQuery.search || '',
+      assignedAgent: lastQuery.assignedAgent,
+      role: lastQuery.role,
+    }));
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'Failed to delete player');
+    yield put(deletePlayerFailure());
+  }
+}
+
+export {
+  PlayerMgmtSaga,
+  AgentsListSaga,
+  DepositSaga,
+  TransactionSaga,
+  PlayerDetailsSaga,
+  SuspendPlayerSaga,
+  UnsuspendPlayerSaga,
+  DeletePlayerSaga,
+};

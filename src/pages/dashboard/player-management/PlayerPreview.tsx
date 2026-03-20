@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
-import { fetchTransactionsRequest } from "../redux/playerSlice";
+import { fetchPlayerByIdRequest, fetchTransactionsRequest } from "../redux/playerSlice";
 import { playerSelector } from "../redux/selector";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,20 +12,19 @@ interface Props {
 
 const PlayerPreview: React.FC<Props> = ({ playerId }) => {
   const dispatch = useAppDispatch();
-  const { transactions, loadingTransactions } = useAppSelector(playerSelector);
+  const { transactions, loadingTransactions, selectedPlayer, loadingPlayerDetails } = useAppSelector(playerSelector);
   const { user } = useAuth();
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  const role = user?.role || "agent";
-
   const load = () => {
     dispatch(
-      fetchTransactionsRequest({ playerId, role, startDate, endDate }),
+      fetchTransactionsRequest({ playerId, role: user?.role || "agent", startDate, endDate }),
     );
   };
 
   useEffect(() => {
+    dispatch(fetchPlayerByIdRequest(playerId));
     // initial load without dates
     load();
   }, [playerId]);
@@ -34,11 +33,30 @@ const PlayerPreview: React.FC<Props> = ({ playerId }) => {
   return (
     <div className="p-4 bg-[#252937] text-white rounded-md max-w-xl">
       <div className="flex justify-between mb-4">
-        <h3 className="text-lg font-bold">Player Transactions</h3>
+        <h3 className="text-lg font-bold">Player Details & Transactions</h3>
         <Button size="sm"  onClick={closeDialog}>
           Close
         </Button>
       </div>
+
+      <div className="mb-4 rounded-md border border-gray-700 p-3">
+        <h4 className="font-semibold mb-2">Player Details</h4>
+        {loadingPlayerDetails ? (
+          <div className="text-sm text-gray-300">Loading player details...</div>
+        ) : selectedPlayer ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p><span className="text-gray-400">Name:</span> {selectedPlayer.username || "-"}</p>
+            <p><span className="text-gray-400">Email:</span> {selectedPlayer.email || "-"}</p>
+            <p><span className="text-gray-400">Status:</span> {selectedPlayer.isSuspended ? "Suspended" : "Active"}</p>
+            <p><span className="text-gray-400">Verified:</span> {selectedPlayer.isVerified ? "Yes" : "No"}</p>
+            <p><span className="text-gray-400">Wallet:</span> {selectedPlayer.walletBalance ?? 0}</p>
+            <p><span className="text-gray-400">Created:</span> {selectedPlayer.createdAt ? new Date(selectedPlayer.createdAt).toLocaleString() : "-"}</p>
+          </div>
+        ) : (
+          <div className="text-sm text-gray-300">No player details found.</div>
+        )}
+      </div>
+
       <div className="flex gap-2 mb-4">
         <input
           type="date"

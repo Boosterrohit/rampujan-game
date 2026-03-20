@@ -30,6 +30,8 @@ interface FetchPlayersParams {
 interface PlayerState {
   loading: boolean;
   players: Player[];
+  selectedPlayer: Player | null;
+  loadingPlayerDetails: boolean;
   pagination: Pagination;
   agents: Agent[];
   loadingAgents: boolean;
@@ -44,6 +46,8 @@ interface PlayerState {
 const initialState: PlayerState = {
   loading: false,
   players: [],
+  selectedPlayer: null,
+  loadingPlayerDetails: false,
   pagination: {
     currentPage: 1,
     totalPages: 0,
@@ -79,6 +83,17 @@ const playerSlice = createSlice({
     },
     fetchPlayersFailure: (state) => {
       state.loading = false;
+    },
+    fetchPlayerByIdRequest: (state, action: PayloadAction<string>) => {
+      state.loadingPlayerDetails = true;
+      state.selectedPlayer = null;
+    },
+    fetchPlayerByIdSuccess: (state, action: PayloadAction<Player>) => {
+      state.loadingPlayerDetails = false;
+      state.selectedPlayer = action.payload;
+    },
+    fetchPlayerByIdFailure: (state) => {
+      state.loadingPlayerDetails = false;
     },
     fetchAgentsRequest: (state) => {
       state.loadingAgents = true;
@@ -130,6 +145,33 @@ const playerSlice = createSlice({
     fetchTransactionsFailure: (state) => {
       state.loadingTransactions = false;
     },
+    suspendPlayerRequest: (state, action: PayloadAction<string>) => {
+      state.loading = true;
+    },
+    suspendPlayerSuccess: (state) => {
+      state.loading = false;
+    },
+    suspendPlayerFailure: (state) => {
+      state.loading = false;
+    },
+    unsuspendPlayerRequest: (state, action: PayloadAction<string>) => {
+      state.loading = true;
+    },
+    unsuspendPlayerSuccess: (state) => {
+      state.loading = false;
+    },
+    unsuspendPlayerFailure: (state) => {
+      state.loading = false;
+    },
+    deletePlayerRequest: (state, action: PayloadAction<string>) => {
+      state.loading = true;
+    },
+    deletePlayerSuccess: (state) => {
+      state.loading = false;
+    },
+    deletePlayerFailure: (state) => {
+      state.loading = false;
+    },
   },
 });
 
@@ -137,6 +179,9 @@ export const {
   fetchPlayersRequest,
   fetchPlayersSuccess,
   fetchPlayersFailure,
+  fetchPlayerByIdRequest,
+  fetchPlayerByIdSuccess,
+  fetchPlayerByIdFailure,
   fetchAgentsRequest,
   fetchAgentsSuccess,
   fetchAgentsFailure,
@@ -147,6 +192,15 @@ export const {
   fetchTransactionsRequest,
   fetchTransactionsSuccess,
   fetchTransactionsFailure,
+  suspendPlayerRequest,
+  suspendPlayerSuccess,
+  suspendPlayerFailure,
+  unsuspendPlayerRequest,
+  unsuspendPlayerSuccess,
+  unsuspendPlayerFailure,
+  deletePlayerRequest,
+  deletePlayerSuccess,
+  deletePlayerFailure,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

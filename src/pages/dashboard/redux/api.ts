@@ -1,6 +1,23 @@
 import { axiosInstance } from "@/utils/axiosInstance";
 import { AgentCreationData } from "./types";
 
+const tryRequest = async <T>(requests: Array<() => Promise<T>>) => {
+  let lastError: any;
+
+  for (const req of requests) {
+    try {
+      return await req();
+    } catch (error: any) {
+      lastError = error;
+      if (error?.response?.status !== 404) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+};
+
 // --- existing admin endpoint supplying agent list with their players ---
 const agentPlayersUrl = `/admin/agents/players`;
 
@@ -44,22 +61,21 @@ export const getAgentPlayers = (params: { page?: number; limit?: number } = {}) 
 export const calculateCredit = (deposit: number) =>
   axiosInstance.get(`/agent/calculate-credit?deposit=${deposit}`);
 
+export const getPlayerById = (playerId: string) =>
+  axiosInstance.get(`/admin/users/${playerId}`);
+
 // transactions for preview
 export const getPlayerTransactions = (
   playerId: string,
-  role: string,
+  _role?: string,
   options: { startDate?: string; endDate?: string } = {},
 ) => {
   const { startDate, endDate } = options;
-  let qs = ``;
-  if (startDate) qs += `startDate=${encodeURIComponent(startDate)}`;
+  let qs = `userId=${encodeURIComponent(playerId)}`;
+  if (startDate) qs += `&startDate=${encodeURIComponent(startDate)}`;
   if (endDate) qs += `${qs ? "&" : ""}endDate=${encodeURIComponent(endDate)}`;
 
-  if (role === "agent") {
-    return axiosInstance.get(`/agent/players/${playerId}/transactions${qs ? `?${qs}` : ""}`);
-  }
-  // admin
-  return axiosInstance.get(`/admin/transactions?userId=${playerId}${qs ? `&${qs}` : ""}`);
+  return axiosInstance.get(`/admin/transactions?${qs}`);
 };
 
 // deposit/gamer create
@@ -85,3 +101,12 @@ export const deleteAgent = (agentId: string) =>
 
 export const updateAgent = (agentId: string, data: AgentCreationData) =>
   axiosInstance.put(`/admin/agents/${agentId}`, data);
+
+export const suspendPlayer = (playerId: string) =>
+  axiosInstance.patch(`/admin/users/${playerId}/suspend`);
+
+export const unsuspendPlayer = (playerId: string) =>
+  axiosInstance.patch(`/admin/users/${playerId}/unsuspend`);
+
+export const deletePlayerById = (playerId: string) =>
+  axiosInstance.delete(`/admin/users/${playerId}`);

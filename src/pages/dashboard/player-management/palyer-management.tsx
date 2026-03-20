@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Eye } from "lucide-react";
+import { Plus, Eye, UserX, UserCheck, Trash2, AlertTriangle } from "lucide-react";
 import { useDialog } from "@/components/dashboard/element/DialogContext";
 import PlayerForm from "./playerForm";
 import PlayerPreview from "./PlayerPreview";
@@ -19,8 +19,61 @@ import useDebounce from "@/hooks/useDebounce";
 import AppPagination from "@/components/dashboard/element/AppPagination";
 import { useAppDispatch, useAppSelector } from "@/hooks/appHooks";
 import { playerSelector } from "../redux/selector";
-import { fetchPlayersRequest, fetchAgentsRequest } from "../redux/playerSlice";
+import {
+  fetchPlayersRequest,
+  fetchAgentsRequest,
+  suspendPlayerRequest,
+  unsuspendPlayerRequest,
+  deletePlayerRequest,
+} from "../redux/playerSlice";
 import { useAuth } from "@/contexts/AuthContext";
+
+function DeletePlayerConfirmDialog({
+  playerId,
+  playerName,
+}: {
+  playerId: string;
+  playerName: string;
+}) {
+  const { closeDialog } = useDialog();
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector(playerSelector);
+
+  const handleConfirm = () => {
+    dispatch(deletePlayerRequest(playerId));
+    closeDialog();
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-2">
+      <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-100">
+        <AlertTriangle className="w-7 h-7 text-red-600" />
+      </div>
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-white mb-1">Delete Player</h3>
+        <p className="text-gray-400 text-sm">
+          Are you sure you want to delete{" "}
+          <span className="text-white font-medium">{playerName}</span>? This action cannot be undone.
+        </p>
+      </div>
+      <div className="flex gap-3 w-full mt-2">
+        <Button
+          className="flex-1 rounded-md bg-gray-600 hover:bg-gray-500 text-white"
+          onClick={closeDialog}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="flex-1 rounded-md !bg-red-600 hover:!bg-red-700 text-white"
+          disabled={loading}
+          onClick={handleConfirm}
+        >
+          {loading ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function PlayerManagement() {
   const dispatch = useAppDispatch();
@@ -76,6 +129,27 @@ export function PlayerManagement() {
       <ErrorBoundary>
         <PlayerPreview playerId={playerId} />
       </ErrorBoundary>
+    );
+  };
+
+  const handleSuspendToggle = (playerId: string, isSuspended: boolean) => {
+    if (user?.role !== "admin") return;
+
+    if (isSuspended) {
+      dispatch(unsuspendPlayerRequest(playerId));
+    } else {
+      dispatch(suspendPlayerRequest(playerId));
+    }
+  };
+
+  const handleDeletePlayer = (playerId: string, playerName: string) => {
+    if (user?.role !== "admin") return;
+
+    openDialog(
+      <DeletePlayerConfirmDialog
+        playerId={playerId}
+        playerName={playerName}
+      />,
     );
   };
 
@@ -147,6 +221,9 @@ export function PlayerManagement() {
                       <th className="text-left py-3 px-4 font-semibold text-white">
                         Assigned Agent
                       </th>
+                      <th className="text-left py-3 px-4 font-semibold text-white">
+                        Status
+                      </th>
                       <th className="text-center py-3 px-4 font-semibold text-white">
                         Actions
                       </th>
@@ -156,7 +233,7 @@ export function PlayerManagement() {
                     {safePlayers.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={4}
+                          colSpan={5}
                           className="text-center py-10 text-gray-400"
                         >
                           No players found.
@@ -179,13 +256,43 @@ export function PlayerManagement() {
                                 : p.assignedAgent
                               : '-'}
                           </td>
+                          <td className="py-3 px-4 text-gray-300">
+                            {p.isSuspended ? "Suspended" : "Active"}
+                          </td>
                           <td className="py-3 px-4 flex items-center justify-center gap-2">
                             <Button
                               className="text-blue-700 bg-blue-200 rounded-full w-9 h-9 hover:bg-blue-300 p-0"
                               onClick={() => openPreview(p._id)}
+                              title="View"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
+                            {user?.role === "admin" && (
+                              <>
+                                <Button
+                                  className={`rounded-full w-9 h-9 p-0 ${
+                                    p.isSuspended
+                                      ? "text-emerald-700 bg-emerald-200 hover:bg-emerald-300"
+                                      : "text-amber-700 bg-amber-200 hover:bg-amber-300"
+                                  }`}
+                                  onClick={() => handleSuspendToggle(p._id, !!p.isSuspended)}
+                                  title={p.isSuspended ? "Unsuspend" : "Suspend"}
+                                >
+                                  {p.isSuspended ? (
+                                    <UserCheck className="w-4 h-4" />
+                                  ) : (
+                                    <UserX className="w-4 h-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  className="text-red-700 bg-red-200 rounded-full w-9 h-9 hover:bg-red-300 p-0"
+                                  onClick={() => handleDeletePlayer(p._id, p.username)}
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </td>
                         </tr>
                       ))
