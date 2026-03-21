@@ -62,6 +62,16 @@ const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.
 const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1"
 const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`
 
+const resolveImageUrl = (imageUrl: string | undefined): string | undefined => {
+  if (!imageUrl) return undefined
+  try {
+    const path = imageUrl.startsWith('http') ? new URL(imageUrl).pathname : imageUrl
+    return `${API_BASE_URL}${path}`
+  } catch {
+    return `${API_BASE_URL}${imageUrl}`
+  }
+}
+
 export default function PrizeChat() {
   interface Agent {
     _id: string
@@ -293,12 +303,11 @@ export default function PrizeChat() {
         setChatId(data.data.chat?._id || null)
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse()
-        const base = API_BASE_URL;
         const mapped: ChatMessage[] = source.map((m: any, idx: number) => ({
           id: idx,
           sender: m.senderRole === 'player' ? 'user' : 'system',
           message: m.content,
-          imageUrl: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
+          imageUrl: resolveImageUrl(m.imageUrl),
           timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
         }))
         setMessages(mapped)
@@ -333,14 +342,13 @@ export default function PrizeChat() {
         if (res.ok && data?.data?.message) {
           const m = data.data.message
           setChatId(data.data.chatId || chatId || null)
-          const base = API_BASE_URL;
           setMessages((prev) => [
             ...prev,
             {
               id: prev.length + 1,
               sender: 'user',
               message: m.content,
-              imageUrl: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
+              imageUrl: resolveImageUrl(m.imageUrl),
               timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
             },
           ])

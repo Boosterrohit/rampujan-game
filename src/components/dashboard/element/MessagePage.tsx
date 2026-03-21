@@ -23,6 +23,16 @@ const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.
 const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1";
 const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`;
 
+const resolveImageUrl = (imageUrl: string | undefined): string | undefined => {
+  if (!imageUrl) return undefined;
+  try {
+    const path = imageUrl.startsWith('http') ? new URL(imageUrl).pathname : imageUrl;
+    return `${API_BASE_URL}${path}`;
+  } catch {
+    return `${API_BASE_URL}${imageUrl}`;
+  }
+};
+
 // image modal shared by many chat screens
 function ImageModal({ src, onClose }: { src: string; onClose: () => void }) {
   const [scale, setScale] = useState(1);
@@ -211,10 +221,9 @@ export default function MessagePage() {
       if (res.ok && data?.data?.messages) {
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
-        const base = API_BASE_URL;
         const formatted = source.map((msg: any) => ({
           text: msg.content,
-          image: msg.imageUrl ? `${base}${msg.imageUrl}` : undefined,
+          image: resolveImageUrl(msg.imageUrl),
           sender: msg.senderRole === "agent" ? "me" : "other",
           timestamp: msg.createdAt
             ? new Date(msg.createdAt).toLocaleTimeString([], {
@@ -256,10 +265,9 @@ export default function MessagePage() {
 
         if (res.ok && data?.data?.message) {
           const m = data.data.message;
-          const base = API_BASE_URL;
           const next: Message = {
             text: m.content,
-            image: m.imageUrl ? `${base}${m.imageUrl}` : undefined,
+            image: resolveImageUrl(m.imageUrl),
             sender: "me",
             timestamp: m.createdAt
               ? new Date(m.createdAt).toLocaleTimeString([], {

@@ -22,6 +22,16 @@ const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.rowgaming669.
 const API_VERSION = import.meta.env.VITE_API_VERSION || "/api/v1";
 const CHAT_API_BASE = `${API_BASE_URL}${API_VERSION}/chat`;
 
+const resolveImageUrl = (imageUrl: string | undefined): string | undefined => {
+  if (!imageUrl) return undefined;
+  try {
+    const path = imageUrl.startsWith('http') ? new URL(imageUrl).pathname : imageUrl;
+    return `${API_BASE_URL}${path}`;
+  } catch {
+    return `${API_BASE_URL}${imageUrl}`;
+  }
+};
+
 interface Message {
   _id?: string;
   senderId: string;
@@ -336,8 +346,7 @@ export default function SocialSidebar() {
         // Backend returns newest-first; reverse so we show oldest at top, newest at bottom
         const source = data.data.messages.slice().reverse();
         const formattedMessages = source.map((msg: Message, idx: number) => {
-          const base = API_BASE_URL;
-          const fullImage = msg.imageUrl ? `${base}${msg.imageUrl}` : undefined;
+          const fullImage = resolveImageUrl(msg.imageUrl);
           return {
             _id: msg._id,
             id: idx,
@@ -398,7 +407,6 @@ export default function SocialSidebar() {
         const data = await res.json();
         if (res.ok && data?.data?.message) {
           const newMsg = data.data.message;
-          const base = API_BASE_URL;
           const formattedMsg: LocalMessage = {
             _id: newMsg._id,
             senderId: newMsg.senderId,
@@ -414,7 +422,7 @@ export default function SocialSidebar() {
               hour: "2-digit",
               minute: "2-digit",
             }),
-            image: newMsg.imageUrl ? `${base}${newMsg.imageUrl}` : undefined,
+            image: resolveImageUrl(newMsg.imageUrl),
           };
           setMessages((prev) => [...prev, formattedMsg]);
           setNewMessage("");
